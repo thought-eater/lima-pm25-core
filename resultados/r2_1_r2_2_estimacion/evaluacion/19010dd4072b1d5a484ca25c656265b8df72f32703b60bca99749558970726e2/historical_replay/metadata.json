@@ -1,0 +1,59 @@
+{
+  "fixed_observed_counts": {
+    "CAMPO_DE_MARTE": 3,
+    "CERES": 0,
+    "SANTA_ANITA": 3,
+    "SAN_JUAN_DE_LURIGANCHO": 3
+  },
+  "hidden_field_available_to_gp": false,
+  "historical_weather_resource": "var_meteorologicas_lima_2025_2026_imputed.csv",
+  "limitations": [
+    "The complete replay field is model-generated, not observed Lima truth.",
+    "Routine source rates and unresolved physics remain provisional.",
+    "Ceres has no historical PM2.5 readings in the supplied product."
+  ],
+  "map_validation": {
+    "active_cells": 4459,
+    "cell_time_count": 17836,
+    "finite_concentration_fraction": 1.0,
+    "map_count": 4,
+    "valid_uncertainty_fraction": 1.0
+  },
+  "mobile_measurement_kind": "model_sampled",
+  "profile_status": "provisional_pending_adviser",
+  "purpose": "provisional_historical_deployment_proxy",
+  "used_measurements": {
+    "previous_context": {
+      "fixed": 0,
+      "mobile": 0
+    },
+    "window_inclusive_end": {
+      "fixed": 9,
+      "mobile": 35
+    }
+  },
+  "used_measurements_by_frame": [
+    {
+      "fixed": 3,
+      "mobile": 0,
+      "timestamp_utc": "2026-01-19T09:00:00+00:00"
+    },
+    {
+      "fixed": 6,
+      "mobile": 12,
+      "timestamp_utc": "2026-01-19T10:00:00+00:00"
+    },
+    {
+      "fixed": 9,
+      "mobile": 23,
+      "timestamp_utc": "2026-01-19T11:00:00+00:00"
+    },
+    {
+      "fixed": 9,
+      "mobile": 35,
+      "timestamp_utc": "2026-01-19T12:00:00+00:00"
+    }
+  ],
+  "window_end_utc": "2026-01-19T12:00:00+00:00",
+  "window_start_utc": "2026-01-19T09:00:00+00:00"
+}

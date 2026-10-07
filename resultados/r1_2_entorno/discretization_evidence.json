@@ -1,0 +1,741 @@
+{
+  "horizontal": {
+    "adjacent_comparisons": {
+      "100_vs_50": {
+        "checks": {
+          "control_event_ordering": true,
+          "domain_mean": true,
+          "event_excess_mass": true,
+          "mass_balance": true,
+          "plume_centroid": true,
+          "probe_concentrations": true
+        },
+        "event_significance_floor_ug": 11089532.915496482,
+        "excluded_negligible_event_times_s": [
+          "3600.0",
+          "10800.0"
+        ],
+        "maximum_centroid_distance_m": 12.770411972007244,
+        "maximum_event_excess_mass_relative_difference": 5.217288835213092e-05,
+        "maximum_mean_relative_difference": 0.000669444047205015,
+        "maximum_probe_relative_difference": 0.003669768816091426,
+        "maximum_relative_mass_residual": 2.0910775704274637e-15,
+        "passes": true
+      },
+      "200_vs_100": {
+        "checks": {
+          "control_event_ordering": true,
+          "domain_mean": true,
+          "event_excess_mass": true,
+          "mass_balance": true,
+          "plume_centroid": true,
+          "probe_concentrations": true
+        },
+        "event_significance_floor_ug": 11088954.342533803,
+        "excluded_negligible_event_times_s": [
+          "3600.0",
+          "10800.0"
+        ],
+        "maximum_centroid_distance_m": 35.13649825566977,
+        "maximum_event_excess_mass_relative_difference": 0.00010713800755593304,
+        "maximum_mean_relative_difference": 0.0004967719399122062,
+        "maximum_probe_relative_difference": 0.025319883970354735,
+        "maximum_relative_mass_residual": 1.252797841786938e-15,
+        "passes": true
+      }
+    },
+    "convergence": {
+      "control:10800.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:10800.0:station:CAMPO_DE_MARTE": {
+        "reason": "differences_do_not_shrink",
+        "status": "not_applicable"
+      },
+      "control:10800.0:station:CERES": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:10800.0:station:SANTA_ANITA": {
+        "apparent_order": 1.1414217174026196,
+        "gci_fine_pct": 0.3803710966489451,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.952682165644545,
+        "status": "applicable"
+      },
+      "control:10800.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "apparent_order": 1.69741492116098,
+        "gci_fine_pct": 0.00038239711904799865,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.1380550734558845,
+        "status": "applicable"
+      },
+      "control:10800.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:3600.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:3600.0:station:CAMPO_DE_MARTE": {
+        "apparent_order": 1.0002385224740933,
+        "gci_fine_pct": 0.020801729063753324,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.97825185984237,
+        "status": "applicable"
+      },
+      "control:3600.0:station:CERES": {
+        "apparent_order": 0.9946124074308724,
+        "gci_fine_pct": 0.023627338619517588,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.858863098382278,
+        "status": "applicable"
+      },
+      "control:3600.0:station:SANTA_ANITA": {
+        "apparent_order": 3.9833506522483924,
+        "gci_fine_pct": 8.40149146944612e-09,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.857288258841102,
+        "status": "applicable"
+      },
+      "control:3600.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "reason": "differences_do_not_shrink",
+        "status": "not_applicable"
+      },
+      "control:3600.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:7200.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:7200.0:station:CAMPO_DE_MARTE": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:7200.0:station:CERES": {
+        "apparent_order": 6.418371956132015,
+        "gci_fine_pct": 0.00043762867353958063,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 9.129667512747504,
+        "status": "applicable"
+      },
+      "control:7200.0:station:SANTA_ANITA": {
+        "apparent_order": 4.1369928477667735,
+        "gci_fine_pct": 0.0009276242273900542,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.832283280317319,
+        "status": "applicable"
+      },
+      "control:7200.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "control:7200.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:10800.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:10800.0:station:CAMPO_DE_MARTE": {
+        "reason": "differences_do_not_shrink",
+        "status": "not_applicable"
+      },
+      "event:10800.0:station:CERES": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:10800.0:station:SANTA_ANITA": {
+        "apparent_order": 1.1414217174026196,
+        "gci_fine_pct": 0.3803710966489451,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.952682165644545,
+        "status": "applicable"
+      },
+      "event:10800.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "apparent_order": 1.69741492116098,
+        "gci_fine_pct": 0.00038239711904799865,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.1380550734558845,
+        "status": "applicable"
+      },
+      "event:10800.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:3600.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:3600.0:station:CAMPO_DE_MARTE": {
+        "apparent_order": 1.0002385224740933,
+        "gci_fine_pct": 0.020801729063753324,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.97825185984237,
+        "status": "applicable"
+      },
+      "event:3600.0:station:CERES": {
+        "apparent_order": 0.9946124074308724,
+        "gci_fine_pct": 0.023627338619517588,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.858863098382278,
+        "status": "applicable"
+      },
+      "event:3600.0:station:SANTA_ANITA": {
+        "apparent_order": 3.9833506522483924,
+        "gci_fine_pct": 8.40149146944612e-09,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.857288258841102,
+        "status": "applicable"
+      },
+      "event:3600.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "reason": "differences_do_not_shrink",
+        "status": "not_applicable"
+      },
+      "event:3600.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:7200.0:domain_mean_ug_m3": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:7200.0:station:CAMPO_DE_MARTE": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:7200.0:station:CERES": {
+        "apparent_order": 6.418371956132015,
+        "gci_fine_pct": 0.00043762867353958063,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 9.129667512747504,
+        "status": "applicable"
+      },
+      "event:7200.0:station:SANTA_ANITA": {
+        "apparent_order": 4.1369928477667735,
+        "gci_fine_pct": 0.0009276242273900542,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 7.832283280317319,
+        "status": "applicable"
+      },
+      "event:7200.0:station:SAN_JUAN_DE_LURIGANCHO": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event:7200.0:total_mass_ug": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event_effect:10800.0:excess_mass": {
+        "apparent_order": 2.0983882027278464,
+        "gci_fine_pct": 162.88879782959435,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": -4405.697924974587,
+        "status": "applicable"
+      },
+      "event_effect:3600.0:excess_mass": {
+        "reason": "oscillatory",
+        "status": "not_applicable"
+      },
+      "event_effect:7200.0:excess_mass": {
+        "apparent_order": 1.0380228901344346,
+        "gci_fine_pct": 0.0061909424615372195,
+        "refinement_ratio": 2.0,
+        "richardson_extrapolated_value": 1109008215.2778122,
+        "status": "applicable"
+      }
+    },
+    "results_by_cell_size_m": {
+      "100.0": {
+        "active_cells": 17835,
+        "metrics": {
+          "event_effect": {
+            "10800.0": {
+              "centroid_x_m": 276855.5092285044,
+              "centroid_y_m": 8670893.79344616,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 76704.02175349444
+            },
+            "3600.0": {
+              "centroid_x_m": null,
+              "centroid_y_m": null,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 0.0
+            },
+            "7200.0": {
+              "centroid_x_m": 277599.51264267723,
+              "centroid_y_m": 8669949.243649885,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 1108895434.2533803
+            }
+          },
+          "mass_balance": {
+            "control": 1.252797841786938e-15,
+            "event": 1.250693829047741e-15
+          },
+          "members": {
+            "control": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.602682732898202,
+                "domain_mean_ug_m3": 7.502483753144061,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.368205382695918,
+                  "CERES": 7.688616104177425,
+                  "SANTA_ANITA": 7.8994598509771725,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.138125893897087
+                },
+                "total_mass_ug": 267613595474.64862
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.593288154552127,
+                "domain_mean_ug_m3": 7.928034163053593,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.975596479743007,
+                  "CERES": 7.8618235282841455,
+                  "SANTA_ANITA": 7.857288267193806,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.861090561029758
+                },
+                "total_mass_ug": 282792978596.12164
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 9.79647110451049,
+                "domain_mean_ug_m3": 7.944851201890409,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.966051740192037,
+                  "CERES": 9.126933681648778,
+                  "SANTA_ANITA": 7.831260679412229,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.823559096716887
+                },
+                "total_mass_ug": 283392842371.43085
+              }
+            },
+            "event": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.602682732898202,
+                "domain_mean_ug_m3": 7.502485903523139,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.368205382695918,
+                  "CERES": 7.688616104177425,
+                  "SANTA_ANITA": 7.8994598509771725,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.138125893897087
+                },
+                "total_mass_ug": 267613672178.67035
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.593288154552127,
+                "domain_mean_ug_m3": 7.928034163053593,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.975596479743007,
+                  "CERES": 7.8618235282841455,
+                  "SANTA_ANITA": 7.857288267193806,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.861090561029758
+                },
+                "total_mass_ug": 282792978596.12164
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 11.174163480869442,
+                "domain_mean_ug_m3": 7.975938822699305,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.966051740192037,
+                  "CERES": 9.126933681648778,
+                  "SANTA_ANITA": 7.831260679412229,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.823559096716887
+                },
+                "total_mass_ug": 284501737805.6842
+              }
+            }
+          }
+        },
+        "runtime_s": 0.4882544160063844,
+        "shape": [
+          118,
+          155
+        ],
+        "stored_field_bytes": 1170560
+      },
+      "200.0": {
+        "active_cells": 4459,
+        "metrics": {
+          "event_effect": {
+            "10800.0": {
+              "centroid_x_m": 276905.11226089776,
+              "centroid_y_m": 8670561.951539379,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 342931.01664740534
+            },
+            "3600.0": {
+              "centroid_x_m": null,
+              "centroid_y_m": null,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 0.0
+            },
+            "7200.0": {
+              "centroid_x_m": 277574.960095768,
+              "centroid_y_m": 8669974.378206773,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 1108776629.4059665
+            }
+          },
+          "mass_balance": {
+            "control": 6.273338938348393e-16,
+            "event": 7.657825263047046e-16
+          },
+          "members": {
+            "control": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.484486045085992,
+                "domain_mean_ug_m3": 7.4987567297358515,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.368130793667855,
+                  "CERES": 7.679507432122067,
+                  "SANTA_ANITA": 7.8352746406630756,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.138284757821592
+                },
+                "total_mass_ug": 267495650063.1373
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.131609663394395,
+                "domain_mean_ug_m3": 7.926970480023891,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.9729402215368035,
+                  "CERES": 7.864761888593072,
+                  "SANTA_ANITA": 7.857288390950929,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.861308561636681
+                },
+                "total_mass_ug": 282770890963.41223
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 9.685658642765597,
+                "domain_mean_ug_m3": 7.94223034214993,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.96605518109646,
+                  "CERES": 8.895840779824308,
+                  "SANTA_ANITA": 7.814291873998191,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.81927557928975
+                },
+                "total_mass_ug": 283315240765.1723
+              }
+            },
+            "event": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.484486045085992,
+                "domain_mean_ug_m3": 7.498766343186642,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.36813079366808,
+                  "CERES": 7.679507432122067,
+                  "SANTA_ANITA": 7.8352746406630756,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.138284757821592
+                },
+                "total_mass_ug": 267495992994.15387
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.131609663394395,
+                "domain_mean_ug_m3": 7.926970480023891,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.9729402215368035,
+                  "CERES": 7.864761888593072,
+                  "SANTA_ANITA": 7.857288390950929,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.861308561636681
+                },
+                "total_mass_ug": 282770890963.41223
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 11.11383646007961,
+                "domain_mean_ug_m3": 7.97331288950937,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.96605518109646,
+                  "CERES": 8.895840779824308,
+                  "SANTA_ANITA": 7.814291873998191,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.81927557928975
+                },
+                "total_mass_ug": 284424017394.57825
+              }
+            }
+          }
+        },
+        "runtime_s": 0.13106743298703805,
+        "shape": [
+          59,
+          78
+        ],
+        "stored_field_bytes": 294528
+      },
+      "50.0": {
+        "active_cells": 71345,
+        "metrics": {
+          "event_effect": {
+            "10800.0": {
+              "centroid_x_m": 276858.57148205687,
+              "centroid_y_m": 8671112.900631174,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 14534.96210406735
+            },
+            "3600.0": {
+              "centroid_x_m": 277617.2933869753,
+              "centroid_y_m": 8667776.003470592,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 1.6857626405908377e-06
+            },
+            "7200.0": {
+              "centroid_x_m": 277601.71792424546,
+              "centroid_y_m": 8669936.665090542,
+              "event_not_below_control": true,
+              "integrated_excess_mass_ug": 1108953291.549648
+            }
+          },
+          "mass_balance": {
+            "control": 2.0910775704274637e-15,
+            "event": 1.8766968478163242e-15
+          },
+          "members": {
+            "control": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.742517955750252,
+                "domain_mean_ug_m3": 7.501844886864854,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.371709378575298,
+                  "CERES": 7.67740180858796,
+                  "SANTA_ANITA": 7.928555817874248,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.1380769100962524
+                },
+                "total_mass_ug": 267609561726.68646
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.623291676790746,
+                "domain_mean_ug_m3": 7.925201089240491,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.9769243892831065,
+                  "CERES": 7.860348851374109,
+                  "SANTA_ANITA": 7.857288259369206,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.86027373283885
+                },
+                "total_mass_ug": 282711735855.9314
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 9.832101413005224,
+                "domain_mean_ug_m3": 7.9395361266928255,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.967709472080246,
+                  "CERES": 9.12963554962514,
+                  "SANTA_ANITA": 7.832225157422836,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.804703937078736
+                },
+                "total_mass_ug": 283223102479.4498
+              }
+            },
+            "event": {
+              "10800.0": {
+                "domain_maximum_ug_m3": 9.742517955750252,
+                "domain_mean_ug_m3": 7.501845294320517,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.371709378575298,
+                  "CERES": 7.67740180858796,
+                  "SANTA_ANITA": 7.928555817874248,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.1380769100962524
+                },
+                "total_mass_ug": 267609576261.64862
+              },
+              "3600.0": {
+                "domain_maximum_ug_m3": 9.623291676790746,
+                "domain_mean_ug_m3": 7.925201089240491,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.9769243892831065,
+                  "CERES": 7.860348851374109,
+                  "SANTA_ANITA": 7.857288259369206,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.86027373283885
+                },
+                "total_mass_ug": 282711735855.9314
+              },
+              "7200.0": {
+                "domain_maximum_ug_m3": 11.403576679268085,
+                "domain_mean_ug_m3": 7.970623190721127,
+                "stations_ug_m3": {
+                  "CAMPO_DE_MARTE": 7.967709472080246,
+                  "CERES": 9.12963554962514,
+                  "SANTA_ANITA": 7.832225157422836,
+                  "SAN_JUAN_DE_LURIGANCHO": 7.804703937078736
+                },
+                "total_mass_ug": 284332055770.9994
+              }
+            }
+          }
+        },
+        "runtime_s": 3.4344567180087324,
+        "shape": [
+          235,
+          310
+        ],
+        "stored_field_bytes": 4662400
+      }
+    },
+    "selected_cell_size_m": 200.0,
+    "selection_rule": "coarsest_passing_adjacent_refinement_chain",
+    "status": "technical_selection_complete"
+  },
+  "protocol": {
+    "claim_limits": [
+      "The 50 m candidate is a numerical reference, not observed ground truth.",
+      "Passing criteria justify only the declared quantities and conclusions.",
+      "Cell-level peaks remain diagnostic when convergence assumptions fail.",
+      "Event-effect percentages and centroids are evaluated only while excess mass is at least 1 percent of its episode peak.",
+      "Temporal information loss includes unresolved evolution between persisted outputs, not only shared instants and peaks.",
+      "Effective mixing height is a constant 200 m provisional approximation for the thesis scope."
+    ],
+    "horizontal": {
+      "candidate_cell_sizes_m": [
+        50.0,
+        100.0,
+        200.0
+      ],
+      "domain_mean_relative_tolerance": 0.05,
+      "event_effect_significance_fraction_of_peak": 0.01,
+      "event_excess_mass_relative_tolerance": 0.05,
+      "mass_residual_relative_tolerance": 1e-10,
+      "plume_centroid_tolerance_m": 100.0,
+      "probe_absolute_floor_ug_m3": 1.0,
+      "probe_relative_tolerance": 0.1,
+      "probe_strategy": "fixed_stations",
+      "require_control_event_ordering": true,
+      "selection_rule": "coarsest_passing_adjacent_refinement_chain",
+      "shared_times_s": [
+        3600.0,
+        7200.0,
+        10800.0
+      ]
+    },
+    "schema_version": 1,
+    "temporal": {
+      "candidate_output_intervals_s": [
+        300.0,
+        900.0,
+        3600.0
+      ],
+      "concentration_scale_floor_ug_m3": 1.0,
+      "event_effect_significance_fraction_of_peak": 0.01,
+      "information_loss_relative_tolerance": 0.05,
+      "selection_rule": "coarsest_passing_shared_field_and_information_loss",
+      "shared_field_l1_relative_tolerance": 0.03,
+      "shared_times_s": [
+        3600.0,
+        7200.0,
+        10800.0
+      ],
+      "trajectory_l1_relative_tolerance": 0.05
+    }
+  },
+  "protocol_fingerprint": "e7ae3d38624222238981af6506a7c7f628e96421f951f186942546af20997ad7",
+  "schema_version": 1,
+  "study_configuration_fingerprint": "0d07da275a7d9643e4fe78eeb2761c838f2c2b329c0816587ecc1c30d64cc897",
+  "technical_selection": {
+    "cell_size_m": 200.0,
+    "concentration_output_interval_s": 300.0,
+    "status": "technical_selection_complete"
+  },
+  "temporal": {
+    "comparisons_to_300_s": {
+      "3600_vs_300": {
+        "checks": {
+          "information_loss": true,
+          "shared_fields": true,
+          "trajectory_loss": false
+        },
+        "information_loss_by_quantity": {
+          "event_domain_peak_ug_m3": 0.0031435129460731124,
+          "event_excess_area_integral_ug_m": 0.0
+        },
+        "maximum_shared_field_l1_relative_difference": 0.0,
+        "passes": false,
+        "trajectory_loss": {
+          "event_effect_significance_floor": 1.3859707867574582,
+          "excluded_negligible_event_times_s": [
+            0.0,
+            300.0,
+            600.0,
+            900.0,
+            1200.0,
+            1500.0,
+            1800.0,
+            2100.0,
+            2400.0,
+            2700.0,
+            3000.0,
+            3300.0,
+            3600.0,
+            9900.0,
+            10200.0,
+            10500.0,
+            10800.0
+          ],
+          "maximum_meaningful_event_effect_l1_relative_difference": 81.97897432436729,
+          "maximum_total_field_l1_relative_difference": 0.0683193164028844,
+          "mean_meaningful_event_effect_l1_relative_difference": 7.860067606925301,
+          "mean_total_field_l1_relative_difference": 0.02173606489327453
+        }
+      },
+      "900_vs_300": {
+        "checks": {
+          "information_loss": true,
+          "shared_fields": true,
+          "trajectory_loss": false
+        },
+        "information_loss_by_quantity": {
+          "event_domain_peak_ug_m3": 0.00025828962447451743,
+          "event_excess_area_integral_ug_m": 0.0
+        },
+        "maximum_shared_field_l1_relative_difference": 0.0,
+        "passes": false,
+        "trajectory_loss": {
+          "event_effect_significance_floor": 1.3859707867574582,
+          "excluded_negligible_event_times_s": [
+            0.0,
+            300.0,
+            600.0,
+            900.0,
+            1200.0,
+            1500.0,
+            1800.0,
+            2100.0,
+            2400.0,
+            2700.0,
+            3000.0,
+            3300.0,
+            3600.0,
+            9900.0,
+            10200.0,
+            10500.0,
+            10800.0
+          ],
+          "maximum_meaningful_event_effect_l1_relative_difference": 4.366279732095812,
+          "maximum_total_field_l1_relative_difference": 0.02245552950888303,
+          "mean_meaningful_event_effect_l1_relative_difference": 0.7255523675342079,
+          "mean_total_field_l1_relative_difference": 0.0043252425815191505
+        }
+      }
+    },
+    "results_by_output_interval_s": {
+      "300.0": {
+        "frame_count": 74,
+        "runtime_s": 0.135323258000426,
+        "stored_field_bytes": 2724384
+      },
+      "3600.0": {
+        "frame_count": 8,
+        "runtime_s": 0.12598645201069303,
+        "stored_field_bytes": 294528
+      },
+      "900.0": {
+        "frame_count": 26,
+        "runtime_s": 0.12931650099926628,
+        "stored_field_bytes": 957216
+      }
+    },
+    "selected_output_interval_s": 300.0,
+    "selection_rule": "coarsest_passing_shared_field_and_information_loss",
+    "status": "technical_selection_complete"
+  }
+}

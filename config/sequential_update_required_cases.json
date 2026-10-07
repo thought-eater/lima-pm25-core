@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "result": "R2.3",
+  "description": "Required functional and R1.3 integration cases for sequential map-update acceptance.",
+  "cases": [
+    {
+      "id": "evaluated-policy",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_change10_profile_supplies_the_evaluated_r23_policy"
+    },
+    {
+      "id": "first-mobile-update",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_first_mobile_batch_updates_prior_and_reduces_uncertainty"
+    },
+    {
+      "id": "successive-coupled-snapshots",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_successive_batches_publish_increasing_coupled_snapshots"
+    },
+    {
+      "id": "fixed-mobile-atomic-batch",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_same_time_fixed_and_mobile_records_publish_one_snapshot"
+    },
+    {
+      "id": "multi-mobile-atomic-batch",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_same_time_multiple_mobile_records_publish_one_snapshot"
+    },
+    {
+      "id": "bounded-history",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_history_window_includes_boundary_and_expires_older_records"
+    },
+    {
+      "id": "policy-noop",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_clipped_only_batch_is_policy_noop"
+    },
+    {
+      "id": "mixed-record-accounting",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_mixed_eligible_and_clipped_batch_accounts_for_every_record"
+    },
+    {
+      "id": "duplicate-rejection",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_duplicate_measurement_key_is_rejected_without_mutation"
+    },
+    {
+      "id": "timestamp-order-rejection",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_older_or_equal_timestamp_is_rejected_without_mutation"
+    },
+    {
+      "id": "invalid-record-rollback",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_invalid_record_rolls_back_all_state"
+    },
+    {
+      "id": "estimator-failure-rollback",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_reconstructor_failure_rolls_back_all_state"
+    },
+    {
+      "id": "agent-map-state-truth-isolation",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_snapshot_is_immutable_agent_consumable_map_state_without_truth"
+    },
+    {
+      "id": "deterministic-replay",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "name": "test_sequential_replay_is_deterministic"
+    },
+    {
+      "id": "r13-r23-evidence-integration",
+      "kind": "integration",
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "name": "test_r13_batches_drive_r23_and_persist_truth_isolated_evidence"
+    },
+    {
+      "id": "evidence-tamper-detection",
+      "kind": "integration",
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "name": "test_sequential_bundle_is_non_overwriting_and_tamper_evident"
+    },
+    {
+      "id": "required-case-positive-gate",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "name": "test_required_case_report_accepts_only_complete_passing_manifest"
+    },
+    {
+      "id": "required-case-negative-gate",
+      "kind": "functional",
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "name": "test_required_case_report_rejects_skipped_and_missing_cases"
+    }
+  ]
+}

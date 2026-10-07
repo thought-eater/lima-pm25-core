@@ -1,0 +1,40 @@
+[project]
+name = "lima-pm25-core"
+version = "0.1.0"
+description = "Core PM2.5 domain, simulation, and map-estimation models for Lima"
+readme = "README.md"
+authors = [
+    { name = "thought-eater", email = "135585422+thought-eater@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "folium>=0.12",
+    "mapclassify>=2.11.0",
+    "matplotlib>=3.11.1",
+    "networkx>=3.6.1",
+    "numpy>=2.4.2",
+    "osmnx>=2.1.1",
+    "pyproj>=3.7.2",
+    "scikit-learn>=1.9,<2",
+    "shapely>=2.1.2",
+]
+
+[project.scripts]
+lima-pm25-core = "lima_pm25.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "lima_pm25"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "types-geopandas>=1.1.4.20260807",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"

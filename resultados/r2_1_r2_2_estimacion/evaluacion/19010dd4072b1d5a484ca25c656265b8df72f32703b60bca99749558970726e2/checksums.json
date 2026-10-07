@@ -1,0 +1,31 @@
+{
+  "files": {
+    "historical_replay/figures/replay-maps.png": "9a9b9c7bcd8acc3bc5d1fd9f9af8da708c92761e9fec1ea8e1f6934312a1c0ce",
+    "historical_replay/metadata.json": "9269b3d4515477a3b866604041c006fc51ce92fc20ae862c28072bd2442ec0ed",
+    "historical_replay/model_run/checksums.json": "3b26acdf35dcf6d0f9bd2fa54b54fe2903a0c760583c8c56591f29c6c8c0ac14",
+    "historical_replay/model_run/concentration.npz": "5288061927bfa8fd5127900e7e84fb32646908eaad978258c5495609c2dfdfbb",
+    "historical_replay/model_run/diagnostics.jsonl": "c7864692aba65b623b139dd73b2ecbcf3c7e923d47cf7d5ba1033c2fcb9acf7e",
+    "historical_replay/model_run/manifest.json": "805ef64a5dfb8b1752a601021c47703e12cc23480c0d5ed81d5623bee4bcb954",
+    "historical_replay/model_run/measurement_attempts.jsonl": "cf5523b1d10edea9f179b591fd27b56595c8ae2cfb4e214864ad95e0cf6fc5b8",
+    "historical_replay/model_run/measurement_batches.jsonl": "09be26bc301947fbdddfb0a683a7e1abcdbf50bce435b88bedc62dc152cf2e38",
+    "historical_replay/posterior_maps.npz": "65322176314b62f4b5478b1ea49765229a5e164648094123667d4f667261a1cd",
+    "identity.json": "df1fb7de935960e6500f0d0414d3d97e8c021eace79aec4d2c20690d873e6dd2",
+    "r2_evaluation/checksums.json": "adbf8bdbf657f3fbb454ecbbd256555b1645dec13bbf298a4968f121400e0525",
+    "r2_evaluation/configuration.json": "2c6f1708ce5617e2350c17ba3bd2c33cf879f3c33e847e0c290cd88bf880173e",
+    "r2_evaluation/execution_log.json": "f10bc2c1e29c9a6a466ea6c90a371af5fc945d69fb77c63ca880313384fda4be",
+    "r2_evaluation/figures/frame-0000.png": "f6d4cad4158d761bb5fcb4bdce5f33982ef0dd91391bb5ba15a53ebe5e514207",
+    "r2_evaluation/figures/frame-0018.png": "a8c4e5cc5c0e24f4239e53d5a064254f052123cbe6032d54cf206f9b64481acc",
+    "r2_evaluation/figures/frame-0036.png": "30bc6c8323b7a54338adc715d563a808bff73e7043f9272f28fadb751291098b",
+    "r2_evaluation/figures/mobile-uncertainty.png": "7d124fe50a9df824588f85b1b0e33b38877da2f5627814d805fb92deed642cfc",
+    "r2_evaluation/figures/temporal-aging.png": "cba01c79b3f6d2c2f6160aaee0a003e18ea37e2d22b6ed78cfac17245014fd3d",
+    "r2_evaluation/maps.npz": "ded8086d397b9daf4155081b76939ec36d576cef23664cb309a12806c91f0fe8",
+    "r2_evaluation/metrics.json": "fed77a325a911546c799001a67e7d114f13268044d1bb783bbfd95cdeaa06a57",
+    "synthetic_retained/checksums.json": "8fb32dbebd874386a039842c2b710347444d50aa98b366587946522945ad7595",
+    "synthetic_retained/concentration.npz": "4630b70a2acfedb997249c9a4da5218af3c00e593dc0f811e2e396417abafed3",
+    "synthetic_retained/diagnostics.jsonl": "88515911667c36b479c0ba2b6d979408993e04f59c890d479933fdc7a6bb2d71",
+    "synthetic_retained/manifest.json": "9f9adfa0b2d829547fce2d9a9abadaffb3aa3058c4135a92e7d97f5d92ed5f96",
+    "synthetic_retained/measurement_attempts.jsonl": "0c3ee3a1b75eb24257f96c8004945dd7cd237ff80f4adbd16f64ce1feb577252",
+    "synthetic_retained/measurement_batches.jsonl": "27a52468815e56db0090385c4f2eb3d696f77b04d5f033cfe41a371aad878c7b",
+    "verification_report.json": "92a1bade0222f8b65942c2e7b31aacf5ec3573fff3cd94b4dbe4ffa003f1b14b"
+  }
+}

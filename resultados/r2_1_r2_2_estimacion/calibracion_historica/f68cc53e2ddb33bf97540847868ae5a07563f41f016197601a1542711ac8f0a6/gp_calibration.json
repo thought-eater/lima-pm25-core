@@ -1,0 +1,1826 @@
+{
+  "candidate_scores": [
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943424695,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182233179,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499958801,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402382295,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874998916815,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201408443146,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331398466,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209401993489,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943766631,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182702513,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499975812,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402420273,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999296735,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00520140894316,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.33645833202735,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209402790318,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943936971,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182933292,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.09531249997889,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402435342,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999461625,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201409170358,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458332370398,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209403208462,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881944078298,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.97631118309139,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.09531249997726,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.68396140244319,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999586004,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201409294084,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458332671624,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209403537035,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942652364279231,
+      "mean_interval_width_ug_m3": 51.885190596356324,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.975957832514577,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095269923490001,
+          "mean_interval_width_ug_m3": 56.26777770683037,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683856125583176,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396616040167816,
+          "mean_interval_width_ug_m3": 44.43921530485801,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004797320430622,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336071129179876,
+          "mean_interval_width_ug_m3": 54.94857877738058,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515704879420497,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.94271039521614,
+      "mean_interval_width_ug_m3": 51.88519059673335,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.97603418888302,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095285237756569,
+          "mean_interval_width_ug_m3": 56.26777770688364,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683882909828128,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396686123727795,
+          "mean_interval_width_ug_m3": 44.439215305363184,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00487957822658,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336159824164062,
+          "mean_interval_width_ug_m3": 54.94857877795323,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515817083904922,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942748164595779,
+      "mean_interval_width_ug_m3": 51.885190598356154,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976086562057041,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095289099864775,
+          "mean_interval_width_ug_m3": 56.267777707064276,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683897218396853,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396726144541873,
+          "mean_interval_width_ug_m3": 44.43921530753806,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004933079884438,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336229249380693,
+          "mean_interval_width_ug_m3": 54.94857878046616,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515900929857324,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942781091785598,
+      "mean_interval_width_ug_m3": 51.88519060006863,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976126503086478,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095287808708305,
+          "mean_interval_width_ug_m3": 56.26777770724103,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683905335080718,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.39675875337108,
+          "mean_interval_width_ug_m3": 44.43921530983328,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00496809941889,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336296713277408,
+          "mean_interval_width_ug_m3": 54.94857878313159,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515974357019495,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.858404184247295,
+      "mean_interval_width_ug_m3": 51.8820800858511,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.84482552209418,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.062125106672495,
+          "mean_interval_width_ug_m3": 56.26663245435797,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.609011038007589,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.300623255693623,
+          "mean_interval_width_ug_m3": 44.43507096482676,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.85542752528369,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.212464190375766,
+          "mean_interval_width_ug_m3": 54.944536838368556,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.355936094000795,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.8728965319363,
+      "mean_interval_width_ug_m3": 51.882070710718395,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.862550531033524,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.07082463556852,
+          "mean_interval_width_ug_m3": 56.266629743691816,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.621538200833442,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.318150992990176,
+          "mean_interval_width_ug_m3": 44.435058399527634,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.87383763960865,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.229713967250206,
+          "mean_interval_width_ug_m3": 54.944523988935764,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.377871700563428,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.885099687233966,
+      "mean_interval_width_ug_m3": 51.88213046324419,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.879464928600953,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.074248801451816,
+          "mean_interval_width_ug_m3": 56.26665769099065,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.630720954965382,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.331725620939688,
+          "mean_interval_width_ug_m3": 44.43513764246308,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.891013445851023,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.249324639310395,
+          "mean_interval_width_ug_m3": 54.94459605627882,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.401495321885964,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.896863545882233,
+      "mean_interval_width_ug_m3": 51.88226959813798,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.895183697882032,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.073644323748285,
+          "mean_interval_width_ug_m3": 56.26671403145043,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.63674763273355,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.34518054422474,
+          "mean_interval_width_ug_m3": 44.43532276718066,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.906002654385816,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.271765769673681,
+          "mean_interval_width_ug_m3": 54.94477199578285,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.426654983319446,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9496527777777778,
+      "mae_ug_m3": 8.826854298576722,
+      "mean_interval_width_ug_m3": 51.13074025156085,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.294731158316036,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.499622743162861,
+          "mean_interval_width_ug_m3": 55.78503131292204,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.434677519227069,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.8958333333333334,
+          "mae_ug_m3": 10.277354801392901,
+          "mean_interval_width_ug_m3": 43.47853701782156,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.128708694493028,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.703585351174402,
+          "mean_interval_width_ug_m3": 54.128652423938945,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.644323772171742,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 8.930576518871426,
+      "mean_interval_width_ug_m3": 51.12844101025045,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.408101048171481,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.602009805400009,
+          "mean_interval_width_ug_m3": 55.78353785173146,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.550091313955123,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.379873988114827,
+          "mean_interval_width_ug_m3": 43.47563130868259,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.231573229049877,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.809845763099437,
+          "mean_interval_width_ug_m3": 54.126153870337355,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.776155897750023,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 9.05863510978691,
+      "mean_interval_width_ug_m3": 51.126468705175526,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.568723564370343,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.677072974340059,
+          "mean_interval_width_ug_m3": 55.78264728384078,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.665281287235457,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.47768798557612,
+          "mean_interval_width_ug_m3": 43.4728927266267,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.376282259322132,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 9.021144369444547,
+          "mean_interval_width_ug_m3": 54.12386610505913,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 12.002946206367275,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 21600.0,
+      "interval_coverage": 0.9496527777777778,
+      "mae_ug_m3": 9.259163763308631,
+      "mean_interval_width_ug_m3": 51.13516659427298,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.826033156356084,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9895833333333334,
+          "mae_ug_m3": 7.7077142215679215,
+          "mean_interval_width_ug_m3": 55.78939327508905,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.807456438724834,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.697963055723704,
+          "mean_interval_width_ug_m3": 43.48340401251921,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.620307660639485,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 9.37181401263427,
+          "mean_interval_width_ug_m3": 54.13270249521069,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 12.383100030821,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943421678,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.97631118222522,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499959073,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402381788,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874998916482,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00520140843451,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331389478,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209401980067,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943725215,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182640412,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499980524,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402418092,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999299639,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201408889928,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331895482,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209402666364,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943860751,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182898051,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499984844,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402435074,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999416909,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201409162254,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458332180502,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209403109556,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943922584,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311183068217,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499983494,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402443346,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999415653,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201409315944,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.33645833236861,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209403437523,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942652326440061,
+      "mean_interval_width_ug_m3": 51.88519059635627,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.975957717221664,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095269937470393,
+          "mean_interval_width_ug_m3": 56.26777770683035,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683856091286913,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396616013651252,
+          "mean_interval_width_ug_m3": 44.439215304857946,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004797183150675,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336071028198536,
+          "mean_interval_width_ug_m3": 54.94857877738048,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515704721592796,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942706825097455,
+      "mean_interval_width_ug_m3": 51.88519059619083,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976027154179782,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095287333060385,
+          "mean_interval_width_ug_m3": 56.267777706814094,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683881576986913,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396685315521575,
+          "mean_interval_width_ug_m3": 44.43921530463621,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004873106883316,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336147826710402,
+          "mean_interval_width_ug_m3": 54.94857877712218,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515804456665839,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.9427366334452,
+      "mean_interval_width_ug_m3": 51.88519059655296,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976081355621465,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095293546512437,
+          "mean_interval_width_ug_m3": 56.26777770686548,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683896729923214,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396717397135575,
+          "mean_interval_width_ug_m3": 44.439215305121415,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004933506324765,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.33619895668759,
+          "mean_interval_width_ug_m3": 54.948578777671976,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515884628342285,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942751137992657,
+      "mean_interval_width_ug_m3": 51.88519059819032,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976123932791927,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095293504722227,
+          "mean_interval_width_ug_m3": 56.26777770704758,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683905272350266,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396723571626117,
+          "mean_interval_width_ug_m3": 44.4392153073158,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00497771845969,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336236337629629,
+          "mean_interval_width_ug_m3": 54.94857878020756,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515954331101211,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.858403825428066,
+      "mean_interval_width_ug_m3": 51.88208008584741,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.844824509889246,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.062125233743233,
+          "mean_interval_width_ug_m3": 56.26663245435464,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.60901040811066,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.300622876615927,
+          "mean_interval_width_ug_m3": 44.43507096482227,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.85542635388396,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.21246336592504,
+          "mean_interval_width_ug_m3": 54.94453683836531,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.355934924904496,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.872580336575957,
+      "mean_interval_width_ug_m3": 51.88206375441401,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.86180480846831,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.071179280440647,
+          "mean_interval_width_ug_m3": 56.26662605640706,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.62114130344419,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.317901026258182,
+          "mean_interval_width_ug_m3": 44.43504922368361,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.87314082807487,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.228660703029043,
+          "mean_interval_width_ug_m3": 54.94451598315137,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.376747499016721,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.883226045006438,
+      "mean_interval_width_ug_m3": 51.88204897756853,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.878618249851918,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.076051358678903,
+          "mean_interval_width_ug_m3": 56.266621602680665,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.630228545808798,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.329684911888222,
+          "mean_interval_width_ug_m3": 44.43502944770092,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.89161320307764,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.24394186445219,
+          "mean_interval_width_ug_m3": 54.94449588232397,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.398499096423185,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.88960623308063,
+      "mean_interval_width_ug_m3": 51.88211169420692,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.895139644736897,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.077159356343243,
+          "mean_interval_width_ug_m3": 56.266650565248476,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.63648495700886,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.335246107325384,
+          "mean_interval_width_ug_m3": 44.435112643654925,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.910442824489447,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.256413235573262,
+          "mean_interval_width_ug_m3": 54.94457187371737,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.421133651045075,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9496527777777778,
+      "mae_ug_m3": 8.826854443664647,
+      "mean_interval_width_ug_m3": 51.13074025155946,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.294731495321917,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.499622824634847,
+          "mean_interval_width_ug_m3": 55.785031312921284,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.434677654764231,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.8958333333333334,
+          "mae_ug_m3": 10.277354900437404,
+          "mean_interval_width_ug_m3": 43.47853701781879,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.128709266267132,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.703585605921694,
+          "mean_interval_width_ug_m3": 54.12865242393831,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.644323986974841,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 8.930383195222127,
+      "mean_interval_width_ug_m3": 51.1284193210258,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.407655782163555,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.6027850107766595,
+          "mean_interval_width_ug_m3": 55.783512407322185,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.549950732084033,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.379816049847024,
+          "mean_interval_width_ug_m3": 43.475613485942525,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.231128933847675,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.808548525042694,
+          "mean_interval_width_ug_m3": 54.12613206981269,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.775437080688175,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 9.049903652185614,
+      "mean_interval_width_ug_m3": 51.124377362501406,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.567333932847975,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.685277278439519,
+          "mean_interval_width_ug_m3": 55.78085441960028,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.66105840120444,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.462899997880555,
+          "mean_interval_width_ug_m3": 43.4704961469921,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.383309717872908,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 9.00153368023677,
+          "mean_interval_width_ug_m3": 54.12178152091182,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.992972076664335,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 43200.0,
+      "interval_coverage": 0.9496527777777778,
+      "mae_ug_m3": 9.200127930543854,
+      "mean_interval_width_ug_m3": 51.12321804032025,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.807084717265733,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.728871973099674,
+          "mean_interval_width_ug_m3": 55.78050920638549,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.775857591032347,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.609547853489689,
+          "mean_interval_width_ug_m3": 43.46878295698706,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.652151913614238,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.953125,
+          "mae_ug_m3": 9.2619639650422,
+          "mean_interval_width_ug_m3": 54.12036195758821,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 12.308818208855872,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943421671,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182225215,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499959073,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402381788,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874998916482,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201408434505,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331389464,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209401980054,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943701881,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182607382,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499981551,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402416339,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999282913,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00520140885491,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331841179,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209402609356,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943747318,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182741933,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499984416,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402427126,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999317612,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.005201408980327,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331939925,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209402860422,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942881943736413,
+      "mean_interval_width_ug_m3": 51.885190619291656,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976311182809209,
+      "sample_count": 576,
+      "spatial_length_scale_m": 500,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095312499978613,
+          "mean_interval_width_ug_m3": 56.26777770910454,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683961402428752,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396874999262357,
+          "mean_interval_width_ug_m3": 44.43921533559898,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.00520140900682,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336458331968268,
+          "mean_interval_width_ug_m3": 54.948578813171444,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.516209403034509,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942652326437006,
+      "mean_interval_width_ug_m3": 51.88519059635627,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.975957717218431,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095269937472594,
+          "mean_interval_width_ug_m3": 56.26777770683035,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683856091285335,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396616013650238,
+          "mean_interval_width_ug_m3": 44.439215304857946,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004797183149993,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336071028188185,
+          "mean_interval_width_ug_m3": 54.94857877738048,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.51570472158487,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942706298243614,
+      "mean_interval_width_ug_m3": 51.885190596180486,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976026349716893,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095287475712894,
+          "mean_interval_width_ug_m3": 56.267777706812275,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683881290947683,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396685021544661,
+          "mean_interval_width_ug_m3": 44.439215304622344,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004872541526414,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336146397473287,
+          "mean_interval_width_ug_m3": 54.948578777106825,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515802898508166,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942727703895843,
+      "mean_interval_width_ug_m3": 51.88519059602877,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976066961331263,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.09529323539083,
+          "mean_interval_width_ug_m3": 56.26777770679814,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683892948212423,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396708949240313,
+          "mean_interval_width_ug_m3": 44.439215304419,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004917499625492,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336180927056382,
+          "mean_interval_width_ug_m3": 54.94857877686919,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.5158631032174,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.942721823563916,
+      "mean_interval_width_ug_m3": 51.88519059642404,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.976078397546082,
+      "sample_count": 576,
+      "spatial_length_scale_m": 1000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.095289248072097,
+          "mean_interval_width_ug_m3": 56.26777770685252,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.683893771871123,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.396698034172745,
+          "mean_interval_width_ug_m3": 44.43921530494861,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 17.004923210376017,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.336178188446906,
+          "mean_interval_width_ug_m3": 54.94857877747098,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.515890743996543,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.858403825427565,
+      "mean_interval_width_ug_m3": 51.88208008584741,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.844824509888078,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.062125233745874,
+          "mean_interval_width_ug_m3": 56.26663245435464,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.609010408109336,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.300622876615757,
+          "mean_interval_width_ug_m3": 44.43507096482227,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.855426353884276,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.212463365921066,
+          "mean_interval_width_ug_m3": 54.94453683836531,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.355934924901522,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.87257080755018,
+      "mean_interval_width_ug_m3": 51.88206374343994,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.861793744034024,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.07118009798547,
+          "mean_interval_width_ug_m3": 56.26662604861318,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.621122918601905,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.317900814972598,
+          "mean_interval_width_ug_m3": 44.43504920958219,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.87314832468471,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.228631509692468,
+          "mean_interval_width_ug_m3": 54.94451597212446,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.376718243558894,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9340277777777778,
+      "mae_ug_m3": 9.882731033377055,
+      "mean_interval_width_ug_m3": 51.882042330383115,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.877612658379478,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.075828467828709,
+          "mean_interval_width_ug_m3": 56.26661807715823,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.629350398195063,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.329289627952072,
+          "mean_interval_width_ug_m3": 44.43502067996463,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.890794264203393,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9322916666666666,
+          "mae_ug_m3": 10.243075004350386,
+          "mean_interval_width_ug_m3": 54.944488234026494,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.397103363219497,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9322916666666666,
+      "mae_ug_m3": 9.884474223611475,
+      "mean_interval_width_ug_m3": 51.88203315535773,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 13.886010484308652,
+      "sample_count": 576,
+      "spatial_length_scale_m": 2000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.96875,
+          "mae_ug_m3": 8.074597660054332,
+          "mean_interval_width_ug_m3": 56.26661569897832,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 10.63086120905855,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 11.331010300563591,
+          "mean_interval_width_ug_m3": 44.435008368391664,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 16.90002838055673,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9270833333333334,
+          "mae_ug_m3": 10.247814710216502,
+          "mean_interval_width_ug_m3": 54.94447539870317,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 13.410357646278513,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9496527777777778,
+      "mae_ug_m3": 8.826854443671742,
+      "mean_interval_width_ug_m3": 51.13074025155946,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.294731495323227,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.499622824635952,
+          "mean_interval_width_ug_m3": 55.785031312921284,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.434677654765638,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.8958333333333334,
+          "mae_ug_m3": 10.277354900437578,
+          "mean_interval_width_ug_m3": 43.47853701781879,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.128709266262527,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.703585605941702,
+          "mean_interval_width_ug_m3": 54.12865242393831,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.644323986983828,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 3600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 8.930381641779483,
+      "mean_interval_width_ug_m3": 51.128419319305145,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.407653725004945,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.602789389784512,
+          "mean_interval_width_ug_m3": 55.78351240435688,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.549951095716374,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.379812901439257,
+          "mean_interval_width_ug_m3": 43.47561348539262,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.231124745121027,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 8.808542634114685,
+          "mean_interval_width_ug_m3": 54.12613206816594,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.775435700935862,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 10800
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.9513888888888888,
+      "mae_ug_m3": 9.05017687997104,
+      "mean_interval_width_ug_m3": 51.12435627797796,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.567039146530513,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.684986115896606,
+          "mean_interval_width_ug_m3": 55.780829839883275,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.659802341696464,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.9010416666666666,
+          "mae_ug_m3": 10.464440240293227,
+          "mean_interval_width_ug_m3": 43.47047867762854,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.3837527016912,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 9.001104283723292,
+          "mean_interval_width_ug_m3": 54.12176031642206,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 11.992488910307793,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 21600
+    },
+    {
+      "history_duration_s": 86400.0,
+      "interval_coverage": 0.953125,
+      "mae_ug_m3": 9.190541595898209,
+      "mean_interval_width_ug_m3": 51.121250413803125,
+      "mean_prior_interval_width_ug_m3": 51.885190619291656,
+      "rmse_ug_m3": 12.777037668991197,
+      "sample_count": 576,
+      "spatial_length_scale_m": 4000,
+      "station_scores": {
+        "CAMPO_DE_MARTE": {
+          "interval_coverage": 0.9947916666666666,
+          "mae_ug_m3": 7.7144735518949155,
+          "mean_interval_width_ug_m3": 55.778818063717715,
+          "mean_prior_interval_width_ug_m3": 56.26777770910454,
+          "rmse_ug_m3": 9.740860055476228,
+          "sample_count": 192
+        },
+        "SANTA_ANITA": {
+          "interval_coverage": 0.90625,
+          "mae_ug_m3": 10.604758063215142,
+          "mean_interval_width_ug_m3": 43.466531792983744,
+          "mean_prior_interval_width_ug_m3": 44.43921533559898,
+          "rmse_ug_m3": 15.622337172155317,
+          "sample_count": 192
+        },
+        "SAN_JUAN_DE_LURIGANCHO": {
+          "interval_coverage": 0.9583333333333334,
+          "mae_ug_m3": 9.252393172584569,
+          "mean_interval_width_ug_m3": 54.118401384707916,
+          "mean_prior_interval_width_ug_m3": 54.948578813171444,
+          "rmse_ug_m3": 12.28072886450889,
+          "sample_count": 192
+        }
+      },
+      "temporal_length_scale_s": 43200
+    }
+  ],
+  "observation_noise_stddev_ug_m3": 0.0,
+  "prior_mean_ug_m3": 19.6,
+  "prior_method": "median_and_population_standard_deviation",
+  "prior_stddev_ug_m3": 13.363818985063656,
+  "selected_candidate": {
+    "history_duration_s": 21600.0,
+    "spatial_length_scale_m": 4000,
+    "temporal_length_scale_s": 3600
+  },
+  "selected_config": {
+    "include_clipped_observations": false,
+    "prior_mean_ug_m3": 19.6,
+    "prior_stddev_ug_m3": 13.363818985063656,
+    "temporal_length_scale_s": 3600,
+    "x_length_scale_m": 4000,
+    "y_length_scale_m": 4000
+  },
+  "selection_metric": "aggregate_rotating_station_rmse",
+  "station_ids": [
+    "CAMPO_DE_MARTE",
+    "CERES",
+    "SANTA_ANITA",
+    "SAN_JUAN_DE_LURIGANCHO"
+  ],
+  "station_priors": {
+    "CAMPO_DE_MARTE": {
+      "prior_mean_ug_m3": 22.0,
+      "prior_stddev_ug_m3": 14.354288689215114
+    },
+    "SANTA_ANITA": {
+      "prior_mean_ug_m3": 19.85,
+      "prior_stddev_ug_m3": 11.336742839697528
+    },
+    "SAN_JUAN_DE_LURIGANCHO": {
+      "prior_mean_ug_m3": 18.4,
+      "prior_stddev_ug_m3": 14.017752174682501
+    }
+  },
+  "target_count": 576,
+  "tie_breakers": [
+    "mae",
+    "absolute_95_percent_coverage_error",
+    "mean_interval_width",
+    "candidate_values"
+  ],
+  "validation_method": "leave_one_station_out"
+}

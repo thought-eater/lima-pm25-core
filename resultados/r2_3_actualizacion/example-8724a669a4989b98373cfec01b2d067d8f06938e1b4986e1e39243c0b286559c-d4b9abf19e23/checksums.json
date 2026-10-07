@@ -1,0 +1,11 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "manifest.json": "9591d0691686ca458b4a97138e8e1c930c8ee6a8951ac0c098f20df5381c5647",
+    "public_batches.jsonl": "45b769d548fcad3ef006b103a27a5ab8a25b89987f9e31f7110ce12d71695f2a",
+    "snapshots.npz": "3c10011bc99836a39c3485885cb0d5e7d735042cd3419d99e7eb3224e71b9ebc",
+    "update_summary.csv": "a9e9c4151d7c575c612ae8ca5b5e006e5e2b1666c7e8d7a169d2b7b1026b283e",
+    "updates.jsonl": "f40b5a0541042448bcda79844ee710bb4ae03faa63ed21c8968daef7c67413c9",
+    "verification_report.json": "52170c79e0e8c79c4feffa7d960667767af84bb9ca5b9fec52adda8bb18eb87a"
+  }
+}

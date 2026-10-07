@@ -1,0 +1,18 @@
+{
+  "history_duration_s": 21600.0,
+  "reconstruction_config": {
+    "include_clipped_observations": false,
+    "prior_mean_ug_m3": 19.6,
+    "prior_stddev_ug_m3": 13.363818985063656,
+    "temporal_length_scale_s": 3600.0,
+    "x_length_scale_m": 2000.0,
+    "y_length_scale_m": 2000.0
+  },
+  "representative_frame_indices": [
+    0,
+    18,
+    36
+  ],
+  "run_id": "389276c1bc6779aebda2186094bd7297f2582649fcdf761c5261496dd9ae7af5",
+  "scale_ug_m3": 41.45
+}

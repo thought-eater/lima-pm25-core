@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "evidence_schema_version": 2,
+  "status": "provisional_pending_adviser",
+  "historical_observation_noise_stddev_ug_m3": 0.0,
+  "gp": {
+    "prior_mean_ug_m3": 19.6,
+    "prior_stddev_ug_m3": 13.363818985063656,
+    "x_length_scale_m": 2000.0,
+    "y_length_scale_m": 2000.0,
+    "temporal_length_scale_s": 3600,
+    "history_duration_s": 21600.0
+  },
+  "r21": {
+    "maximum_nmae": 0.15,
+    "maximum_nrmse": 0.2,
+    "minimum_rmse_skill": 0.0,
+    "minimum_sample_count": 1
+  },
+  "r22": {
+    "nominal_coverage": 0.95,
+    "minimum_coverage": 0.9,
+    "maximum_coverage": 0.98,
+    "require_narrower_than_prior": true,
+    "minimum_sample_count": 1
+  },
+  "synthetic_calibration_member_id": "control",
+  "spatial_calibration": {
+    "candidates_m": [
+      500.0,
+      1000.0,
+      2000.0,
+      4000.0
+    ],
+    "historical_station_best_m": 4000,
+    "synthetic_fixed_mobile_selected_m": 2000.0
+  },
+  "calibration_artifact": "resultados/r2_1_r2_2_estimacion/calibracion_historica/final_calibration.json",
+  "routine_source_scale": 20.09519380779664,
+  "minimum_synthetic_scale_fraction": 0.2,
+  "retained_weather_window_index": 1,
+  "representative_frame_indices": [
+    0,
+    18,
+    36
+  ],
+  "uncertainty_numerical_tolerance": 1e-09,
+  "verification": {
+    "pytest_command": "uv run --offline --no-sync pytest --junitxml=cache/tests/station-holdout.xml",
+    "passed": 227,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0,
+    "build_command": "uv build --offline --no-python-downloads",
+    "build_status": "passed"
+  },
+  "notes": [
+    "The profile freezes the zero-noise GP pilot only for provisional technical execution.",
+    "It is not an adviser-approved instrument-noise or Lima-physics calibration.",
+    "A later accepted profile requires a distinct configuration identity and retained evaluation."
+  ],
+  "historical_validation_method": "leave_one_station_out"
+}

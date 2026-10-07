@@ -1,0 +1,32 @@
+{
+  "calibration_run_id": "e54ced78886984b19416230e25061bf82cc80030a62f216ad057ec4dedfbc4fa",
+  "historical_interval_coverage": 0.9340277777777778,
+  "historical_mean_interval_width_ug_m3": 51.8820800858511,
+  "historical_mean_prior_interval_width_ug_m3": 51.885190619291656,
+  "historical_r22_reasons": [],
+  "historical_r22_status": "pass",
+  "historical_scale_ug_m3": 41.45,
+  "historical_station_best_spatial_m": 4000,
+  "historical_validation_method": "leave_one_station_out",
+  "history_duration_s": 21600.0,
+  "pm25_resource_sha256": "54f845390ca35cbe5648cf0c5a3c173cc0317cbbf2717918fabea45c85cac766",
+  "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+  "reconstruction_config": {
+    "include_clipped_observations": false,
+    "prior_mean_ug_m3": 19.6,
+    "prior_stddev_ug_m3": 13.363818985063656,
+    "temporal_length_scale_s": 3600,
+    "x_length_scale_m": 2000.0,
+    "y_length_scale_m": 2000.0
+  },
+  "routine_source_scale": 20.09519380779664,
+  "spatial_candidate_rmse_ug_m3": {
+    "1000": 2.173184022768965,
+    "2000": 2.137188235715267,
+    "4000": 2.247165625204756,
+    "500": 2.236518467193382
+  },
+  "synthetic_contrast_ug_m3": 10.625182210031852,
+  "synthetic_selected_spatial_m": 2000.0,
+  "weather_resource_sha256": "6d63ff43d3a9b324b9536c2d52de0f49f9a717fc7d00efe15decf89a2945a6c8"
+}

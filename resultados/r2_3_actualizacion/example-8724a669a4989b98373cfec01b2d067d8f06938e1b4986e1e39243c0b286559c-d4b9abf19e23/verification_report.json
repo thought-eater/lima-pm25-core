@@ -1,0 +1,13 @@
+{
+  "applied_mobile_batch_count": 35,
+  "eligible_mobile_incorporation_coverage": 1.0,
+  "eligible_mobile_measurement_count": 35,
+  "incorporated_mobile_measurement_count": 35,
+  "mobile_diagnostic_count": 35,
+  "mobile_diagnostic_coverage": 1.0,
+  "mobile_measurements_incorporated_exactly_once": true,
+  "mobile_nonincrease_pass_count": 35,
+  "positive_mobile_reduction_batch_count": 35,
+  "runtime_accepted": true,
+  "unique_incorporated_mobile_measurement_count": 35
+}

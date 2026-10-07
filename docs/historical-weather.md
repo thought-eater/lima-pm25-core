@@ -1,0 +1,140 @@
+# Historical Weather Forcing
+
+## Purpose
+
+The historical-weather adapter connects the supplied R1.1 meteorological series
+to the R1.3 PM2.5 transport model. It does not acquire, quality-control, repair,
+or impute observations. It also does not combine meteorology with PM2.5 station
+records.
+
+Historical weather supports two immediate uses:
+
+- replay a selected observed period for later calibration and evaluation;
+- keep observed weather fixed while emissions or other PM2.5 scenario inputs
+  change in a counterfactual run.
+
+Generating new meteorological sequences constrained by Lima observations is a
+separate scenario-generation capability, not part of this adapter.
+
+## Supplied CSV Schema
+
+The default `WeatherCsvConfig` maps the supplied CSV as follows:
+
+| Source column | Meaning | Source representation | Simulation representation |
+| --- | --- | --- | --- |
+| `ESTACION` | Station identifier | text | one explicitly selected series |
+| `FECHA` | Local date | `YYYYMMDD` | aware UTC timestamp |
+| `HORA` | Local hour | `HH * 10000` | aware UTC timestamp |
+| `TEMP` | Air temperature | degrees Celsius | degrees Celsius |
+| `HR` | Relative humidity | percent | percent |
+| `PP` | Hourly precipitation | millimetres | `mm/h` over a one-hour interval |
+| `DIR_VIENTO` | Wind from-direction | meteorological degrees | eastward/northward components |
+| `VEL_VIENTO` | Wind speed | `m/s` | eastward/northward components |
+| `<VAR>_SOURCE` | Cell provenance | producer vocabulary | preserved provenance |
+| `PP_IFS` | External ECMWF IFS precipitation | preceding-hour millimetres | optional explicit fallback |
+
+The CSV carries the values and their complete per-cell source classifications;
+it has no companion sidecar. Source timestamps have no embedded offset. The
+default adapter interprets them as `America/Lima` and converts them to UTC.
+Column names, timezone, missing markers, delimiter, and encoding remain explicit
+adapter configuration fields. Canonical units are fixed by the output field
+names and this adapter contract.
+
+An empty field, `S/D`, `NaN`, or `null` is unavailable by default. Zero is a
+valid value and is never treated as missing. In particular, `PP=0` means no
+precipitation was recorded for that source hour.
+
+The producer owns range checks, outlier classification, imputation, and source
+classification. The adapter does not repeat those checks. Its local simulation
+policy accepts `senamhi_observed` and `imputed_*`; operational outliers and
+missing states remain unavailable. Wind and precipitation are required by the
+current transport model; temperature and relative humidity are retained as
+optional diagnostics. An unavailable required value splits contiguous coverage.
+The `error` policy rejects the selected station at the first unavailable
+required value. The adapter never performs another source-data imputation.
+
+`PP_IFS` is external model output, not a SENAMHI observation. It is not used by default.
+`PrecipitationSourcePolicy.STATION_THEN_IFS` must be selected explicitly to use
+it when station `PP` is unavailable.
+
+## Provenance
+
+Exact source records retain each variable's upstream `SOURCE`. Adapter
+interpolation creates adapter-derived source states while recording the upstream
+source names. Piecewise-constant precipitation retains the provenance of the
+left endpoint. IFS fallback is labeled `ecmwf_ifs`. For
+calm wind, `DIR_VIENTO_SOURCE=not_applicable` is valid when usable wind speed is
+zero.
+
+`WeatherRecord` requires explicit provenance for every variable even when it is
+constructed directly. The historical adapter never assigns an implicit
+`unspecified` source. Unit-test fixtures use their own explicit fixture label;
+generated scenario weather uses a synthetic `AtmosphericForcing` provider rather
+than passing through this historical-record contract.
+
+## Temporal Lookup
+
+`HistoricalWeatherDataset.record_at()` accepts an aware datetime and returns a
+canonical UTC weather record. Temperature, relative humidity, and wind vector
+components are linearly interpolated between adjacent covered records. Wind
+direction is reconstructed only after interpolation, avoiding the artificial
+southward result produced by averaging 350 and 10 degrees directly.
+
+Precipitation is not linearly interpolated. The source amount is numerically
+equivalent to an hourly rate because records are one hour apart, and the latest
+record is held constant on `[t, t + 1h)`. The supplied CSV does not establish
+whether SENAMHI instrument accumulation occurs before or after the timestamp;
+the interval above is an explicit simulation convention, not an institutional
+claim.
+
+Lookup before or after dataset coverage always raises `WeatherCoverageError`.
+Lookup never interpolates across an upstream-unavailable timestamp or a gap longer than
+`WeatherCsvConfig.maximum_gap`.
+
+## Episode Windows
+
+An explicit historical episode is selected by aware UTC start and duration:
+
+```python
+from datetime import datetime, timedelta, UTC
+
+window = weather.select_window(
+    datetime(2025, 1, 1, 5, tzinfo=UTC),
+    timedelta(hours=24),
+)
+```
+
+The complete interval must belong to one contiguous covered segment. Selecting
+the same explicit start and duration returns the same records. Random episode
+sampling belongs to scenario or experiment composition, where eligible
+train/validation/test intervals are known.
+
+`WeatherWindow` maps elapsed seconds back to UTC. It can therefore feed the
+current transport runner without changing `PM25State`:
+
+```python
+frames = tuple(
+    iter_simulation(
+        model,
+        initial_state,
+        duration_s=window.duration_s,
+        frame_duration_s=900,
+        forcing_at=window.forcing_at_elapsed_s,
+        forcing_change_times_s=window.forcing_change_times_s,
+    )
+)
+```
+
+A regional-boundary callback remains independently configured. It can use
+`window.utc_at_elapsed_s(elapsed_s)` when it needs the same UTC instant.
+
+## Scope Boundaries
+
+`AtmosphericForcing` currently sends wind and precipitation to `PM25Transport`.
+Temperature and relative humidity remain in canonical weather records for
+diagnostics and later model extensions but do not currently alter transport.
+
+The file `pm25_lima_2025_2026_imputed.csv` is not read by this module. Historical
+PM2.5 observations enter later GP calibration and final replay through a separate
+adapter. Complete R2.1/R2.2 map evaluation uses retained synthetic truth, whereas
+data-constrained synthetic weather is a separate scenario-generation concern.

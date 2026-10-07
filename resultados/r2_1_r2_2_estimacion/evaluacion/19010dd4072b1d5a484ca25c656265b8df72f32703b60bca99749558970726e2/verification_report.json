@@ -1,0 +1,15 @@
+{
+  "build_artifacts_sha256": {
+    "lima_pm25_core-0.1.0-py3-none-any.whl": "18cc2d3690c9615a93a753dfe2f6be3071326eb0b56d80e5ca18b533d1dd5846",
+    "lima_pm25_core-0.1.0.tar.gz": "9cc863f96c5522581542106887f8fbb887629b0100f370f2cbc4fd8e9d0570ae"
+  },
+  "build_command": "uv build --offline --no-python-downloads",
+  "build_status": "passed",
+  "errored": 0,
+  "experiment_fingerprint": "19010dd4072b1d5a484ca25c656265b8df72f32703b60bca99749558970726e2",
+  "failed": 0,
+  "passed": 227,
+  "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+  "pytest_command": "uv run --offline --no-sync pytest --junitxml=cache/tests/station-holdout.xml",
+  "skipped": 0
+}

@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "environment_id": "lima-r1.2-study",
+  "domain": {
+    "left": -77.05108161742221,
+    "bottom": -12.079,
+    "right": -76.90976879099601,
+    "top": -11.974250416076465,
+    "network_type": "drive",
+    "cell_size_m": 200.0,
+    "road_network_buffer_m": 50.0,
+    "cache_directory": "resultados/r1_2_entorno/domain",
+    "osmnx_cache_directory": "cache/osmnx"
+  },
+  "station_catalog_id": "senamhi-pm25-lima",
+  "mobility_policy": {
+    "road_tolerance_m": 5.0,
+    "maximum_speed_m_s": null
+  },
+  "vertical": {
+    "mixing_height_m": 200.0,
+    "evidence_status": "synthetic_demo",
+    "provenance": "constant effective height of 200 m accepted provisionally for thesis scope, as reported by the author; vertically averaged model assumption, not measured Lima mixing height",
+    "time_varying": false
+  },
+  "temporal": {
+    "concentration_output_interval_s": 300.0,
+    "concentration_output_times_s": [],
+    "concentration_output_status": "technical_selection_complete",
+    "mobile_sampling_interval_s": 300.0,
+    "mobile_sampling_status": "provisional_implementation_value"
+  },
+  "horizontal_candidate_cell_sizes_m": [
+    50.0,
+    100.0,
+    200.0
+  ],
+  "selected_cell_size_status": "technical_selection_complete",
+  "scenario_families": [
+    {
+      "family_id": "lima-synthetic-event",
+      "purpose": "stress_counterfactual",
+      "control_member_id": "control",
+      "constraint_evidence_ids": [],
+      "members": [
+        {
+          "member_id": "control",
+          "changed_factors": [],
+          "claims_calibrated_providers": false,
+          "calibration_evidence_id": null
+        },
+        {
+          "member_id": "event",
+          "changed_factors": [
+            "event_sources"
+          ],
+          "claims_calibrated_providers": false,
+          "calibration_evidence_id": null
+        }
+      ]
+    }
+  ]
+}

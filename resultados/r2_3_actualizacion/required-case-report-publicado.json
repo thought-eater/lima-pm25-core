@@ -1,0 +1,168 @@
+{
+  "accepted": true,
+  "cases": [
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "evaluated-policy",
+      "kind": "functional",
+      "name": "test_change10_profile_supplies_the_evaluated_r23_policy",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "first-mobile-update",
+      "kind": "functional",
+      "name": "test_first_mobile_batch_updates_prior_and_reduces_uncertainty",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "successive-coupled-snapshots",
+      "kind": "functional",
+      "name": "test_successive_batches_publish_increasing_coupled_snapshots",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "fixed-mobile-atomic-batch",
+      "kind": "functional",
+      "name": "test_same_time_fixed_and_mobile_records_publish_one_snapshot",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "multi-mobile-atomic-batch",
+      "kind": "functional",
+      "name": "test_same_time_multiple_mobile_records_publish_one_snapshot",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "bounded-history",
+      "kind": "functional",
+      "name": "test_history_window_includes_boundary_and_expires_older_records",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "policy-noop",
+      "kind": "functional",
+      "name": "test_clipped_only_batch_is_policy_noop",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "mixed-record-accounting",
+      "kind": "functional",
+      "name": "test_mixed_eligible_and_clipped_batch_accounts_for_every_record",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "duplicate-rejection",
+      "kind": "functional",
+      "name": "test_duplicate_measurement_key_is_rejected_without_mutation",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "timestamp-order-rejection",
+      "kind": "functional",
+      "name": "test_older_or_equal_timestamp_is_rejected_without_mutation",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "invalid-record-rollback",
+      "kind": "functional",
+      "name": "test_invalid_record_rolls_back_all_state",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "estimator-failure-rollback",
+      "kind": "functional",
+      "name": "test_reconstructor_failure_rolls_back_all_state",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "agent-map-state-truth-isolation",
+      "kind": "functional",
+      "name": "test_snapshot_is_immutable_agent_consumable_map_state_without_truth",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential",
+      "id": "deterministic-replay",
+      "kind": "functional",
+      "name": "test_sequential_replay_is_deterministic",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "id": "r13-r23-evidence-integration",
+      "kind": "integration",
+      "name": "test_r13_batches_drive_r23_and_persist_truth_isolated_evidence",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "id": "evidence-tamper-detection",
+      "kind": "integration",
+      "name": "test_sequential_bundle_is_non_overwriting_and_tamper_evident",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "id": "required-case-positive-gate",
+      "kind": "functional",
+      "name": "test_required_case_report_accepts_only_complete_passing_manifest",
+      "outcome": "passed"
+    },
+    {
+      "classname": "tests.tesis.r2_3.test_sequential_evidence",
+      "id": "required-case-negative-gate",
+      "kind": "functional",
+      "name": "test_required_case_report_rejects_skipped_and_missing_cases",
+      "outcome": "passed"
+    }
+  ],
+  "configuration_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+  "errored": 0,
+  "failed": 0,
+  "missing": 0,
+  "passed": 18,
+  "required_case_count": 18,
+  "runtime_accepted": true,
+  "runtime_verification": {
+    "applied_mobile_batch_count": 35,
+    "eligible_mobile_incorporation_coverage": 1.0,
+    "eligible_mobile_measurement_count": 35,
+    "incorporated_mobile_measurement_count": 35,
+    "mobile_diagnostic_count": 35,
+    "mobile_diagnostic_coverage": 1.0,
+    "mobile_measurements_incorporated_exactly_once": true,
+    "mobile_nonincrease_pass_count": 35,
+    "positive_mobile_reduction_batch_count": 35,
+    "runtime_accepted": true,
+    "unique_incorporated_mobile_measurement_count": 35
+  },
+  "schema_version": 1,
+  "skipped": 0,
+  "software": {
+    "numpy_version": "2.5.1",
+    "package": "lima-pm25-core",
+    "package_version": "0.1.0",
+    "python_version": "3.14.7",
+    "scikit_learn_version": "1.9.0"
+  },
+  "test_artifacts": {
+    "junit_xml": "cache/tests/required-cases.xml",
+    "junit_xml_sha256": "f2dd4c56f00f3910eb822139a5834c2b8b855884654b80262fc1c8c9482fd3c5",
+    "required_case_manifest": "config/sequential_update_required_cases.json",
+    "required_case_manifest_sha256": "fdb702e650e198bb36527f150afb19c008c8c396a4ae6322c0564b74d0604802",
+    "runtime_verification_report": "resultados/r2_3_actualizacion/example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-d4b9abf19e23/verification_report.json",
+    "runtime_verification_report_sha256": "52170c79e0e8c79c4feffa7d960667767af84bb9ca5b9fec52adda8bb18eb87a"
+  }
+}

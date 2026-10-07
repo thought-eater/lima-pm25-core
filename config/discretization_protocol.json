@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "horizontal": {
+    "candidate_cell_sizes_m": [50.0, 100.0, 200.0],
+    "shared_times_s": [3600.0, 7200.0, 10800.0],
+    "probe_strategy": "fixed_stations",
+    "probe_relative_tolerance": 0.10,
+    "probe_absolute_floor_ug_m3": 1.0,
+    "domain_mean_relative_tolerance": 0.05,
+    "event_excess_mass_relative_tolerance": 0.05,
+    "event_effect_significance_fraction_of_peak": 0.01,
+    "plume_centroid_tolerance_m": 100.0,
+    "mass_residual_relative_tolerance": 1e-10,
+    "require_control_event_ordering": true,
+    "selection_rule": "coarsest_passing_adjacent_refinement_chain"
+  },
+  "temporal": {
+    "candidate_output_intervals_s": [300.0, 900.0, 3600.0],
+    "shared_times_s": [3600.0, 7200.0, 10800.0],
+    "shared_field_l1_relative_tolerance": 0.03,
+    "information_loss_relative_tolerance": 0.05,
+    "trajectory_l1_relative_tolerance": 0.05,
+    "event_effect_significance_fraction_of_peak": 0.01,
+    "concentration_scale_floor_ug_m3": 1.0,
+    "selection_rule": "coarsest_passing_shared_field_and_information_loss"
+  },
+  "claim_limits": [
+    "The 50 m candidate is a numerical reference, not observed ground truth.",
+    "Passing criteria justify only the declared quantities and conclusions.",
+    "Cell-level peaks remain diagnostic when convergence assumptions fail.",
+    "Event-effect percentages and centroids are evaluated only while excess mass is at least 1 percent of its episode peak.",
+    "Temporal information loss includes unresolved evolution between persisted outputs, not only shared instants and peaks.",
+    "Effective mixing height is a constant 200 m provisional approximation for the thesis scope."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "bbox_wgs84": {
+    "bottom": -12.079,
+    "left": -77.05108161742221,
+    "right": -76.90976879099601,
+    "top": -11.974250416076465
+  },
+  "cell_size_m": 200.0,
+  "config_fingerprint": "aaa8074881b06f69",
+  "graph": {
+    "edges": 46083,
+    "generated_at_utc": "2026-09-27T04:41:15.495262+00:00",
+    "nodes": 18714
+  },
+  "grid": {
+    "active_cells": 4459,
+    "columns": 78,
+    "domain_bounds_m": [
+      276656.057875911,
+      8663874.185767746,
+      292129.6831251803,
+      8675574.470754325
+    ],
+    "generated_at_utc": "2026-09-27T04:41:15.495262+00:00",
+    "grid_bounds_m": [
+      276656.057875911,
+      8663874.185767746,
+      292256.057875911,
+      8675674.185767746
+    ],
+    "rows": 59
+  },
+  "network_type": "drive",
+  "projected_crs": "EPSG:32718",
+  "road_bbox_wgs84": {
+    "bottom": -12.079451985911756,
+    "left": -77.05154078818101,
+    "right": -76.90930962023721,
+    "top": -11.97379842676711
+  },
+  "road_network_buffer_m": 50.0,
+  "schema_version": 2,
+  "software": {
+    "networkx": "3.6.1",
+    "numpy": "2.5.1",
+    "osmnx": "2.1.1",
+    "pyproj": "3.7.2",
+    "python": "3.14.7",
+    "shapely": "2.1.2"
+  }
+}

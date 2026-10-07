@@ -1,0 +1,46 @@
+{
+  "configuration": {
+    "calibration_artifact_sha256": "cf08e52a4f4deec1fb92788f267680f29155ee635da29b2d9c1de86bfd7e4a99",
+    "calibration_artifact_source": "resultados/r2_1_r2_2_estimacion/calibracion_historica/final_calibration.json",
+    "history_duration": 21600.0,
+    "prediction_chunk_size": 2048,
+    "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+    "profile_source": "config/estimation_evaluation.json",
+    "profile_status": "provisional_pending_adviser",
+    "reconstruction_config": {
+      "include_clipped_observations": false,
+      "prior_mean_ug_m3": 19.6,
+      "prior_stddev_ug_m3": 13.363818985063656,
+      "temporal_length_scale_s": 3600.0,
+      "x_length_scale_m": 2000.0,
+      "y_length_scale_m": 2000.0
+    },
+    "variance_numerical_tolerance_ug_m3_squared": 1e-09
+  },
+  "grid": {
+    "cell_size_m": 200.0,
+    "crs": "EPSG:32718",
+    "sha256": "d7c54fb4208b0ce5a6b733b27714c9f074392f5c57637d74c9a3d6a2e6f66c5c",
+    "shape": [
+      59,
+      78
+    ]
+  },
+  "hidden_truth_included": false,
+  "input_batch_count": 36,
+  "purpose": "r23_sequential_map_update_evidence",
+  "schema_version": 1,
+  "snapshot_count": 36,
+  "software": {
+    "numpy_version": "2.5.1",
+    "package": "lima-pm25-core",
+    "package_version": "0.1.0",
+    "python_version": "3.14.7",
+    "scikit_learn_version": "1.9.0"
+  },
+  "upstream_run": {
+    "manifest_sha256": "6d42000f6f0212aab03e678c114eb8b91afd17a9d8b97b39181c81eff6f29f6e",
+    "run_id": "8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c",
+    "seed": 20260925
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "files": {
+    "configuration.json": "2c6f1708ce5617e2350c17ba3bd2c33cf879f3c33e847e0c290cd88bf880173e",
+    "execution_log.json": "f10bc2c1e29c9a6a466ea6c90a371af5fc945d69fb77c63ca880313384fda4be",
+    "figures/frame-0000.png": "f6d4cad4158d761bb5fcb4bdce5f33982ef0dd91391bb5ba15a53ebe5e514207",
+    "figures/frame-0018.png": "a8c4e5cc5c0e24f4239e53d5a064254f052123cbe6032d54cf206f9b64481acc",
+    "figures/frame-0036.png": "30bc6c8323b7a54338adc715d563a808bff73e7043f9272f28fadb751291098b",
+    "figures/mobile-uncertainty.png": "7d124fe50a9df824588f85b1b0e33b38877da2f5627814d805fb92deed642cfc",
+    "figures/temporal-aging.png": "cba01c79b3f6d2c2f6160aaee0a003e18ea37e2d22b6ed78cfac17245014fd3d",
+    "maps.npz": "ded8086d397b9daf4155081b76939ec36d576cef23664cb309a12806c91f0fe8",
+    "metrics.json": "fed77a325a911546c799001a67e7d114f13268044d1bb783bbfd95cdeaa06a57"
+  }
+}

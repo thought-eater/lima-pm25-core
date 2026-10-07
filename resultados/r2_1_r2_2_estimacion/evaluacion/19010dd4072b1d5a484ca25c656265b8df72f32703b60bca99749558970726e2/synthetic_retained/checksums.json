@@ -1,0 +1,10 @@
+{
+  "algorithm": "sha256",
+  "files": {
+    "concentration.npz": "4630b70a2acfedb997249c9a4da5218af3c00e593dc0f811e2e396417abafed3",
+    "diagnostics.jsonl": "88515911667c36b479c0ba2b6d979408993e04f59c890d479933fdc7a6bb2d71",
+    "manifest.json": "9f9adfa0b2d829547fce2d9a9abadaffb3aa3058c4135a92e7d97f5d92ed5f96",
+    "measurement_attempts.jsonl": "0c3ee3a1b75eb24257f96c8004945dd7cd237ff80f4adbd16f64ce1feb577252",
+    "measurement_batches.jsonl": "27a52468815e56db0090385c4f2eb3d696f77b04d5f033cfe41a371aad878c7b"
+  }
+}

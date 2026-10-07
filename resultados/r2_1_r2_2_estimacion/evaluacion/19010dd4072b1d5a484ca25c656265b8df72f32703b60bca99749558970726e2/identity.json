@@ -1,0 +1,15 @@
+{
+  "calibration_artifact_sha256": "cf08e52a4f4deec1fb92788f267680f29155ee635da29b2d9c1de86bfd7e4a99",
+  "calibration_run_id": "e54ced78886984b19416230e25061bf82cc80030a62f216ad057ec4dedfbc4fa",
+  "fingerprint": "19010dd4072b1d5a484ca25c656265b8df72f32703b60bca99749558970726e2",
+  "historical_r22_reasons": [],
+  "historical_r22_status": "pass",
+  "historical_scale_ug_m3": 41.45,
+  "historical_validation_method": "leave_one_station_out",
+  "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+  "profile_status": "provisional_pending_adviser",
+  "retained_run_id": "389276c1bc6779aebda2186094bd7297f2582649fcdf761c5261496dd9ae7af5",
+  "routine_source_scale": 20.09519380779664,
+  "selected_spatial_length_scale_m": 2000.0,
+  "synthetic_scale_ug_m3": 10.625182210031852
+}
