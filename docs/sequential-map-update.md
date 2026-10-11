@@ -89,7 +89,8 @@ run, _ = run_complete_synthetic_demo(
 profile = load_change10_evaluation_profile("config/estimation_evaluation.json")
 config = SequentialUpdateConfig.from_change10_profile(profile)
 trace = process_measurement_batches(
-    SequentialMapUpdater(domain.grid, config), run.measurement_batches,
+    SequentialMapUpdater(domain.grid, config),
+    run.measurement_batches,
 )
 destination = Path("cache/reproduccion/r23")
 write_sequential_update_bundle(

@@ -6,7 +6,10 @@ Estas comprobaciones no vuelven a ejecutar las simulaciones de sensibilidad.
 import json
 from pathlib import Path
 
-from lima_pm25.simulation import load_discretization_protocol, render_discretization_markdown
+from lima_pm25.simulation import (
+    load_discretization_protocol,
+    render_discretization_markdown,
+)
 
 
 def test_predeclared_discretization_protocol_has_fixed_candidates_and_rules() -> None:

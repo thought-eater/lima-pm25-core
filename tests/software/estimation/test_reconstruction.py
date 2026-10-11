@@ -12,8 +12,6 @@ from lima_pm25.estimation import (
 )
 from lima_pm25.simulation import (
     MeasurementQuality,
-    MeasurementRecord,
-    SensorType,
 )
 from tests.reconstruction_cases import (
     _grid,
@@ -72,9 +70,9 @@ def test_preparation_uses_the_supplied_observation_set_in_chronological_order() 
 
     assert posterior.observations.provided_record_count == 25
     assert posterior.observations.used_record_count == 25
-    assert [timestamp for _, timestamp in posterior.observations.used_measurement_keys] == [
-        current - timedelta(hours=24 - index) for index in range(25)
-    ]
+    assert [
+        timestamp for _, timestamp in posterior.observations.used_measurement_keys
+    ] == [current - timedelta(hours=24 - index) for index in range(25)]
 
     selected_subset = records[-5:]
     subset_posterior = _reconstructor(temporal_length_scale_s=1e6).reconstruct(
@@ -171,24 +169,30 @@ def test_numeric_clipped_measurement_can_be_included_explicitly() -> None:
 
 
 @pytest.mark.parametrize(
-    ("record_overrides", "message"),
+    ("sensor_id", "crs", "x_m", "message"),
     [
         (
-            {"sensor_id": "wrong-crs", "crs": "EPSG:3857"},
+            "wrong-crs",
+            "EPSG:3857",
+            50,
             "different CRS",
         ),
         (
-            {"sensor_id": "outside", "x_m": 500},
+            "outside",
+            "EPSG:32718",
+            500,
             "active reconstruction cell",
         ),
     ],
 )
 def test_incompatible_accepted_measurements_fail_explicitly(
-    record_overrides: dict[str, object],
+    sensor_id: str,
+    crs: str,
+    x_m: float,
     message: str,
 ) -> None:
     timestamp = datetime(2026, 9, 14, tzinfo=UTC)
-    record = _record(timestamp=timestamp, **record_overrides)
+    record = _record(sensor_id, timestamp, crs=crs, x_m=x_m)
     with pytest.raises(ValueError, match=message):
         _reconstructor().reconstruct(
             ReconstructionRequest(
@@ -483,7 +487,7 @@ def test_reconstruction_configuration_is_explicit_and_validated(
     values.update(override)
 
     with pytest.raises(ValueError, match=message):
-        ReconstructionConfig(**values)
+        ReconstructionConfig(**values)  # ty: ignore[invalid-argument-type] -- deliberately invalid configuration
 
 
 @pytest.mark.parametrize("invalid_chunk_size", (0, -1, True, 1.5))
@@ -493,5 +497,5 @@ def test_prediction_chunk_size_is_a_validated_execution_parameter(
     with pytest.raises(ValueError, match="prediction_chunk_size"):
         GaussianProcessFieldReconstructor(
             _reconstruction_config(),
-            prediction_chunk_size=invalid_chunk_size,  # type: ignore[arg-type]
+            prediction_chunk_size=invalid_chunk_size,  # ty: ignore[invalid-argument-type] -- deliberately invalid size
         )

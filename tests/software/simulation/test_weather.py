@@ -21,12 +21,12 @@ from lima_pm25.simulation import (
     PM25PhysicsConfig,
     PM25Transport,
     PrecipitationSourcePolicy,
+    ScheduledWeatherValue,
+    SyntheticWeatherWindow,
     WeatherCoverageError,
     WeatherCsvConfig,
     WeatherRecord,
     WeatherValueProvenance,
-    ScheduledWeatherValue,
-    SyntheticWeatherWindow,
     iter_simulation,
     load_historical_weather_csv,
 )
@@ -123,7 +123,7 @@ def test_loader_requires_source_columns(tmp_path: Path) -> None:
 
 def test_weather_record_requires_explicit_provenance_for_every_variable() -> None:
     with pytest.raises(TypeError, match="provenance"):
-        WeatherRecord(
+        WeatherRecord(  # ty: ignore[missing-argument] -- provenance is required
             station_id="A",
             timestamp_utc=datetime(2025, 1, 1, tzinfo=UTC),
             temperature_c=20,
@@ -161,16 +161,36 @@ def test_loader_supports_configured_columns_timezone_and_missing_marker(
         )
         writer.writerow(
             (
-                "A", "20250101", "0", "20", "80", "0", "NA", "0",
-                "senamhi_observed", "senamhi_observed", "senamhi_observed",
-                "not_applicable", "senamhi_observed",
+                "A",
+                "20250101",
+                "0",
+                "20",
+                "80",
+                "0",
+                "NA",
+                "0",
+                "senamhi_observed",
+                "senamhi_observed",
+                "senamhi_observed",
+                "not_applicable",
+                "senamhi_observed",
             )
         )
         writer.writerow(
             (
-                "A", "20250101", "10000", "21", "79", "0", "180", "1",
-                "senamhi_observed", "senamhi_observed", "senamhi_observed",
-                "senamhi_observed", "senamhi_observed",
+                "A",
+                "20250101",
+                "10000",
+                "21",
+                "79",
+                "0",
+                "180",
+                "1",
+                "senamhi_observed",
+                "senamhi_observed",
+                "senamhi_observed",
+                "senamhi_observed",
+                "senamhi_observed",
             )
         )
     config = WeatherCsvConfig(
@@ -271,9 +291,7 @@ def test_vector_interpolation_does_not_cross_to_southerly_wind(
     forcing = dataset.forcing_at(datetime(2025, 1, 1, 5, 30, tzinfo=UTC))
 
     assert forcing.wind_from_direction_deg == pytest.approx(0, abs=1e-12)
-    assert forcing.wind_speed_m_s == pytest.approx(
-        2 * math.cos(math.radians(10))
-    )
+    assert forcing.wind_speed_m_s == pytest.approx(2 * math.cos(math.radians(10)))
 
 
 def test_continuous_values_interpolate_and_precipitation_is_piecewise_constant(
@@ -310,9 +328,7 @@ def test_continuous_values_interpolate_and_precipitation_is_piecewise_constant(
     assert midpoint.precipitation_mm_h == 1
     assert next_hour.precipitation_mm_h == 3
     assert midpoint.temperature_provenance.source == "adapter_linear_interpolation"
-    assert midpoint.temperature_provenance.upstream_sources == (
-        "senamhi_observed",
-    )
+    assert midpoint.temperature_provenance.upstream_sources == ("senamhi_observed",)
     assert midpoint.precipitation_provenance.source == "senamhi_observed"
 
 
@@ -442,8 +458,7 @@ def test_explicit_window_selection_is_reproducible() -> None:
     assert first.duration_s == 10_800
 
 
-def test_weather_window_adapts_elapsed_seconds_without_mixing_pm25_inputs(
-) -> None:
+def test_weather_window_adapts_elapsed_seconds_without_mixing_pm25_inputs() -> None:
     dataset = _dataset(hours=3)
     window = dataset.select_window(dataset.coverage_start_utc, timedelta(hours=2))
     grid = build_grid(box(0, 0, 200, 200), "EPSG:32718", 100)

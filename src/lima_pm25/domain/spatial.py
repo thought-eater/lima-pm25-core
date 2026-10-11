@@ -589,8 +589,7 @@ def _graph_metadata_is_compatible(
         and bbox.get("right") == config.right
         and bbox.get("top") == config.top
         and metadata.get("network_type") == config.network_type
-        and metadata.get("road_network_buffer_m")
-        == config.road_network_buffer_m
+        and metadata.get("road_network_buffer_m") == config.road_network_buffer_m
     )
 
 

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import json
+import math
 from dataclasses import asdict, dataclass, replace
 from datetime import timedelta
 from hashlib import sha256
-import json
-import math
 from pathlib import Path
 
 import numpy as np
@@ -26,15 +26,15 @@ from lima_pm25.simulation import (
     write_run_bundle,
 )
 
+from .calibration import GPCalibrationResult, GPCandidateScore
 from .evaluation import (
     EvaluationStatus,
     R21AcceptanceProfile,
     R22AcceptanceProfile,
 )
-from .evidence import write_retained_evaluation_bundle, export_replay_figures
+from .evidence import export_replay_figures, write_retained_evaluation_bundle
 from .historical import HistoricalPM25Dataset
 from .partition import HistoricalPartitionManifest
-from .calibration import GPCalibrationResult, GPCandidateScore
 from .reconstruction import ReconstructionConfig
 from .replay import compose_historical_replay_batches, reconstruct_measurement_series
 from .retained import RetainedSyntheticEvaluation, evaluate_retained_synthetic_run
@@ -125,8 +125,7 @@ class Change10CalibrationArtifact:
             "history_duration_s": self.history_duration_s,
             "calibration_run_id": self.calibration_run_id,
             "spatial_candidate_rmse_ug_m3": {
-                f"{scale:g}": rmse
-                for scale, rmse in self.spatial_candidate_rmse_ug_m3
+                f"{scale:g}": rmse for scale, rmse in self.spatial_candidate_rmse_ug_m3
             },
         }
 
@@ -166,14 +165,13 @@ def load_change10_evaluation_profile(
         not math.isfinite(value) or value <= 0 for value in spatial_candidates
     ):
         raise ValueError("synthetic spatial candidates must be positive")
-    final_spatial = float(
-        spatial_calibration["synthetic_fixed_mobile_selected_m"]
-    )
+    final_spatial = float(spatial_calibration["synthetic_fixed_mobile_selected_m"])
     if final_spatial not in spatial_candidates:
         raise ValueError("final spatial scale must belong to calibration candidates")
-    if float(gp["x_length_scale_m"]) != final_spatial or float(
-        gp["y_length_scale_m"]
-    ) != final_spatial:
+    if (
+        float(gp["x_length_scale_m"]) != final_spatial
+        or float(gp["y_length_scale_m"]) != final_spatial
+    ):
         raise ValueError("final GP spatial scales must match calibration selection")
     routine_source_scale = float(payload["routine_source_scale"])
     if not math.isfinite(routine_source_scale) or routine_source_scale <= 0:
@@ -194,9 +192,7 @@ def load_change10_evaluation_profile(
         history_duration=timedelta(seconds=history_duration_s),
         r21_profile=R21AcceptanceProfile(**r21),
         r22_profile=R22AcceptanceProfile(**r22),
-        synthetic_calibration_member_id=str(
-            payload["synthetic_calibration_member_id"]
-        ),
+        synthetic_calibration_member_id=str(payload["synthetic_calibration_member_id"]),
         synthetic_spatial_candidates_m=spatial_candidates,
         historical_station_best_spatial_m=float(
             spatial_calibration["historical_station_best_m"]
@@ -236,7 +232,9 @@ def calibrate_change10_configuration(
     try:
         template = requests[profile.synthetic_calibration_member_id]
     except KeyError as error:
-        raise ValueError(f"Unknown configured synthetic member {error.args[0]!r}") from error
+        raise ValueError(
+            f"Unknown configured synthetic member {error.args[0]!r}"
+        ) from error
     duration = timedelta(hours=3)
     calibration_weather = weather.select_window(
         partition.calibration_windows[0].start_utc,
@@ -270,6 +268,7 @@ def calibrate_change10_configuration(
         raise ValueError("Synthetic calibration field remains insufficiently variable")
     assert calibration_run is not None
     calibration_evaluations = []
+    candidate_rmse: list[tuple[float, float]] = []
     for spatial_scale in profile.synthetic_spatial_candidates_m:
         candidate_config = replace(
             base_config,
@@ -283,10 +282,12 @@ def calibrate_change10_configuration(
             scale_ug_m3=historical_scale_ug_m3,
             r21_profile=profile.r21_profile,
             r22_profile=profile.r22_profile,
-            uncertainty_numerical_tolerance=(
-                profile.uncertainty_numerical_tolerance
-            ),
+            uncertainty_numerical_tolerance=(profile.uncertainty_numerical_tolerance),
         )
+        rmse = candidate_evaluation.fixed_mobile_r21.rmse_ug_m3
+        if rmse is None:
+            raise ValueError("Synthetic calibration candidate has no RMSE")
+        candidate_rmse.append((candidate_config.x_length_scale_m, float(rmse)))
         calibration_evaluations.append((candidate_config, candidate_evaluation))
     eligible_calibration_evaluations = tuple(
         item
@@ -308,8 +309,7 @@ def calibrate_change10_configuration(
         score
         for score in historical_calibration.candidate_scores
         if score.candidate.history_duration == history_duration
-        and score.candidate.spatial_length_scale_m
-        == selected_config.x_length_scale_m
+        and score.candidate.spatial_length_scale_m == selected_config.x_length_scale_m
         and score.candidate.temporal_length_scale_s
         == selected_config.temporal_length_scale_s
     )
@@ -341,13 +341,7 @@ def calibrate_change10_configuration(
         reconstruction_config=selected_config,
         history_duration_s=history_duration.total_seconds(),
         calibration_run_id=calibration_run.run_id,
-        spatial_candidate_rmse_ug_m3=tuple(
-            (
-                candidate_config.x_length_scale_m,
-                float(candidate_evaluation.fixed_mobile_r21.rmse_ug_m3),
-            )
-            for candidate_config, candidate_evaluation in calibration_evaluations
-        ),
+        spatial_candidate_rmse_ug_m3=tuple(candidate_rmse),
     )
 
 
@@ -385,23 +379,17 @@ def load_change10_calibration_artifact(
         historical_station_best_spatial_m=float(
             payload["historical_station_best_spatial_m"]
         ),
-        synthetic_selected_spatial_m=float(
-            payload["synthetic_selected_spatial_m"]
-        ),
+        synthetic_selected_spatial_m=float(payload["synthetic_selected_spatial_m"]),
         routine_source_scale=float(payload["routine_source_scale"]),
         synthetic_contrast_ug_m3=float(payload["synthetic_contrast_ug_m3"]),
-        historical_interval_coverage=float(
-            payload["historical_interval_coverage"]
-        ),
+        historical_interval_coverage=float(payload["historical_interval_coverage"]),
         historical_mean_interval_width_ug_m3=float(
             payload["historical_mean_interval_width_ug_m3"]
         ),
         historical_mean_prior_interval_width_ug_m3=float(
             payload["historical_mean_prior_interval_width_ug_m3"]
         ),
-        historical_r22_status=EvaluationStatus(
-            payload["historical_r22_status"]
-        ),
+        historical_r22_status=EvaluationStatus(payload["historical_r22_status"]),
         historical_r22_reasons=tuple(payload["historical_r22_reasons"]),
         historical_validation_method=str(payload["historical_validation_method"]),
         reconstruction_config=ReconstructionConfig(**payload["reconstruction_config"]),
@@ -516,7 +504,9 @@ def run_change10_retained_evaluation(
     )
 
 
-def _nominal_request(template, weather, ambient_value: float, *, source_scale: float, seed_offset: int):
+def _nominal_request(
+    template, weather, ambient_value: float, *, source_scale: float, seed_offset: int
+):
     sources = tuple(
         RoadLineSource(
             source_id=source.source_id,
@@ -572,7 +562,11 @@ def _historical_r22_status(
         reasons.append("historical_coverage_above_maximum")
     if score.mean_interval_width_ug_m3 >= score.mean_prior_interval_width_ug_m3:
         reasons.append("historical_posterior_not_narrower_than_prior")
-    return (EvaluationStatus.FAIL, tuple(reasons)) if reasons else (EvaluationStatus.PASS, ())
+    return (
+        (EvaluationStatus.FAIL, tuple(reasons))
+        if reasons
+        else (EvaluationStatus.PASS, ())
+    )
 
 
 def _synthetic_p99_p50_contrast(
@@ -636,6 +630,11 @@ def write_provisional_historical_replay(
         for config in template.sensor_configs
         if config.sensor_type is SensorType.MOBILE
     )
+    road_sources: list[RoadLineSource] = []
+    for source in template.sources:
+        if not isinstance(source, RoadLineSource):
+            raise TypeError("Historical replay requires road-line source templates")
+        road_sources.append(source)
     request = replace(
         template,
         initial_state=initial_state,
@@ -663,7 +662,7 @@ def write_provisional_historical_replay(
                 ends_at_s=duration.total_seconds(),
                 role=source.role,
             )
-            for source in template.sources
+            for source in road_sources
         ),
         regional_boundary=RegionalBoundarySchedule.constant(
             RegionalBoundaryForcing(
@@ -681,9 +680,7 @@ def write_provisional_historical_replay(
         grid=domain.grid,
         replay_start_utc=window.start_utc,
         end_utc=replay_end,
-        noise_stddev_ug_m3=(
-            profile.historical_observation_noise_stddev_ug_m3
-        ),
+        noise_stddev_ug_m3=(profile.historical_observation_noise_stddev_ug_m3),
         station_ids=partition.station_ids,
     )
     batches = compose_historical_replay_batches(
@@ -705,7 +702,10 @@ def write_provisional_historical_replay(
         np.savez_compressed(
             output / "posterior_maps.npz",
             timestamps_utc=np.asarray(
-                [posterior.reconstruction_timestamp_utc.isoformat() for posterior in posteriors]
+                [
+                    posterior.reconstruction_timestamp_utc.isoformat()
+                    for posterior in posteriors
+                ]
             ),
             active_mask=domain.grid.active_mask,
             mean_ug_m3=np.stack([posterior.mean_ug_m3 for posterior in posteriors]),
@@ -737,7 +737,8 @@ def write_provisional_historical_replay(
             encoding="utf-8",
         )
         export_replay_figures(
-            output, grid=domain.grid,
+            output,
+            grid=domain.grid,
             config=reconstruction_config or profile.reconstruction_config,
             measurements=tuple(r for batch in batches for r in batch.records),
             history_duration=profile.history_duration,

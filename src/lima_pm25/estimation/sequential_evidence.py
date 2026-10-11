@@ -1,16 +1,16 @@
 from __future__ import annotations
 
+import csv
+import json
+import platform
+import xml.etree.ElementTree as ET
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timedelta
-import csv
 from enum import Enum
 from hashlib import sha256
 from importlib.metadata import PackageNotFoundError, version
-import json
 from pathlib import Path
-import platform
-from typing import Mapping, Sequence
-import xml.etree.ElementTree as ET
 
 import numpy as np
 
@@ -21,13 +21,11 @@ from .reconstruction import (
     ReconstructionRequest,
     select_reconstruction_observations,
 )
-
 from .sequential import (
     SequentialUpdateConfig,
     SequentialUpdateTrace,
     grid_sha256,
 )
-
 
 SEQUENTIAL_EVIDENCE_SCHEMA_VERSION = 1
 R23_REQUIRED_CASE_SCHEMA_VERSION = 1
@@ -165,9 +163,16 @@ def export_sequential_table(destination: Path | str) -> Path:
     root = Path(destination)
     manifest = json.loads((root / "manifest.json").read_text())
     duration = timedelta(seconds=manifest["configuration"]["history_duration"])
-    batches = [json.loads(line) for line in (root / "public_batches.jsonl").read_text().splitlines()]
-    updates = [json.loads(line) for line in (root / "updates.jsonl").read_text().splitlines()]
-    records = {(r["sensor_id"], r["timestamp_utc"]): r for b in batches for r in b["records"]}
+    batches = [
+        json.loads(line)
+        for line in (root / "public_batches.jsonl").read_text().splitlines()
+    ]
+    updates = [
+        json.loads(line) for line in (root / "updates.jsonl").read_text().splitlines()
+    ]
+    records = {
+        (r["sensor_id"], r["timestamp_utc"]): r for b in batches for r in b["records"]
+    }
     incorporated = set()
     rows = []
     for update in updates:
@@ -175,23 +180,39 @@ def export_sequential_table(destination: Path | str) -> Path:
         keys = [tuple(key) for key in log["incorporated_measurement_keys"]]
         incorporated.update(keys)
         t = datetime.fromisoformat(log["processed_timestamp_utc"])
-        history_count = sum(t-duration <= datetime.fromisoformat(key[1]) <= t for key in incorporated)
+        history_count = sum(
+            t - duration <= datetime.fromisoformat(key[1]) <= t for key in incorporated
+        )
         diagnostic = update["uncertainty_reduction"]
         if diagnostic is None:
             continue
         for local in diagnostic["local"]:
-            rows.append({
-                "sequence": log["sequence_number"], "timestamp_utc": t.isoformat(),
-                "new_fixed_count": sum(records[key]["sensor_type"] == "fixed" for key in keys),
-                "new_mobile_count": sum(records[key]["sensor_type"] == "mobile" for key in keys),
-                "history_count": history_count, "sensor_id": local["measurement_key"][0],
-                "local_variance_before": local["variance_before_ug_m3_squared"],
-                "local_variance_after": local["variance_after_ug_m3_squared"],
-                "local_variance_reduction": local["reduction_ug_m3_squared"],
-                "batch_integrated_variance_before": diagnostic["integrated_variance_before_ug2_m4"],
-                "batch_integrated_variance_after": diagnostic["integrated_variance_after_ug2_m4"],
-                "batch_integrated_variance_reduction": diagnostic["integrated_reduction_ug2_m4"],
-            })
+            rows.append(
+                {
+                    "sequence": log["sequence_number"],
+                    "timestamp_utc": t.isoformat(),
+                    "new_fixed_count": sum(
+                        records[key]["sensor_type"] == "fixed" for key in keys
+                    ),
+                    "new_mobile_count": sum(
+                        records[key]["sensor_type"] == "mobile" for key in keys
+                    ),
+                    "history_count": history_count,
+                    "sensor_id": local["measurement_key"][0],
+                    "local_variance_before": local["variance_before_ug_m3_squared"],
+                    "local_variance_after": local["variance_after_ug_m3_squared"],
+                    "local_variance_reduction": local["reduction_ug_m3_squared"],
+                    "batch_integrated_variance_before": diagnostic[
+                        "integrated_variance_before_ug2_m4"
+                    ],
+                    "batch_integrated_variance_after": diagnostic[
+                        "integrated_variance_after_ug2_m4"
+                    ],
+                    "batch_integrated_variance_reduction": diagnostic[
+                        "integrated_reduction_ug2_m4"
+                    ],
+                }
+            )
     if not rows:
         raise ValueError("No applied updates to tabulate")
     path = root / "update_summary.csv"
@@ -213,7 +234,7 @@ def verify_sequential_update_bundle(path: Path | str) -> tuple[str, ...]:
         expected = checksums["files"]
         if not isinstance(expected, dict):
             raise TypeError
-    except (json.JSONDecodeError, KeyError, TypeError):
+    except json.JSONDecodeError, KeyError, TypeError:
         return ("invalid:checksums.json",)
 
     failures = []
@@ -285,8 +306,7 @@ def write_r23_required_case_report(
     accepted = (
         counts["passed"] == len(cases)
         and all(
-            counts[name] == 0
-            for name in ("failed", "errored", "skipped", "missing")
+            counts[name] == 0 for name in ("failed", "errored", "skipped", "missing")
         )
         and runtime_accepted
     )
@@ -340,9 +360,7 @@ def _runtime_verification_payload(
         if mobile_keys:
             mobile_entries.append(result)
     incorporated_mobile_keys = tuple(
-        key
-        for entry in trace.log
-        for key in entry.eligible_mobile_measurement_keys
+        key for entry in trace.log for key in entry.eligible_mobile_measurement_keys
     )
     diagnostic_entries = tuple(
         result
@@ -361,17 +379,14 @@ def _runtime_verification_payload(
         for result in diagnostic_entries
         if result.snapshot is not None
         and any(
-            local.sensor_type.value == "mobile"
-            and local.reduction_ug_m3_squared > 0
+            local.sensor_type.value == "mobile" and local.reduction_ug_m3_squared > 0
             for local in result.snapshot.uncertainty_reduction.local
         )
         and result.snapshot.uncertainty_reduction.integrated_reduction_ug2_m4 > 0
     )
     submitted_mobile_set = set(submitted_mobile_keys)
     incorporated_mobile_set = set(incorporated_mobile_keys)
-    unique_incorporation = len(incorporated_mobile_keys) == len(
-        incorporated_mobile_set
-    )
+    unique_incorporation = len(incorporated_mobile_keys) == len(incorporated_mobile_set)
     incorporation_coverage = (
         len(submitted_mobile_set.intersection(incorporated_mobile_set))
         / len(submitted_mobile_set)
@@ -394,9 +409,7 @@ def _runtime_verification_payload(
         "runtime_accepted": runtime_accepted,
         "eligible_mobile_measurement_count": len(submitted_mobile_set),
         "incorporated_mobile_measurement_count": len(incorporated_mobile_keys),
-        "unique_incorporated_mobile_measurement_count": len(
-            incorporated_mobile_set
-        ),
+        "unique_incorporated_mobile_measurement_count": len(incorporated_mobile_set),
         "mobile_measurements_incorporated_exactly_once": unique_incorporation,
         "eligible_mobile_incorporation_coverage": incorporation_coverage,
         "applied_mobile_batch_count": len(mobile_entries),
@@ -411,7 +424,10 @@ def _junit_outcomes(path: Path) -> dict[tuple[str, str], str]:
     root = ET.parse(path).getroot()
     outcomes: dict[tuple[str, str], str] = {}
     for testcase in root.iter("testcase"):
-        identity = (testcase.attrib.get("classname", ""), testcase.attrib.get("name", ""))
+        identity = (
+            testcase.attrib.get("classname", ""),
+            testcase.attrib.get("name", ""),
+        )
         if identity in outcomes:
             raise ValueError(f"Duplicate JUnit test identity {identity!r}")
         if testcase.find("failure") is not None:
@@ -438,8 +454,7 @@ def _required_case_outcome(
     candidates = [
         outcome
         for (classname, name), outcome in outcomes.items()
-        if name == expected_name
-        and classname.rsplit(".", 1)[-1] == expected_module
+        if name == expected_name and classname.rsplit(".", 1)[-1] == expected_module
     ]
     return candidates[0] if len(candidates) == 1 else "missing"
 
@@ -489,8 +504,9 @@ def _jsonable(value: object) -> object:
         return {str(key): _jsonable(item) for key, item in value.items()}
     if isinstance(value, (tuple, list)):
         return [_jsonable(item) for item in value]
-    if hasattr(value, "total_seconds"):
-        return value.total_seconds()
+    total_seconds = getattr(value, "total_seconds", None)
+    if callable(total_seconds):
+        return total_seconds()
     return value
 
 

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import datetime, timedelta
-from typing import Sequence
+from itertools import pairwise
 
 from lima_pm25.domain import GridDefinition
 from lima_pm25.simulation import MeasurementBatch, MeasurementRecord, SensorType
@@ -30,9 +31,7 @@ def compose_historical_replay_batches(
             "historical_fixed_records must contain accepted fixed observations"
         )
     if any(record.sensor_type is not SensorType.MOBILE for record in mobile):
-        raise ValueError(
-            "simulated_mobile_attempts must contain only mobile records"
-        )
+        raise ValueError("simulated_mobile_attempts must contain only mobile records")
 
     accepted_mobile = tuple(record for record in mobile if record.is_accepted)
     grouped: dict[datetime, list[MeasurementRecord]] = defaultdict(list)
@@ -77,16 +76,9 @@ def reconstruct_measurement_series(
     if history_duration <= timedelta(0):
         raise ValueError("history_duration must be positive")
     timestamps = tuple(reconstruction_timestamps_utc)
-    if any(
-        current <= previous
-        for previous, current in zip(timestamps, timestamps[1:], strict=False)
-    ):
+    if any(current <= previous for previous, current in pairwise(timestamps)):
         raise ValueError("reconstruction_timestamps_utc must strictly increase")
-    records = tuple(
-        record
-        for batch in batches
-        for record in batch.records
-    )
+    records = tuple(record for batch in batches for record in batch.records)
     reconstructor = GaussianProcessFieldReconstructor(
         config,
         prediction_chunk_size=prediction_chunk_size,

@@ -65,6 +65,9 @@ evaluador; los ensayos no establecen exactitud atmosférica real.
 Ejecutar desde la raíz del repositorio:
 
 ```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run ty check --error-on-warning
 uv run pytest
 uv build
 ```

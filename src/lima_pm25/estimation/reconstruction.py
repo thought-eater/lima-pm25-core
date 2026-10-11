@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import math
-from typing import Sequence
 
 import numpy as np
+from numpy.typing import ArrayLike, DTypeLike
 from pyproj import CRS
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Kernel, Matern
@@ -36,7 +37,7 @@ class ReconstructionConfig:
             self.temporal_length_scale_s,
         )
         if not isinstance(self.include_clipped_observations, bool):
-            raise ValueError("include_clipped_observations must be a boolean")
+            raise ValueError("include_clipped_observations must be a boolean")  # noqa: TRY004 -- preserve configuration validation contract
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
@@ -101,8 +102,13 @@ class PosteriorField:
         )
         object.__setattr__(self, "active_mask", active_mask)
 
-        if mean.shape != active_mask.shape or standard_deviation.shape != active_mask.shape:
-            raise ValueError("Posterior arrays and active_mask must have the same shape")
+        if (
+            mean.shape != active_mask.shape
+            or standard_deviation.shape != active_mask.shape
+        ):
+            raise ValueError(
+                "Posterior arrays and active_mask must have the same shape"
+            )
         if not np.all(np.isfinite(mean[active_mask])):
             raise ValueError("Active posterior means must be finite")
         if not np.all(np.isfinite(standard_deviation[active_mask])):
@@ -112,7 +118,9 @@ class PosteriorField:
         if np.any(~np.isnan(mean[~active_mask])) or np.any(
             ~np.isnan(standard_deviation[~active_mask])
         ):
-            raise ValueError("Inactive posterior cells must be explicitly masked with NaN")
+            raise ValueError(
+                "Inactive posterior cells must be explicitly masked with NaN"
+            )
         _require_utc_datetime(
             "reconstruction_timestamp_utc",
             self.reconstruction_timestamp_utc,
@@ -227,9 +235,7 @@ class GaussianProcessFieldReconstructor:
                 posterior_fitted=True,
                 kernel=str(regressor.kernel_),
                 numerical_jitter_ug_m3_squared=numerical_jitter,
-                log_marginal_likelihood=float(
-                    regressor.log_marginal_likelihood_value_
-                ),
+                log_marginal_likelihood=float(regressor.log_marginal_likelihood_value_),
             ),
         )
 
@@ -303,9 +309,7 @@ class GaussianProcessFieldReconstructor:
                 posterior_fitted=True,
                 kernel=str(regressor.kernel_),
                 numerical_jitter_ug_m3_squared=numerical_jitter,
-                log_marginal_likelihood=float(
-                    regressor.log_marginal_likelihood_value_
-                ),
+                log_marginal_likelihood=float(regressor.log_marginal_likelihood_value_),
             ),
         )
 
@@ -422,20 +426,24 @@ def _training_arrays(
             (
                 record.x_m - x_origin,
                 record.y_m - y_origin,
-                (record.timestamp_utc - request.reconstruction_timestamp_utc).total_seconds(),
+                (
+                    record.timestamp_utc - request.reconstruction_timestamp_utc
+                ).total_seconds(),
             )
             for record in records
         ],
         dtype=np.float64,
     )
-    targets = np.asarray(
-        [float(record.value_ug_m3) - config.prior_mean_ug_m3 for record in records],
-        dtype=np.float64,
+    targets = (
+        np.asarray(
+            [record.value_ug_m3 for record in records],
+            dtype=np.float64,
+        )
+        - config.prior_mean_ug_m3
     )
     alpha = np.asarray(
         [
-            record.noise_stddev_ug_m3**2
-            + numerical_jitter_ug_m3_squared
+            record.noise_stddev_ug_m3**2 + numerical_jitter_ug_m3_squared
             for record in records
         ],
         dtype=np.float64,
@@ -521,6 +529,6 @@ def _require_metric_crs(crs_value: str) -> None:
         raise ValueError("The reconstruction CRS axes must use meters")
 
 
-def _immutable_array(value: object, dtype: object) -> np.ndarray:
+def _immutable_array(value: ArrayLike, dtype: DTypeLike) -> np.ndarray:
     array = np.asarray(value, dtype=dtype)
     return np.frombuffer(array.tobytes(), dtype=array.dtype).reshape(array.shape)

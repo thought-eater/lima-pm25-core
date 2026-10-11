@@ -21,7 +21,10 @@ def test_robust_scale_uses_only_active_calibration_truth() -> None:
 
     scale = robust_p95_p05_scale(calibration, mask)
 
-    expected = float(np.percentile([0, 10, 20, 30, 40, 50], 95) - np.percentile([0, 10, 20, 30, 40, 50], 5))
+    expected = float(
+        np.percentile([0, 10, 20, 30, 40, 50], 95)
+        - np.percentile([0, 10, 20, 30, 40, 50], 5)
+    )
     assert scale == pytest.approx(expected)
 
 
@@ -168,6 +171,8 @@ def test_uncertainty_change_checks_local_and_integrated_variance() -> None:
     assert passed.status is EvaluationStatus.PASS
     assert passed.local_variance_before == (4.0,)
     assert passed.local_variance_after == (1.0,)
+    assert passed.integrated_variance_after is not None
+    assert passed.integrated_variance_before is not None
     assert passed.integrated_variance_after < passed.integrated_variance_before
     assert failed.status is EvaluationStatus.FAIL
     assert failed.reasons == (

@@ -1,5 +1,5 @@
-from datetime import UTC, datetime, timedelta
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -50,9 +50,7 @@ def test_profile_uses_only_observed_pm25_and_retains_evidence_classes(
     write_lima_plausibility_profile(profile, destination)
     payload = json.loads(destination.read_text(encoding="utf-8"))
     assert payload["nominal_envelopes"]["pm25_ug_m3"] == "p01_to_p99"
-    assert payload["nominal_envelopes"]["precipitation_mm_h"] == (
-        "observed_min_to_max"
-    )
+    assert payload["nominal_envelopes"]["precipitation_mm_h"] == ("observed_min_to_max")
     assert payload["parameters"][0]["evidence_class"] == "synthetic"
     with pytest.raises(FileExistsError, match="already exists"):
         write_lima_plausibility_profile(profile, destination)

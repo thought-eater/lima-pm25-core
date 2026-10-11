@@ -82,6 +82,9 @@ campo oculto. Todo el código pertenece a una única distribución Python.
 ## Pruebas y reproducción
 
 ```bash
+uv run ruff check .
+uv run ruff format --check .
+uv run ty check --error-on-warning
 uv run pytest tests/software
 uv run pytest tests/tesis
 uv run pytest

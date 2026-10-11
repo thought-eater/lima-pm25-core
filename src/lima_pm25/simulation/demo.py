@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import asdict
-from datetime import UTC, datetime
 import json
 import math
+from collections.abc import Sequence
+from dataclasses import asdict
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 import osmnx as ox
@@ -36,7 +36,6 @@ from .orchestration import (
 )
 from .sensing import SensorConfig, SensorType, create_lima_fixed_sensor_configs
 from .trajectory import TimestampedTrajectoryProvider, TrajectoryPoint
-
 from .transport import (
     BoundaryMode,
     MassBudget,
@@ -126,7 +125,9 @@ def run_complete_synthetic_demo(
 ) -> tuple[SimulationRunResult, Path]:
     if study_config is not None:
         request = create_synthetic_study_family_requests(
-            domain, station_catalog=station_catalog, study_config=study_config,
+            domain,
+            station_catalog=station_catalog,
+            study_config=study_config,
         )["event"]
         result = run_simulation(request)
         bundle_directory = output_directory / result.run_id
@@ -266,16 +267,12 @@ def create_synthetic_study_family_requests(
         "control": SimulationRunRequest(
             **shared,
             sources=routine_sources,
-            scenario_identity=study_config.scenario_families[0].run_identity(
-                "control"
-            ),
+            scenario_identity=study_config.scenario_families[0].run_identity("control"),
         ),
         "event": SimulationRunRequest(
             **shared,
             sources=sources,
-            scenario_identity=study_config.scenario_families[0].run_identity(
-                "event"
-            ),
+            scenario_identity=study_config.scenario_families[0].run_identity("event"),
         ),
     }
 
@@ -292,7 +289,8 @@ def animate_synthetic_demo(
     import matplotlib.pyplot as plt
     from matplotlib.widgets import Button
 
-    _require_positive_finite("playback_speed", playback_speed)
+    if not math.isfinite(playback_speed) or playback_speed <= 0:
+        raise ValueError("playback_speed must be positive and finite")
     model, initial_state, sources = _create_synthetic_demo(domain)
     frames = tuple(
         iter_simulation(
@@ -317,7 +315,8 @@ def animate_synthetic_demo(
     colorbar_axis = figure.add_subplot(grid_spec[0, 1])
     status_axis = figure.add_subplot(grid_spec[0, 2])
     _, edges = ox.graph_to_gdfs(domain.road_graph)
-    extent = domain.grid.grid_bounds_m[[0, 2, 1, 3]]
+    x_min, y_min, x_max, y_max = domain.grid.grid_bounds_m
+    extent = (float(x_min), float(x_max), float(y_min), float(y_max))
     field = _masked_demo_field(domain, first_frame.state)
     image = axis.imshow(
         field,
@@ -328,7 +327,8 @@ def animate_synthetic_demo(
         vmax=maximum_scale,
         interpolation="nearest",
     )
-    edges.plot(ax=axis, color="white", linewidth=0.18, alpha=0.25)
+    # GeoPandas accepts scalar colors; the accessor stub rejects this valid call.
+    edges.plot(ax=axis, color="white", linewidth=0.18, alpha=0.25)  # ty: ignore[invalid-argument-type]
     if station_catalog is not None:
         plot_fixed_station_catalog(axis, station_catalog)
     source_artists = tuple(
@@ -543,9 +543,11 @@ def _demo_mobile_replay(
     domain: SpatialDomain,
     line: LineString,
     *,
-    mobility_policy: MobilityPolicy = MobilityPolicy(road_tolerance_m=5.0),
+    mobility_policy: MobilityPolicy | None = None,
     sampling_interval_s: float = 300.0,
 ) -> TimestampedTrajectoryProvider:
+    if mobility_policy is None:
+        mobility_policy = MobilityPolicy(road_tolerance_m=5.0)
     due_times = tuple(
         float(time_s)
         for time_s in np.arange(
@@ -558,9 +560,7 @@ def _demo_mobile_replay(
     for index, time_s in enumerate(due_times):
         cycle_position = index % 20
         fraction = (
-            cycle_position / 10
-            if cycle_position <= 10
-            else (20 - cycle_position) / 10
+            cycle_position / 10 if cycle_position <= 10 else (20 - cycle_position) / 10
         )
         point = line.interpolate(fraction, normalized=True)
         points.append(
@@ -705,7 +705,9 @@ def _demo_concentration_limits(
     return minimum, maximum
 
 
-def _source_style(source: RoadLineSource, simulation_time_s: float) -> dict[str, object]:
+def _source_style(
+    source: RoadLineSource, simulation_time_s: float
+) -> dict[str, object]:
     if not _source_is_active(source, simulation_time_s):
         return {"color": "#77838f", "alpha": 0.45, "linestyle": ":"}
     if source.role is PM25SourceRole.COUNTERFACTUAL_EVENT:
@@ -963,7 +965,8 @@ def _build_pm25_summary_figure(
         figure.add_subplot(grid_spec[1, 1]),
     )
     colorbar_axis = figure.add_subplot(grid_spec[:, 2])
-    extent = domain.grid.grid_bounds_m[[0, 2, 1, 3]]
+    x_min, y_min, x_max, y_max = domain.grid.grid_bounds_m
+    extent = (float(x_min), float(x_max), float(y_min), float(y_max))
     selected_frames = _select_demo_summary_frames(frames)
     minimum_scale, maximum_scale = _demo_concentration_limits(domain, frames)
 
@@ -979,7 +982,8 @@ def _build_pm25_summary_figure(
             vmax=maximum_scale,
             interpolation="nearest",
         )
-        edges.plot(ax=axis, color="white", linewidth=0.12, alpha=0.22)
+        # Keep a scalar color so multi-part road geometries share the same color.
+        edges.plot(ax=axis, color="white", linewidth=0.12, alpha=0.22)  # ty: ignore[invalid-argument-type]
         if station_catalog is not None:
             plot_fixed_station_catalog(axis, station_catalog)
         _plot_demo_sources(

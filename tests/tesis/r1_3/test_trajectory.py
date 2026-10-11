@@ -72,7 +72,10 @@ def test_trajectory_rejects_offroad_and_excessively_external_positions() -> None
 
 def test_domain_buffer_controls_the_permitted_road_excursion() -> None:
     point = (TrajectoryPoint("MOBILE", 0, 120, 50),)
-    assert _provider(point, road_network_buffer_m=50).position_at("MOBILE", 0) == (120, 50)
+    assert _provider(point, road_network_buffer_m=50).position_at("MOBILE", 0) == (
+        120,
+        50,
+    )
     with pytest.raises(TrajectoryValidationError, match="road_network_buffer_m"):
         _provider(point, road_network_buffer_m=0)
 

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import StrEnum
-import math
-from typing import Callable, Sequence
 
 import numpy as np
 from pyproj import CRS
@@ -72,7 +72,9 @@ class SensorConfig:
                 self.mobile_position_provider_id,
             )
             if self.station_site_id is not None:
-                raise ValueError("A mobile sensor cannot reference a fixed station site")
+                raise ValueError(
+                    "A mobile sensor cannot reference a fixed station site"
+                )
 
 
 @dataclass(frozen=True, slots=True)
@@ -191,7 +193,9 @@ class SensingService:
         for provider in mobile_position_providers:
             _require_usable_text("provider_id", provider.provider_id)
             if provider.provider_id in providers:
-                raise ValueError(f"Duplicate mobile provider_id {provider.provider_id!r}")
+                raise ValueError(
+                    f"Duplicate mobile provider_id {provider.provider_id!r}"
+                )
             if CRS.from_user_input(provider.crs) != CRS.from_user_input(grid.crs):
                 raise ValueError(
                     f"Mobile provider {provider.provider_id!r} uses a different CRS"
@@ -271,7 +275,10 @@ class SensingService:
                     raise ValueError(
                         f"Fixed station {site.site_id!r} is not in an active grid cell"
                     )
-            elif config.mobile_position_provider_id not in self._mobile_position_providers:
+            elif (
+                config.mobile_position_provider_id
+                not in self._mobile_position_providers
+            ):
                 raise ValueError(
                     "Unknown mobile position provider "
                     f"{config.mobile_position_provider_id!r}"

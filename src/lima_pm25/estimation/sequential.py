@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
-import math
-from typing import Protocol, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 import numpy as np
+from numpy.typing import ArrayLike, DTypeLike
 
 from lima_pm25.domain import GridDefinition
 from lima_pm25.simulation import (
@@ -260,9 +262,7 @@ class SequentialUpdateTrace:
     @property
     def snapshots(self) -> tuple[SequentialMapSnapshot, ...]:
         return tuple(
-            result.snapshot
-            for result in self.results
-            if result.snapshot is not None
+            result.snapshot for result in self.results if result.snapshot is not None
         )
 
     @property
@@ -374,9 +374,7 @@ class SequentialMapUpdater:
             before=before,
             after=after,
             new_records=eligible,
-            local_tolerance=(
-                self.config.variance_numerical_tolerance_ug_m3_squared
-            ),
+            local_tolerance=(self.config.variance_numerical_tolerance_ug_m3_squared),
         )
 
         sequence_number = self._state.sequence_number + 1
@@ -470,9 +468,7 @@ class SequentialMapUpdater:
             latest_processed_timestamp_utc=batch.timestamp_utc,
             sequence_number=self._state.sequence_number,
             current_snapshot=self._state.current_snapshot,
-            active_incorporated_records=(
-                self._state.active_incorporated_records
-            ),
+            active_incorporated_records=(self._state.active_incorporated_records),
             processed_measurements=(
                 *self._state.processed_measurements,
                 *dispositions,
@@ -618,7 +614,7 @@ def _measurement_key(record: MeasurementRecord) -> MeasurementKey:
     return record.sensor_id, record.timestamp_utc
 
 
-def _immutable_array(value: object, dtype: object) -> np.ndarray:
+def _immutable_array(value: ArrayLike, dtype: DTypeLike) -> np.ndarray:
     array = np.asarray(value, dtype=dtype)
     return np.frombuffer(array.tobytes(), dtype=array.dtype).reshape(array.shape)
 

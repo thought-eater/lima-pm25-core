@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import csv
+import math
 from collections import Counter
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
-import math
 from pathlib import Path
-from typing import Sequence
 from zoneinfo import ZoneInfo
 
 from pyproj import CRS, Transformer
@@ -88,7 +88,10 @@ class HistoricalPM25Record:
     def __post_init__(self) -> None:
         _require_text("station_id", self.station_id)
         _require_utc("timestamp_utc", self.timestamp_utc)
-        if not math.isfinite(self.longitude_deg) or not -180 <= self.longitude_deg <= 180:
+        if (
+            not math.isfinite(self.longitude_deg)
+            or not -180 <= self.longitude_deg <= 180
+        ):
             raise ValueError("longitude_deg must be finite and between -180 and 180")
         if not math.isfinite(self.latitude_deg) or not -90 <= self.latitude_deg <= 90:
             raise ValueError("latitude_deg must be finite and between -90 and 90")
@@ -267,8 +270,7 @@ def load_historical_pm25_csv(
         ]
         if missing_columns:
             raise ValueError(
-                "PM2.5 CSV is missing required columns: "
-                f"{', '.join(missing_columns)}"
+                f"PM2.5 CSV is missing required columns: {', '.join(missing_columns)}"
             )
 
         for row in reader:
@@ -427,5 +429,9 @@ def _require_utc(name: str, value: datetime) -> None:
 
 
 def _require_sha256(value: str) -> None:
-    if len(value) != 64 or any(character not in "0123456789abcdef" for character in value):
-        raise ValueError("resource_sha256 must be a lowercase SHA-256 hexadecimal digest")
+    if len(value) != 64 or any(
+        character not in "0123456789abcdef" for character in value
+    ):
+        raise ValueError(
+            "resource_sha256 must be a lowercase SHA-256 hexadecimal digest"
+        )

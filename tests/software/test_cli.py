@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-import lima_pm25.cli as cli
+from lima_pm25 import cli
 
 
 @pytest.fixture
@@ -39,18 +39,23 @@ def test_no_arguments_run_headless_simulation(
 
 
 def test_complete_example_receives_selected_study_configuration(
-    isolated_cli, monkeypatch, tmp_path,
+    isolated_cli,
+    monkeypatch,
+    tmp_path,
 ) -> None:
     import json
     from pathlib import Path
+
     payload = json.loads(Path("config/study_environment.json").read_text())
     payload["temporal"]["concentration_output_interval_s"] = 437.0
     config_path = tmp_path / "study.json"
     config_path.write_text(json.dumps(payload))
     received = []
+
     def run(domain, *, station_catalog, study_config):
         received.append(study_config.temporal.concentration_output_interval_s)
         return _complete_result()
+
     monkeypatch.setattr(cli, "run_complete_synthetic_demo", run)
     cli.main(["--study-config", str(config_path)])
     assert received == [437.0]
@@ -79,7 +84,7 @@ def test_domain_summary_reports_projected_operational_grid_only(
         grid_source="cache",
     )
 
-    cli._print_domain_summary(domain)
+    cli._print_domain_summary(domain)  # ty: ignore[invalid-argument-type] -- summary-only test double
 
     output = capsys.readouterr().out
     assert "EPSG:32718" in output
@@ -253,19 +258,31 @@ def test_sensitivity_command_writes_only_experimental_summary(tmp_path, monkeypa
     calls = []
     monkeypatch.setattr(cli, "create_spatial_domain", lambda config: object())
     monkeypatch.setattr(cli, "_print_domain_summary", lambda domain: None)
+
     def experiment(domain, config, protocol):
         calls.append(config)
-        return {"technical_selection": {"cell_size_m": 200.0,
-                "concentration_output_interval_s": 300.0}}
+        return {
+            "technical_selection": {
+                "cell_size_m": 200.0,
+                "concentration_output_interval_s": 300.0,
+            }
+        }
+
     monkeypatch.setattr(cli, "run_study_discretization_experiment", experiment)
     output = tmp_path / "result.json"
-    cli._run_study_sensitivity(cli.Path("config/study_environment.json"),
-        cli.Path("config/discretization_protocol.json"), output)
+    cli._run_study_sensitivity(
+        cli.Path("config/study_environment.json"),
+        cli.Path("config/discretization_protocol.json"),
+        output,
+    )
     assert len(calls) == 1
     assert list(tmp_path.iterdir()) == [output]
     with pytest.raises(FileExistsError):
-        cli._run_study_sensitivity(cli.Path("config/study_environment.json"),
-            cli.Path("config/discretization_protocol.json"), output)
+        cli._run_study_sensitivity(
+            cli.Path("config/study_environment.json"),
+            cli.Path("config/discretization_protocol.json"),
+            output,
+        )
     assert len(calls) == 1
 
 

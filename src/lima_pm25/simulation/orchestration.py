@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+import json
+import math
+import platform
+from collections.abc import Sequence
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 from hashlib import sha256
 from importlib.metadata import PackageNotFoundError, version
-import json
-import math
-import platform
-from typing import Protocol, Sequence
+from itertools import pairwise
+from typing import Protocol
 
 import numpy as np
 
@@ -30,19 +32,29 @@ from .trajectory import MobilePositionProvider
 from .transport import BoundaryMode, MassBudget, PM25State, PM25Transport
 from .weather import WeatherDiagnostic
 
-
 ORCHESTRATION_SCHEMA_VERSION = 1
 EVENT_ORDER_VERSION = "interval-then-output-sensors-batch-v1"
 _TIME_TOLERANCE_S = 1e-9
 
 
 class WeatherEpisode(Protocol):
-    start_utc: datetime
-    end_utc: datetime
-    duration_s: float
-    provider_id: str
-    provenance: str
-    transition_times_s: tuple[float, ...]
+    @property
+    def start_utc(self) -> datetime: ...
+
+    @property
+    def end_utc(self) -> datetime: ...
+
+    @property
+    def duration_s(self) -> float: ...
+
+    @property
+    def provider_id(self) -> str: ...
+
+    @property
+    def provenance(self) -> str: ...
+
+    @property
+    def transition_times_s(self) -> tuple[float, ...]: ...
 
     def forcing_at_elapsed_s(self, elapsed_s: float) -> AtmosphericForcing: ...
 
@@ -112,10 +124,12 @@ class SimulationRunConfig:
             explicit_times,
         )
         if self.concentration_output_interval_s is None and not explicit_times:
-            raise ValueError(
-                "Simulation outputs require an interval or explicit times"
-            )
-        if not isinstance(self.seed, int) or isinstance(self.seed, bool) or self.seed < 0:
+            raise ValueError("Simulation outputs require an interval or explicit times")
+        if (
+            not isinstance(self.seed, int)
+            or isinstance(self.seed, bool)
+            or self.seed < 0
+        ):
             raise ValueError("seed must be a nonnegative integer")
         object.__setattr__(self, "boundary_mode", BoundaryMode(self.boundary_mode))
         if self.event_order_version != EVENT_ORDER_VERSION:
@@ -156,7 +170,7 @@ class RegionalBoundarySchedule:
         values = tuple(self.values)
         if not values or values[0].starts_at_s != 0:
             raise ValueError("Regional boundary must define its first value at t=0")
-        for left, right in zip(values, values[1:], strict=False):
+        for left, right in pairwise(values):
             if right.starts_at_s <= left.starts_at_s:
                 raise ValueError("Regional-boundary start times must increase")
         object.__setattr__(self, "values", values)
@@ -344,7 +358,7 @@ def run_simulation(request: SimulationRunRequest) -> SimulationRunResult:
         attempts = sensing.sample_due(
             end_time_s,
             timestamp_at=clock.utc_at,
-            concentration_at=lambda _time_s: state.concentration_ug_m3,
+            concentration_at=lambda _time_s, state=state: state.concentration_ug_m3,
         )
         _append_batch(batches, attempts)
         current_time_s = end_time_s
@@ -406,9 +420,7 @@ def _validate_request(
 
     if config.boundary_mode is BoundaryMode.REGIONAL_INFLOW:
         if request.regional_boundary is None:
-            raise ValueError(
-                "regional_boundary is required for regional-inflow runs"
-            )
+            raise ValueError("regional_boundary is required for regional-inflow runs")
     elif request.regional_boundary is not None:
         raise ValueError("Closed-boundary runs cannot configure regional inflow")
     boundary_times = _validated_transition_times(
@@ -435,7 +447,8 @@ def _validate_request(
                 f"Source {source.source_id!r} must expose transitions and evidence"
             ) from error
         if not isinstance(descriptor, dict):
-            raise ValueError("Source evidence_descriptor must return a mapping")
+            # Provider validation consistently reports ValueError to callers.
+            raise ValueError("Source evidence_descriptor must return a mapping")  # noqa: TRY004
         source_times.extend(
             _validated_transition_times(
                 f"source {source.source_id}",
@@ -445,8 +458,7 @@ def _validate_request(
         )
 
     provider_by_id = {
-        provider.provider_id: provider
-        for provider in request.mobile_position_providers
+        provider.provider_id: provider for provider in request.mobile_position_providers
     }
     if len(provider_by_id) != len(request.mobile_position_providers):
         raise ValueError("Mobile replay provider IDs must be unique")

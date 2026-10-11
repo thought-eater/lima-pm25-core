@@ -6,8 +6,8 @@ import pytest
 from lima_pm25.domain import (
     EvidenceStatus,
     ScenarioFactor,
-    ScenarioFamilyPurpose,
     ScenarioFamilyDefinition,
+    ScenarioFamilyPurpose,
     ScenarioMemberDefinition,
     SelectionStatus,
     load_study_environment_config,
@@ -21,8 +21,7 @@ def test_versioned_study_configuration_loads_with_explicit_statuses() -> None:
     assert config.domain.cell_size_m == 200
     assert config.horizontal_candidate_cell_sizes_m == (50, 100, 200)
     assert (
-        config.selected_cell_size_status
-        is SelectionStatus.TECHNICAL_SELECTION_COMPLETE
+        config.selected_cell_size_status is SelectionStatus.TECHNICAL_SELECTION_COMPLETE
     )
     assert config.vertical.evidence_status is EvidenceStatus.SYNTHETIC_DEMO
     assert config.temporal.mobile_sampling_interval_s == 300
@@ -68,9 +67,7 @@ def test_control_member_cannot_declare_changed_factors(tmp_path: Path) -> None:
     payload = json.loads(
         Path("config/study_environment.json").read_text(encoding="utf-8")
     )
-    payload["scenario_families"][0]["members"][0]["changed_factors"] = [
-        "weather"
-    ]
+    payload["scenario_families"][0]["members"][0]["changed_factors"] = ["weather"]
     path = tmp_path / "invalid-family.json"
     path.write_text(json.dumps(payload), encoding="utf-8")
 

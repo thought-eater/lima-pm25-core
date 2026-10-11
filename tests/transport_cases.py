@@ -1,14 +1,21 @@
 """Entradas sintéticas compartidas por pruebas de contratos y ensayos numéricos."""
 
+from dataclasses import replace
+
 import numpy as np
 from shapely.geometry import box
 
 from lima_pm25.domain import (
-    AmbientBaseline, AtmosphericForcing, GridDefinition, RegionalBoundaryForcing,
+    AmbientBaseline,
+    AtmosphericForcing,
+    GridDefinition,
+    RegionalBoundaryForcing,
     build_grid,
 )
 from lima_pm25.simulation.transport import (
-    GaussianKernelSource, PM25PhysicsConfig, PM25Transport,
+    GaussianKernelSource,
+    PM25PhysicsConfig,
+    PM25Transport,
 )
 
 
@@ -41,18 +48,17 @@ def _forcing(**changes: float) -> AtmosphericForcing:
 
 
 def _source(**changes: object) -> GaussianKernelSource:
-    values = {
-        "source_id": "source",
-        "x_m": 2_050.0,
-        "y_m": 2_050.0,
-        "emission_rate_ug_s": 1_000.0,
-        "sigma_m": 200.0,
-        "starts_at_s": 0.0,
-        "ends_at_s": None,
-        "provenance": "synthetic test source",
-    }
-    values.update(changes)
-    return GaussianKernelSource(**values)
+    source = GaussianKernelSource(
+        source_id="source",
+        x_m=2_050.0,
+        y_m=2_050.0,
+        emission_rate_ug_s=1_000.0,
+        sigma_m=200.0,
+        starts_at_s=0.0,
+        ends_at_s=None,
+        provenance="synthetic test source",
+    )
+    return replace(source, **changes)
 
 
 def _baseline(concentration_ug_m3: float) -> AmbientBaseline:

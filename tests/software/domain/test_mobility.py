@@ -16,9 +16,9 @@ def test_road_policy_requires_tolerance_is_immutable_and_has_no_speed_default() 
     assert DomainConfig().road_network_buffer_m == 50
     assert policy.maximum_speed_m_s is None
     with pytest.raises(TypeError, match="road_tolerance_m"):
-        MobilityPolicy()
+        MobilityPolicy()  # ty: ignore[missing-argument] -- exercise required argument
     with pytest.raises(FrozenInstanceError):
-        policy.road_tolerance_m = 10  # type: ignore[misc]
+        policy.road_tolerance_m = 10  # ty: ignore[invalid-assignment] -- exercise immutability
 
 
 @pytest.mark.parametrize(

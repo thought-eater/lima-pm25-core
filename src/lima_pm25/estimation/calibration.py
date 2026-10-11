@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 import json
 import math
+from collections.abc import Sequence
+from dataclasses import dataclass
+from datetime import timedelta
 from pathlib import Path
 from statistics import NormalDist
-from typing import Sequence
 
 import numpy as np
 
@@ -78,9 +78,7 @@ class GPCalibrationResult:
             "prior_mean_ug_m3": self.prior_mean_ug_m3,
             "prior_stddev_ug_m3": self.prior_stddev_ug_m3,
             "prior_method": self.prior_method,
-            "observation_noise_stddev_ug_m3": (
-                self.observation_noise_stddev_ug_m3
-            ),
+            "observation_noise_stddev_ug_m3": (self.observation_noise_stddev_ug_m3),
             "selected_candidate": _candidate_descriptor(self.selected_candidate),
             "selected_config": {
                 "prior_mean_ug_m3": self.selected_config.prior_mean_ug_m3,
@@ -138,8 +136,7 @@ def calibrate_gp_from_historical_stations(
 ) -> GPCalibrationResult:
     windows = tuple(calibration_windows)
     if not windows or any(
-        window.partition is not HistoricalPartition.CALIBRATION
-        for window in windows
+        window.partition is not HistoricalPartition.CALIBRATION for window in windows
     ):
         raise ValueError("calibration_windows must contain calibration windows")
     selected_station_ids = tuple(station_ids)
@@ -179,26 +176,34 @@ def calibrate_gp_from_historical_stations(
         and record.value_ug_m3 is not None
     )
     calibration_values = np.asarray(
-        [float(record.value_ug_m3) for record in calibration_records], dtype=np.float64,
+        [record.value_ug_m3 for record in calibration_records],
+        dtype=np.float64,
     )
     if calibration_values.size < 2:
         raise ValueError("Historical GP calibration requires at least two targets")
     prior_mean = float(np.median(calibration_values))
     prior_stddev = float(np.std(calibration_values))
     if not math.isfinite(prior_stddev) or prior_stddev <= 0:
-        raise ValueError("Historical calibration cannot define positive prior uncertainty")
+        raise ValueError(
+            "Historical calibration cannot define positive prior uncertainty"
+        )
 
     # One donor-only prior per held-out station, shared by all candidates. The
     # pooled prior above belongs only to the final operational configuration.
     station_priors = {}
     for station in sorted({record.sensor_id for record in calibration_records}):
-        donor_values = np.asarray([
-            float(record.value_ug_m3)
-            for record in calibration_records
-            if record.sensor_id != station
-        ])
+        donor_values = np.asarray(
+            [
+                record.value_ug_m3
+                for record in calibration_records
+                if record.sensor_id != station
+            ],
+            dtype=np.float64,
+        )
         if donor_values.size < 2:
-            raise ValueError(f"Insufficient donor observations when excluding {station}")
+            raise ValueError(
+                f"Insufficient donor observations when excluding {station}"
+            )
         donor_stddev = float(np.std(donor_values))
         if not math.isfinite(donor_stddev) or donor_stddev <= 0:
             raise ValueError(f"Nonpositive prior uncertainty when excluding {station}")
@@ -234,9 +239,7 @@ def calibrate_gp_from_historical_stations(
         prior_stddev_ug_m3=prior_stddev,
         x_length_scale_m=selected_score.candidate.spatial_length_scale_m,
         y_length_scale_m=selected_score.candidate.spatial_length_scale_m,
-        temporal_length_scale_s=(
-            selected_score.candidate.temporal_length_scale_s
-        ),
+        temporal_length_scale_s=(selected_score.candidate.temporal_length_scale_s),
     )
     return GPCalibrationResult(
         station_ids=selected_station_ids,
@@ -292,13 +295,15 @@ def _score_candidate(
     minimum_input_record_count: int,
 ) -> GPCandidateScore:
     reconstructors = {
-        station: GaussianProcessFieldReconstructor(ReconstructionConfig(
-            prior_mean_ug_m3=mean,
-            prior_stddev_ug_m3=stddev,
-            x_length_scale_m=candidate.spatial_length_scale_m,
-            y_length_scale_m=candidate.spatial_length_scale_m,
-            temporal_length_scale_s=candidate.temporal_length_scale_s,
-        ))
+        station: GaussianProcessFieldReconstructor(
+            ReconstructionConfig(
+                prior_mean_ug_m3=mean,
+                prior_stddev_ug_m3=stddev,
+                x_length_scale_m=candidate.spatial_length_scale_m,
+                y_length_scale_m=candidate.spatial_length_scale_m,
+                temporal_length_scale_s=candidate.temporal_length_scale_s,
+            )
+        )
         for station, (mean, stddev) in station_priors.items()
     }
     targets: list[float] = []
@@ -330,9 +335,7 @@ def _score_candidate(
             assert target.value_ug_m3 is not None
             targets.append(float(target.value_ug_m3))
             means.append(float(posterior.mean_ug_m3[0]))
-            standard_deviations.append(
-                float(posterior.standard_deviation_ug_m3[0])
-            )
+            standard_deviations.append(float(posterior.standard_deviation_ug_m3[0]))
             prior_standard_deviations.append(station_priors[target.sensor_id][1])
             target_stations.append(target.sensor_id)
     if not targets:
@@ -342,9 +345,8 @@ def _score_candidate(
     stddev_array = np.asarray(standard_deviations)
     errors = mean_array - target_array
     z95 = NormalDist().inv_cdf(0.975)
-    covered = (
-        (mean_array - z95 * stddev_array <= target_array)
-        & (target_array <= mean_array + z95 * stddev_array)
+    covered = (mean_array - z95 * stddev_array <= target_array) & (
+        target_array <= mean_array + z95 * stddev_array
     )
     prior_widths = 2 * z95 * np.asarray(prior_standard_deviations)
     widths = 2 * z95 * stddev_array

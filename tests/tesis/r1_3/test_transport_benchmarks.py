@@ -7,10 +7,22 @@ import pytest
 from shapely.geometry import LineString, Polygon
 
 from lima_pm25.domain import PM25SourceRole, build_grid
-from lima_pm25.simulation.transport import BoundaryMode, PM25Transport, RoadLineSource, iter_simulation
+from lima_pm25.simulation.transport import (
+    BoundaryMode,
+    PM25Transport,
+    RoadLineSource,
+    iter_simulation,
+)
 from tests.transport_cases import (
-    _baseline, _boundary, _cell_volume, _centroid, _forcing, _physics,
-    _source, _square_grid, _x_variance,
+    _baseline,
+    _boundary,
+    _cell_volume,
+    _centroid,
+    _forcing,
+    _physics,
+    _source,
+    _square_grid,
+    _x_variance,
 )
 
 
@@ -273,17 +285,22 @@ def test_counterfactual_line_event_changes_only_source_inputs() -> None:
         role=PM25SourceRole.COUNTERFACTUAL_EVENT,
     )
 
-    arguments = {
-        "duration_s": 60,
-        "frame_duration_s": 60,
-        "forcing_at": lambda _time_s: forcing,
-        "regional_boundary_at": lambda _time_s: boundary,
-        "boundary_mode": BoundaryMode.REGIONAL_INFLOW,
-    }
-    baseline_frames = tuple(iter_simulation(model, initial, **arguments))
-    event_frames = tuple(
-        iter_simulation(model, initial, sources=(event,), **arguments)
-    )
+    def run(sources: tuple[RoadLineSource, ...]):
+        return tuple(
+            iter_simulation(
+                model,
+                initial,
+                duration_s=60,
+                frame_duration_s=60,
+                forcing_at=lambda _time_s: forcing,
+                regional_boundary_at=lambda _time_s: boundary,
+                boundary_mode=BoundaryMode.REGIONAL_INFLOW,
+                sources=sources,
+            )
+        )
+
+    baseline_frames = run(())
+    event_frames = run((event,))
     baseline_state = baseline_frames[-1].state
     event_state = event_frames[-1].state
     baseline_budget = baseline_frames[-1].budget
@@ -355,16 +372,10 @@ def test_timestep_refinement_produces_convergent_fields() -> None:
         boundary_mode=BoundaryMode.CLOSED,
     )
     coarse_difference = np.sum(
-        np.abs(
-            coarse_state.concentration_ug_m3
-            - refined_state.concentration_ug_m3
-        )
+        np.abs(coarse_state.concentration_ug_m3 - refined_state.concentration_ug_m3)
     )
     refined_difference = np.sum(
-        np.abs(
-            refined_state.concentration_ug_m3
-            - fine_state.concentration_ug_m3
-        )
+        np.abs(refined_state.concentration_ug_m3 - fine_state.concentration_ug_m3)
     )
     reference = np.sum(np.abs(fine_state.concentration_ug_m3))
 

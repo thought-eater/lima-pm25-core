@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from hashlib import sha256
 import json
-from pathlib import Path
 import shutil
 import tempfile
+from dataclasses import dataclass
+from hashlib import sha256
+from pathlib import Path
 
 import numpy as np
 
@@ -100,7 +100,7 @@ def verify_run_bundle(bundle_directory: Path | str) -> BundleVerificationResult:
         expected = payload["files"]
         if not isinstance(expected, dict):
             raise TypeError
-    except (json.JSONDecodeError, KeyError, TypeError):
+    except json.JSONDecodeError, KeyError, TypeError:
         return BundleVerificationResult(False, ("invalid:checksums.json",))
 
     failures: list[str] = []

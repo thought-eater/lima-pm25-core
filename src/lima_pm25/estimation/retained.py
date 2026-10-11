@@ -100,9 +100,7 @@ def evaluate_retained_synthetic_run(
         mean_maps=mixed_means,
         standard_deviation_maps=mixed_stddev,
         active_mask=grid.active_mask,
-        prior_standard_deviation_ug_m3=(
-            reconstruction_config.prior_stddev_ug_m3
-        ),
+        prior_standard_deviation_ug_m3=(reconstruction_config.prior_stddev_ug_m3),
         profile=r22_profile,
     )
     batches_by_timestamp = {

@@ -6,10 +6,10 @@ import pytest
 from pyproj import CRS
 
 from lima_pm25.domain import (
+    SENAMHI_PM25_PROVENANCE,
     FixedStationCatalog,
     FixedStationSite,
     GridDefinition,
-    SENAMHI_PM25_PROVENANCE,
 )
 from lima_pm25.simulation import (
     MeasurementHistory,
@@ -92,17 +92,22 @@ def test_fixed_sensor_samples_every_crossed_due_time_exactly_once() -> None:
 
     assert [record.simulation_time_s for record in records] == [0, 3600, 7200]
     assert [record.value_ug_m3 for record in records] == [10, 11, 12]
-    assert all(record.quality_status is MeasurementQuality.ACCEPTED for record in records)
+    assert all(
+        record.quality_status is MeasurementQuality.ACCEPTED for record in records
+    )
     assert all(
         record.provenance == "baseline synthetic sensing at SENAMHI PM2.5 sites"
         for record in records
     )
     assert all(record.position_source_id == "STATION" for record in records)
-    assert service.sample_due(
-        7200,
-        timestamp_at=lambda elapsed: start + timedelta(seconds=elapsed),
-        concentration_at=lambda _: np.full(grid.shape, 99.0),
-    ) == ()
+    assert (
+        service.sample_due(
+            7200,
+            timestamp_at=lambda elapsed: start + timedelta(seconds=elapsed),
+            concentration_at=lambda _: np.full(grid.shape, 99.0),
+        )
+        == ()
+    )
     assert service.state_for("STATION").next_due_time_s == 10_800
 
 
@@ -296,8 +301,9 @@ def test_public_measurement_record_does_not_expose_hidden_truth() -> None:
     assert "sampled_truth_ug_m3" not in public_fields
     assert "hidden_field" not in public_fields
     assert "pre_bound_value_ug_m3" not in public_fields
-    with pytest.raises(ImportError):
-        exec("from lima_pm25.simulation import _MeasurementDiagnostic", {})
+    from lima_pm25 import simulation
+
+    assert not hasattr(simulation, "_MeasurementDiagnostic")
 
 
 def test_sensor_configuration_validates_position_ownership_and_unique_ids() -> None:
@@ -339,8 +345,9 @@ def _sample_sequence(config: SensorConfig, seed: int) -> tuple[MeasurementRecord
     )
     return service.sample_due(
         20,
-        timestamp_at=lambda elapsed: datetime(2026, 9, 14, tzinfo=UTC)
-        + timedelta(seconds=elapsed),
+        timestamp_at=lambda elapsed: (
+            datetime(2026, 9, 14, tzinfo=UTC) + timedelta(seconds=elapsed)
+        ),
         concentration_at=lambda _: np.full(grid.shape, 10.0),
     )
 
@@ -383,7 +390,7 @@ class _MobileProvider:
 
     def position_at(
         self,
-        _sensor_id: str,
+        sensor_id: str,
         simulation_time_s: float,
     ) -> tuple[float, float]:
         return 30 + simulation_time_s / 6, 50
@@ -403,7 +410,7 @@ class _RecordedMobileProvider:
 
     def position_at(
         self,
-        _sensor_id: str,
+        sensor_id: str,
         simulation_time_s: float,
     ) -> tuple[float, float]:
         self.requested_times.append(simulation_time_s)

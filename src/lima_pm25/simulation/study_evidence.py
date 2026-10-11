@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import asdict, dataclass, replace
-from hashlib import sha256
-from importlib.metadata import PackageNotFoundError, version
 import json
-from pathlib import Path
 import platform
 import shutil
 import tempfile
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import asdict, dataclass, replace
+from hashlib import sha256
+from importlib.metadata import PackageNotFoundError, version
+from pathlib import Path
 from time import perf_counter
-from typing import Callable, Mapping, Sequence
+from typing import Any, TypedDict
 
 import networkx as nx
 import numpy as np
@@ -33,10 +34,17 @@ from .orchestration import (
 )
 
 
+class _SensitivityResult(TypedDict):
+    shape: list[int]
+    active_cells: int
+    runtime_s: float
+    metrics: dict[str, float]
+
+
 @dataclass(frozen=True, slots=True)
 class ResolvedScenarioFamily:
     family_id: str
-    manifest: dict[str, object]
+    manifest: dict[str, Any]
     fingerprint: str
 
 
@@ -95,7 +103,7 @@ def run_horizontal_sensitivity(
 ) -> dict[str, object]:
     from lima_pm25.domain import build_grid
 
-    results: dict[float, dict[str, object]] = {}
+    results: dict[float, _SensitivityResult] = {}
     for cell_size_m in protocol.cell_sizes_m:
         grid = build_grid(boundary, crs, cell_size_m)
         request = request_factory(grid)
@@ -129,9 +137,7 @@ def run_horizontal_sensitivity(
                 raise ValueError(
                     f"Sensitivity probe {name!r} is outside the active grid"
                 )
-            metrics[f"probe:{name}:ug_m3"] = float(
-                frame.concentration_ug_m3[cell]
-            )
+            metrics[f"probe:{name}:ug_m3"] = float(frame.concentration_ug_m3[cell])
         results[cell_size_m] = {
             "shape": list(grid.shape),
             "active_cells": int(np.count_nonzero(grid.active_mask)),
@@ -148,17 +154,14 @@ def run_horizontal_sensitivity(
     fine_size, medium_size, _coarse_size = protocol.cell_sizes_m
     for quantity in protocol.selection_quantities:
         values = {
-            size: results[size]["metrics"][quantity]
-            for size in protocol.cell_sizes_m
+            size: results[size]["metrics"][quantity] for size in protocol.cell_sizes_m
         }
         convergence[quantity] = assess_grid_convergence(values)
         fine_value = values[fine_size]
         medium_value = values[medium_size]
         scale = max(abs(fine_value), np.finfo(np.float64).eps)
         relative_difference = abs(fine_value - medium_value) / scale
-        convergence[quantity]["fine_medium_relative_difference"] = (
-            relative_difference
-        )
+        convergence[quantity]["fine_medium_relative_difference"] = relative_difference
         convergence[quantity]["within_declared_tolerance"] = (
             relative_difference <= protocol.relative_tolerance
         )
@@ -221,10 +224,7 @@ def assess_grid_convergence(
     gci_fine_pct = (
         None
         if np.isclose(fine, 0)
-        else 1.25
-        * abs((fine - medium) / fine)
-        / denominator
-        * 100
+        else 1.25 * abs((fine - medium) / fine) / denominator * 100
     )
     return {
         "status": "applicable",
@@ -324,7 +324,7 @@ def resolve_scenario_family(
         descriptor = descriptors[member.member_id]
         identity = descriptor.get("scenario_identity")
         if not isinstance(identity, dict):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004 -- invalid family lineage is a value error
                 f"Scenario member {member.member_id!r} lacks per-run family lineage"
             )
         expected_identity = {
@@ -358,9 +358,7 @@ def resolve_scenario_family(
             {
                 "member_id": member.member_id,
                 "is_control": member.member_id == definition.control_member_id,
-                "changed_factors": [
-                    factor.value for factor in member.changed_factors
-                ],
+                "changed_factors": [factor.value for factor in member.changed_factors],
                 "claims_calibrated_providers": member.claims_calibrated_providers,
                 "calibration_evidence_id": member.calibration_evidence_id,
                 "request": descriptor,
@@ -416,7 +414,7 @@ def render_scenario_family_markdown(family: ResolvedScenarioFamily) -> str:
     ]
     members = family.manifest["members"]
     if not isinstance(members, list):
-        raise ValueError("Resolved family members must be an array")
+        raise ValueError("Resolved family members must be an array")  # noqa: TRY004 -- manifest validation
     for member in members:
         request = _mapping("family member request", member["request"])
         weather = _mapping("weather", request["weather"])
@@ -458,8 +456,10 @@ def render_scenario_family_markdown(family: ResolvedScenarioFamily) -> str:
     lines.extend(
         (
             "",
-            "Generated fields remain model outputs. Sparse historical PM2.5 "
-            "stations are not a complete observed truth surface.",
+            (
+                "Generated fields remain model outputs. Sparse historical PM2.5 "
+                "stations are not a complete observed truth surface."
+            ),
         )
     )
     return "\n".join(lines)
@@ -472,7 +472,7 @@ def render_environment_markdown(manifest: Mapping[str, object]) -> str:
         manifest["vertical_representation"],
     )
     temporal = _mapping("temporal_policy", manifest["temporal_policy"])
-    families = manifest["scenario_families"]
+    families = _list_of_mappings("scenario_families", manifest["scenario_families"])
     lines = [
         f"# Study environment: {manifest['environment_id']}",
         "",
@@ -489,9 +489,7 @@ def render_environment_markdown(manifest: Mapping[str, object]) -> str:
         "",
     ]
     for family in families:
-        lines.append(
-            f"- `{family['family_id']}` — `{family['fingerprint']}`"
-        )
+        lines.append(f"- `{family['family_id']}` — `{family['fingerprint']}`")
     lines.extend(
         (
             "",
@@ -514,8 +512,10 @@ def render_discretization_markdown(evidence: Mapping[str, object]) -> str:
         "",
         f"- Protocol fingerprint: `{evidence['protocol_fingerprint']}`",
         f"- Selected horizontal cell size: `{selection['cell_size_m']} m`",
-        "- Selected concentration-output interval: "
-        f"`{selection['concentration_output_interval_s']} s`",
+        (
+            "- Selected concentration-output interval: "
+            f"`{selection['concentration_output_interval_s']} s`"
+        ),
         f"- Status: `{selection['status']}`",
         "",
         "## Horizontal adjacent comparisons",
@@ -549,7 +549,7 @@ def render_discretization_markdown(evidence: Mapping[str, object]) -> str:
             f"{trajectory['mean_meaningful_event_effect_l1_relative_difference']:.6g} |"
         )
     lines.extend(("", "## Claim limits", ""))
-    for claim in evidence["protocol"].get("claim_limits", ()):
+    for claim in _mapping("protocol", evidence["protocol"]).get("claim_limits", ()):
         lines.append(f"- {claim}")
     return "\n".join(lines)
 
@@ -572,12 +572,12 @@ def build_environment_manifest(
     configured_ids = {family.family_id for family in config.scenario_families}
     resolved_ids = {family.family_id for family in families}
     if configured_ids != resolved_ids:
-        raise ValueError(
-            "Resolved scenario families do not match study configuration"
-        )
+        raise ValueError("Resolved scenario families do not match study configuration")
     _validate_family_configuration(config, families)
 
-    graph_source = Path(road_graph_path or config.domain.cache_directory / "road_graph.graphml")
+    graph_source = Path(
+        road_graph_path or config.domain.cache_directory / "road_graph.graphml"
+    )
     grid_source = Path(grid_path or config.domain.cache_directory / "grid.npz")
     if not graph_source.is_file():
         raise FileNotFoundError(f"Road graph artifact does not exist: {graph_source}")
@@ -638,9 +638,7 @@ def build_environment_manifest(
         },
         "discretization_evidence": {
             "fingerprint": _fingerprint(resolved_discretization),
-            "technical_selection": resolved_discretization.get(
-                "technical_selection"
-            ),
+            "technical_selection": resolved_discretization.get("technical_selection"),
         },
         "scenario_families": [
             {
@@ -660,9 +658,7 @@ def build_environment_manifest(
                 _file_sha256(lock_file) if lock_file.is_file() else None
             ),
             "source_tree_sha256": (
-                _tree_sha256(source_directory)
-                if source_directory.is_dir()
-                else None
+                _tree_sha256(source_directory) if source_directory.is_dir() else None
             ),
         },
     }
@@ -689,7 +685,9 @@ def write_environment_bundle(
     temporary = Path(
         tempfile.mkdtemp(prefix=f".{destination.name}-", dir=destination.parent)
     )
-    graph_source = Path(road_graph_path or config.domain.cache_directory / "road_graph.graphml")
+    graph_source = Path(
+        road_graph_path or config.domain.cache_directory / "road_graph.graphml"
+    )
     grid_source = Path(grid_path or config.domain.cache_directory / "grid.npz")
     try:
         resolved_discretization = _resolved_discretization_evidence(
@@ -750,7 +748,7 @@ def write_environment_bundle(
         )
         _write_json(
             temporary / "map_metadata.json",
-            _map_metadata(domain, station_catalog, manifest["fingerprint"]),
+            _map_metadata(domain, station_catalog, str(manifest["fingerprint"])),
         )
         spatial_directory = temporary / "spatial"
         spatial_directory.mkdir()
@@ -796,7 +794,7 @@ def verify_environment_bundle(
         expected = payload["files"]
         if not isinstance(expected, dict):
             raise TypeError
-    except (json.JSONDecodeError, KeyError, TypeError):
+    except json.JSONDecodeError, KeyError, TypeError:
         return EnvironmentBundleVerificationResult(
             False,
             ("invalid:checksums.json",),
@@ -824,7 +822,10 @@ def verify_environment_bundle(
         for artifact_name in ("road_graph", "grid"):
             artifact = _mapping(artifact_name, spatial[artifact_name])
             artifact_path = directory / str(artifact["bundle_path"])
-            if artifact_path.is_file() and _file_sha256(artifact_path) != artifact["sha256"]:
+            if (
+                artifact_path.is_file()
+                and _file_sha256(artifact_path) != artifact["sha256"]
+            ):
                 failures.append(f"mismatch:{artifact_name}-manifest-hash")
         family_payload = json.loads(families_path.read_text(encoding="utf-8"))
         family_references = {
@@ -842,7 +843,7 @@ def verify_environment_bundle(
                 failures.append(
                     f"mismatch:scenario-family-reference:{family['family_id']}"
                 )
-    except (json.JSONDecodeError, KeyError, OSError, TypeError, ValueError):
+    except json.JSONDecodeError, KeyError, OSError, TypeError, ValueError:
         failures.append("invalid:environment-bundle-metadata")
     return EnvironmentBundleVerificationResult(not failures, tuple(failures))
 
@@ -864,7 +865,7 @@ def _validate_family_configuration(
             )
         members = family.manifest["members"]
         if not isinstance(members, list):
-            raise ValueError("Resolved family members must be an array")
+            raise ValueError("Resolved family members must be an array")  # noqa: TRY004 -- manifest validation
         for member in members:
             request = _mapping("family member request", member["request"])
             grid = _mapping("grid", request["grid"])
@@ -903,9 +904,7 @@ def _resolved_discretization_evidence(
     if evidence is None:
         return {
             "horizontal_status": "pending_evidence",
-            "horizontal_candidates_m": list(
-                config.horizontal_candidate_cell_sizes_m
-            ),
+            "horizontal_candidates_m": list(config.horizontal_candidate_cell_sizes_m),
             "temporal_status": "pending_evidence",
             "vertical_status": config.vertical.evidence_status.value,
         }
@@ -914,14 +913,17 @@ def _resolved_discretization_evidence(
         "technical_selection",
         resolved.get("technical_selection"),
     )
-    if float(selection.get("cell_size_m")) != config.domain.cell_size_m:
+    cell_size = selection.get("cell_size_m")
+    output_interval = selection.get("concentration_output_interval_s")
+    if cell_size is None or output_interval is None:
+        raise ValueError(
+            "Discretization evidence must include selected size and interval"
+        )
+    if float(cell_size) != config.domain.cell_size_m:
         raise ValueError(
             "Discretization evidence cell size does not match study configuration"
         )
-    if (
-        float(selection.get("concentration_output_interval_s"))
-        != config.temporal.concentration_output_interval_s
-    ):
+    if float(output_interval) != config.temporal.concentration_output_interval_s:
         raise ValueError(
             "Discretization evidence output interval does not match study configuration"
         )
@@ -938,7 +940,7 @@ def _station_metadata(
     domain: SpatialDomain,
     station_catalog: FixedStationCatalog,
 ) -> list[dict[str, object]]:
-    result = []
+    result: list[dict[str, object]] = []
     for site in station_catalog.sites:
         cell = domain.grid.xy_to_cell(site.x_m, site.y_m)
         if cell is None or not domain.grid.active_mask[cell]:
@@ -1000,9 +1002,7 @@ def _file_sha256(path: Path) -> str:
 def _tree_sha256(directory: Path) -> str:
     digest = sha256()
     files = sorted(
-        path
-        for path in directory.rglob("*")
-        if path.is_file() and path.suffix == ".py"
+        path for path in directory.rglob("*") if path.is_file() and path.suffix == ".py"
     )
     for path in files:
         relative = path.relative_to(directory).as_posix()
@@ -1065,11 +1065,7 @@ def _factor_payloads(
             for provider in mobile
         ],
         ScenarioFactor.TRAJECTORY: [
-            {
-                key: value
-                for key, value in provider.items()
-                if key != "mobility_policy"
-            }
+            {key: value for key, value in provider.items() if key != "mobility_policy"}
             for provider in mobile
         ],
         ScenarioFactor.TEMPORAL_CONFIGURATION: {
@@ -1086,9 +1082,10 @@ def _sources_with_role(
     return [source for source in sources if source.get("role") == role.value]
 
 
-def _mapping(name: str, value: object) -> dict[str, object]:
+def _mapping(name: str, value: object) -> dict[str, Any]:
+    """Read a heterogeneous JSON descriptor after checking its container."""
     if not isinstance(value, dict):
-        raise ValueError(f"Run descriptor {name!r} must be an object")
+        raise ValueError(f"Run descriptor {name!r} must be an object")  # noqa: TRY004 -- descriptor validation
     return value
 
 

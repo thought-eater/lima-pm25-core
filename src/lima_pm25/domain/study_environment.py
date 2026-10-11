@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import json
+import math
 from dataclasses import dataclass
 from enum import StrEnum
 from hashlib import sha256
-import json
-import math
 from pathlib import Path
+from typing import Any
 
 from .mobility import MobilityPolicy
 from .spatial import DomainConfig
-
 
 STUDY_ENVIRONMENT_SCHEMA_VERSION = 1
 
@@ -95,7 +95,9 @@ class ScenarioFamilyDefinition:
         try:
             control = by_id[self.control_member_id]
         except KeyError as error:
-            raise ValueError("control_member_id must identify one family member") from error
+            raise ValueError(
+                "control_member_id must identify one family member"
+            ) from error
         if control.changed_factors:
             raise ValueError("The control member cannot declare changed factors")
         evidence = tuple(self.constraint_evidence_ids)
@@ -103,10 +105,14 @@ class ScenarioFamilyDefinition:
             _require_text("constraint_evidence_id", evidence_id)
         if len(evidence) != len(set(evidence)):
             raise ValueError("constraint_evidence_ids must be unique")
-        if self.purpose in {
-            ScenarioFamilyPurpose.SYNTHETIC_TRAINING,
-            ScenarioFamilyPurpose.HELD_OUT_SYNTHETIC_EVALUATION,
-        } and not evidence:
+        if (
+            self.purpose
+            in {
+                ScenarioFamilyPurpose.SYNTHETIC_TRAINING,
+                ScenarioFamilyPurpose.HELD_OUT_SYNTHETIC_EVALUATION,
+            }
+            and not evidence
+        ):
             raise ValueError(
                 "Nominal synthetic families require Lima constraint evidence"
             )
@@ -245,7 +251,9 @@ class StudyEnvironmentConfig:
             raise ValueError(
                 f"Unsupported study-environment schema {self.schema_version!r}"
             )
-        candidates = tuple(float(value) for value in self.horizontal_candidate_cell_sizes_m)
+        candidates = tuple(
+            float(value) for value in self.horizontal_candidate_cell_sizes_m
+        )
         if not candidates:
             raise ValueError("horizontal_candidate_cell_sizes_m cannot be empty")
         for value in candidates:
@@ -324,9 +332,7 @@ class StudyEnvironmentConfig:
                 "mobile_sampling_interval_s": (
                     self.temporal.mobile_sampling_interval_s
                 ),
-                "mobile_sampling_status": (
-                    self.temporal.mobile_sampling_status.value
-                ),
+                "mobile_sampling_status": (self.temporal.mobile_sampling_status.value),
             },
             "horizontal_candidate_cell_sizes_m": list(
                 self.horizontal_candidate_cell_sizes_m
@@ -337,9 +343,7 @@ class StudyEnvironmentConfig:
                     "family_id": family.family_id,
                     "purpose": family.purpose.value,
                     "control_member_id": family.control_member_id,
-                    "constraint_evidence_ids": list(
-                        family.constraint_evidence_ids
-                    ),
+                    "constraint_evidence_ids": list(family.constraint_evidence_ids),
                     "members": [
                         {
                             "member_id": member.member_id,
@@ -349,9 +353,7 @@ class StudyEnvironmentConfig:
                             "claims_calibrated_providers": (
                                 member.claims_calibrated_providers
                             ),
-                            "calibration_evidence_id": (
-                                member.calibration_evidence_id
-                            ),
+                            "calibration_evidence_id": (member.calibration_evidence_id),
                         }
                         for member in family.members
                     ],
@@ -368,7 +370,8 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
     except json.JSONDecodeError as error:
         raise ValueError(f"Invalid study-environment JSON: {error}") from error
     if not isinstance(payload, dict):
-        raise ValueError("Study-environment configuration must be a JSON object")
+        # Malformed configuration is reported as ValueError by this loader.
+        raise ValueError("Study-environment configuration must be a JSON object")  # noqa: TRY004
     required = {
         "schema_version",
         "environment_id",
@@ -396,7 +399,7 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
     temporal_payload = _require_mapping("temporal", payload["temporal"])
     families_payload = payload["scenario_families"]
     if not isinstance(families_payload, list):
-        raise ValueError("scenario_families must be a JSON array")
+        raise ValueError("scenario_families must be a JSON array")  # noqa: TRY004 -- configuration validation
 
     families = []
     for family_payload_value in families_payload:
@@ -406,7 +409,7 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
         )
         member_values = family_payload.get("members")
         if not isinstance(member_values, list):
-            raise ValueError("Scenario-family members must be a JSON array")
+            raise ValueError("Scenario-family members must be a JSON array")  # noqa: TRY004 -- configuration validation
         members = tuple(
             ScenarioMemberDefinition(
                 member_id=_required_value(member, "member_id"),
@@ -447,9 +450,7 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
             road_network_buffer_m=float(
                 _required_value(domain_payload, "road_network_buffer_m")
             ),
-            cache_directory=Path(
-                domain_payload.get("cache_directory", "cache/domain")
-            ),
+            cache_directory=Path(domain_payload.get("cache_directory", "cache/domain")),
             osmnx_cache_directory=Path(
                 domain_payload.get("osmnx_cache_directory", "cache/osmnx")
             ),
@@ -466,9 +467,7 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
             ),
         ),
         vertical=EffectiveVerticalRepresentation(
-            mixing_height_m=float(
-                _required_value(vertical_payload, "mixing_height_m")
-            ),
+            mixing_height_m=float(_required_value(vertical_payload, "mixing_height_m")),
             evidence_status=_required_value(
                 vertical_payload,
                 "evidence_status",
@@ -507,16 +506,17 @@ def load_study_environment_config(path: Path | str) -> StudyEnvironmentConfig:
     )
 
 
-def _required_value(mapping: dict[str, object], key: str):
+def _required_value(mapping: dict[str, Any], key: str) -> Any:
     try:
         return mapping[key]
     except KeyError as error:
         raise ValueError(f"Missing required configuration key {key!r}") from error
 
 
-def _require_mapping(name: str, value: object) -> dict[str, object]:
+def _require_mapping(name: str, value: object) -> dict[str, Any]:
+    """Narrow the JSON container; individual values are validated by the models."""
     if not isinstance(value, dict):
-        raise ValueError(f"{name} must be a JSON object")
+        raise ValueError(f"{name} must be a JSON object")  # noqa: TRY004 -- configuration validation
     return value
 
 
@@ -535,7 +535,7 @@ def _strictly_increasing_nonnegative_times(
     return times
 
 
-def _require_text(name: str, value: str) -> None:
+def _require_text(name: str, value: object) -> None:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"{name} must be a nonempty string")
 

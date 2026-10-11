@@ -16,7 +16,9 @@ from lima_pm25.simulation import (
 )
 
 
-def test_replay_batches_merge_every_available_fixed_and_accepted_mobile_record() -> None:
+def test_replay_batches_merge_every_available_fixed_and_accepted_mobile_record() -> (
+    None
+):
     timestamp = datetime(2025, 1, 1, tzinfo=UTC)
     fixed = tuple(
         _record(station, SensorType.FIXED, timestamp, value=10 + index)
@@ -121,9 +123,7 @@ def _record(
         crs="EPSG:32718",
         value_ug_m3=value,
         quality_status=(
-            quality
-            if quality is not None
-            else MeasurementQuality.ACCEPTED
+            quality if quality is not None else MeasurementQuality.ACCEPTED
         ),
         noise_stddev_ug_m3=0,
         position_source_id=sensor_id,

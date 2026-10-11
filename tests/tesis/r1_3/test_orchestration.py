@@ -1,6 +1,6 @@
+import json
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
-import json
 
 import networkx as nx
 import numpy as np
@@ -8,6 +8,7 @@ import pytest
 from shapely.geometry import LineString, box
 
 from lima_pm25.domain import (
+    SENAMHI_PM25_PROVENANCE,
     AmbientBaseline,
     AtmosphericForcing,
     DomainConfig,
@@ -17,14 +18,14 @@ from lima_pm25.domain import (
     MobilityPolicy,
     PM25SourceRole,
     RegionalBoundaryForcing,
-    SENAMHI_PM25_PROVENANCE,
     SpatialDomain,
 )
 from lima_pm25.simulation import (
-    BundleVerificationResult,
     BoundaryMode,
+    BundleVerificationResult,
     EpisodeClock,
     GaussianKernelSource,
+    HistoricalWeatherDataset,
     MeasurementQuality,
     PM25PhysicsConfig,
     PM25Transport,
@@ -38,18 +39,16 @@ from lima_pm25.simulation import (
     SimulationRunConfig,
     SimulationRunRequest,
     SyntheticWeatherWindow,
-    HistoricalWeatherDataset,
     TimestampedTrajectoryProvider,
     TrajectoryCoverageError,
     TrajectoryPoint,
     WeatherRecord,
     WeatherValueProvenance,
-    run_simulation,
     run_complete_synthetic_demo,
+    run_simulation,
     verify_run_bundle,
     write_run_bundle,
 )
-
 
 START = datetime(2026, 9, 25, 5, tzinfo=UTC)
 
@@ -96,8 +95,7 @@ def test_complete_run_orders_events_batches_and_source_intervals() -> None:
     )
     assert [attempt.x_m for attempt in mobile_attempts] == [25, 75, 125]
     assert all(
-        attempt.position_source_id == "mobile-replay"
-        for attempt in mobile_attempts
+        attempt.position_source_id == "mobile-replay" for attempt in mobile_attempts
     )
 
     assert [diagnostic.end_time_s for diagnostic in result.diagnostics] == [
@@ -108,19 +106,24 @@ def test_complete_run_orders_events_batches_and_source_intervals() -> None:
         100,
         120,
     ]
+    assert (
+        sum(
+            diagnostic.budget.emitted_mass_ug
+            for diagnostic in result.diagnostics
+            if diagnostic.end_time_s <= 50
+        )
+        == 0
+    )
+    assert (
+        sum(
+            diagnostic.budget.emitted_mass_ug
+            for diagnostic in result.diagnostics
+            if diagnostic.start_time_s >= 100
+        )
+        == 0
+    )
     assert sum(
-        diagnostic.budget.emitted_mass_ug
-        for diagnostic in result.diagnostics
-        if diagnostic.end_time_s <= 50
-    ) == 0
-    assert sum(
-        diagnostic.budget.emitted_mass_ug
-        for diagnostic in result.diagnostics
-        if diagnostic.start_time_s >= 100
-    ) == 0
-    assert sum(
-        diagnostic.budget.emitted_mass_ug
-        for diagnostic in result.diagnostics
+        diagnostic.budget.emitted_mass_ug for diagnostic in result.diagnostics
     ) == pytest.approx(50_000)
     assert result.final_state.simulation_time_s == 120
 
@@ -201,6 +204,8 @@ def test_regional_boundary_transition_splits_the_complete_engine() -> None:
     result = run_simulation(request)
 
     assert result.diagnostics[0].end_time_s == 30
+    assert result.diagnostics[0].regional_boundary is not None
+    assert result.diagnostics[1].regional_boundary is not None
     assert result.diagnostics[0].regional_boundary.concentration_ug_m3 == 5
     assert result.diagnostics[1].regional_boundary.concentration_ug_m3 == 7
 
@@ -209,8 +214,7 @@ def test_empty_source_run_reports_zero_emitted_mass() -> None:
     result = run_simulation(replace(_request(), sources=()))
 
     assert all(
-        diagnostic.budget.emitted_mass_ug == 0
-        for diagnostic in result.diagnostics
+        diagnostic.budget.emitted_mass_ug == 0 for diagnostic in result.diagnostics
     )
 
 
@@ -311,9 +315,7 @@ def test_bundle_is_complete_non_overwriting_and_tamper_evident(tmp_path) -> None
         assert payload["times_s"].tolist() == [0, 70, 120]
         assert payload["active_mask"].all()
 
-    attempts_text = (bundle / "measurement_attempts.jsonl").read_text(
-        encoding="utf-8"
-    )
+    attempts_text = (bundle / "measurement_attempts.jsonl").read_text(encoding="utf-8")
     assert "sampled_truth" not in attempts_text
     assert "pre_bound" not in attempts_text
     assert '"position_source_id":"mobile-replay"' in attempts_text
@@ -334,7 +336,7 @@ def test_documented_complete_example_records_field_and_mobile_positions(
     tmp_path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    import lima_pm25.simulation.demo as demo
+    from lima_pm25.simulation import demo
 
     domain = _domain()
     model = PM25Transport(

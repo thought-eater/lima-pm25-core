@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from dataclasses import replace
-from hashlib import sha256
 import json
 import math
+from collections.abc import Mapping
+from dataclasses import replace
+from hashlib import sha256
 from pathlib import Path
 from time import perf_counter
+from typing import Any
 
 import numpy as np
 
@@ -22,7 +24,7 @@ from .orchestration import SimulationRunResult, run_simulation
 from .study_evidence import assess_grid_convergence
 
 
-def load_discretization_protocol(path: Path | str) -> dict[str, object]:
+def load_discretization_protocol(path: Path | str) -> dict[str, Any]:
     source = Path(path)
     try:
         protocol = json.loads(source.read_text(encoding="utf-8"))
@@ -37,33 +39,68 @@ def load_discretization_protocol(path: Path | str) -> dict[str, object]:
         horizontal.get("candidate_cell_sizes_m"),
         expected_count=3,
     )
-    _increasing_nonnegative_values("horizontal shared_times_s", horizontal.get("shared_times_s"))
+    _increasing_nonnegative_values(
+        "horizontal shared_times_s", horizontal.get("shared_times_s")
+    )
     _fraction("probe_relative_tolerance", horizontal.get("probe_relative_tolerance"))
-    _positive("probe_absolute_floor_ug_m3", horizontal.get("probe_absolute_floor_ug_m3"))
-    _fraction("domain_mean_relative_tolerance", horizontal.get("domain_mean_relative_tolerance"))
-    _fraction("event_excess_mass_relative_tolerance", horizontal.get("event_excess_mass_relative_tolerance"))
-    _fraction("event_effect_significance_fraction_of_peak", horizontal.get("event_effect_significance_fraction_of_peak"))
-    _positive("plume_centroid_tolerance_m", horizontal.get("plume_centroid_tolerance_m"))
-    _positive("mass_residual_relative_tolerance", horizontal.get("mass_residual_relative_tolerance"))
+    _positive(
+        "probe_absolute_floor_ug_m3", horizontal.get("probe_absolute_floor_ug_m3")
+    )
+    _fraction(
+        "domain_mean_relative_tolerance",
+        horizontal.get("domain_mean_relative_tolerance"),
+    )
+    _fraction(
+        "event_excess_mass_relative_tolerance",
+        horizontal.get("event_excess_mass_relative_tolerance"),
+    )
+    _fraction(
+        "event_effect_significance_fraction_of_peak",
+        horizontal.get("event_effect_significance_fraction_of_peak"),
+    )
+    _positive(
+        "plume_centroid_tolerance_m", horizontal.get("plume_centroid_tolerance_m")
+    )
+    _positive(
+        "mass_residual_relative_tolerance",
+        horizontal.get("mass_residual_relative_tolerance"),
+    )
     _increasing_positive_values(
         "candidate_output_intervals_s",
         temporal.get("candidate_output_intervals_s"),
         expected_count=3,
     )
-    _increasing_nonnegative_values("temporal shared_times_s", temporal.get("shared_times_s"))
-    _fraction("shared_field_l1_relative_tolerance", temporal.get("shared_field_l1_relative_tolerance"))
-    _fraction("information_loss_relative_tolerance", temporal.get("information_loss_relative_tolerance"))
-    _fraction("trajectory_l1_relative_tolerance", temporal.get("trajectory_l1_relative_tolerance"))
-    _fraction("temporal event_effect_significance_fraction_of_peak", temporal.get("event_effect_significance_fraction_of_peak"))
-    _positive("concentration_scale_floor_ug_m3", temporal.get("concentration_scale_floor_ug_m3"))
+    _increasing_nonnegative_values(
+        "temporal shared_times_s", temporal.get("shared_times_s")
+    )
+    _fraction(
+        "shared_field_l1_relative_tolerance",
+        temporal.get("shared_field_l1_relative_tolerance"),
+    )
+    _fraction(
+        "information_loss_relative_tolerance",
+        temporal.get("information_loss_relative_tolerance"),
+    )
+    _fraction(
+        "trajectory_l1_relative_tolerance",
+        temporal.get("trajectory_l1_relative_tolerance"),
+    )
+    _fraction(
+        "temporal event_effect_significance_fraction_of_peak",
+        temporal.get("event_effect_significance_fraction_of_peak"),
+    )
+    _positive(
+        "concentration_scale_floor_ug_m3",
+        temporal.get("concentration_scale_floor_ug_m3"),
+    )
     return protocol
 
 
 def run_study_discretization_experiment(
     domain: SpatialDomain,
     config: StudyEnvironmentConfig,
-    protocol: dict[str, object],
-) -> dict[str, object]:
+    protocol: Mapping[str, Any],
+) -> dict[str, Any]:
     horizontal_protocol = _mapping("horizontal", protocol["horizontal"])
     temporal_protocol = _mapping("temporal", protocol["temporal"])
     protocol_fingerprint = _fingerprint(protocol)
@@ -88,16 +125,14 @@ def run_study_discretization_experiment(
         "temporal": temporal,
         "technical_selection": {
             "cell_size_m": selected_cell_size_m,
-            "concentration_output_interval_s": temporal[
-                "selected_output_interval_s"
-            ],
+            "concentration_output_interval_s": temporal["selected_output_interval_s"],
             "status": "technical_selection_complete",
         },
     }
 
 
 def write_discretization_evidence(
-    evidence: dict[str, object],
+    evidence: Mapping[str, object],
     output_path: Path | str,
 ) -> Path:
     destination = Path(output_path)
@@ -114,8 +149,8 @@ def write_discretization_evidence(
 def _run_horizontal_experiment(
     base_domain: SpatialDomain,
     config: StudyEnvironmentConfig,
-    protocol: dict[str, object],
-) -> dict[str, object]:
+    protocol: Mapping[str, Any],
+) -> dict[str, Any]:
     sizes = tuple(float(value) for value in protocol["candidate_cell_sizes_m"])
     shared_times = tuple(float(value) for value in protocol["shared_times_s"])
     results = {}
@@ -135,7 +170,10 @@ def _run_horizontal_experiment(
             study_config=candidate_config,
         )
         started = perf_counter()
-        runs = {member_id: run_simulation(request) for member_id, request in requests.items()}
+        runs = {
+            member_id: run_simulation(request)
+            for member_id, request in requests.items()
+        }
         runtime_s = perf_counter() - started
         metrics = _horizontal_metrics(
             candidate_domain,
@@ -159,15 +197,16 @@ def _run_horizontal_experiment(
 
     pair_results = {
         "100_vs_50": _compare_horizontal_pair(results[100.0], results[50.0], protocol),
-        "200_vs_100": _compare_horizontal_pair(results[200.0], results[100.0], protocol),
+        "200_vs_100": _compare_horizontal_pair(
+            results[200.0], results[100.0], protocol
+        ),
     }
     if pair_results["100_vs_50"]["passes"]:
         selected = 200.0 if pair_results["200_vs_100"]["passes"] else 100.0
     else:
         selected = 50.0
     convergence = {
-        name: assess_grid_convergence(values)
-        for name, values in scalar_series.items()
+        name: assess_grid_convergence(values) for name, values in scalar_series.items()
     }
     return {
         "results_by_cell_size_m": {str(size): results[size] for size in sizes},
@@ -182,10 +221,12 @@ def _run_horizontal_experiment(
 def _run_temporal_experiment(
     base_domain: SpatialDomain,
     config: StudyEnvironmentConfig,
-    protocol: dict[str, object],
+    protocol: Mapping[str, Any],
     selected_cell_size_m: float,
 ) -> dict[str, object]:
-    intervals = tuple(float(value) for value in protocol["candidate_output_intervals_s"])
+    intervals = tuple(
+        float(value) for value in protocol["candidate_output_intervals_s"]
+    )
     shared_times = tuple(float(value) for value in protocol["shared_times_s"])
     runs_by_interval = {}
     summaries = {}
@@ -204,7 +245,10 @@ def _run_temporal_experiment(
             study_config=candidate_config,
         )
         started = perf_counter()
-        runs = {member_id: run_simulation(request) for member_id, request in requests.items()}
+        runs = {
+            member_id: run_simulation(request)
+            for member_id, request in requests.items()
+        }
         runtime_s = perf_counter() - started
         runs_by_interval[interval_s] = runs
         summaries[interval_s] = {
@@ -412,8 +456,7 @@ def _compare_horizontal_pair(coarse, fine, protocol):
         <= protocol["event_excess_mass_relative_tolerance"],
         "plume_centroid": max(centroid_distances, default=0)
         <= protocol["plume_centroid_tolerance_m"],
-        "mass_balance": mass_residual
-        <= protocol["mass_residual_relative_tolerance"],
+        "mass_balance": mass_residual <= protocol["mass_residual_relative_tolerance"],
         "control_event_ordering": ordering_stable,
     }
     return {
@@ -449,8 +492,7 @@ def _compare_temporal_runs(candidate_runs, fine_runs, shared_times, protocol):
     candidate_peaks = _temporal_peak_metrics(candidate_runs)
     floor = float(protocol["concentration_scale_floor_ug_m3"])
     losses = {
-        name: max(0.0, fine_value - candidate_peaks[name])
-        / max(abs(fine_value), floor)
+        name: max(0.0, fine_value - candidate_peaks[name]) / max(abs(fine_value), floor)
         for name, fine_value in fine_peaks.items()
     }
     trajectory = _temporal_trajectory_loss(candidate_runs, fine_runs, protocol)
@@ -487,7 +529,14 @@ def _temporal_trajectory_loss(candidate_runs, fine_runs, protocol):
     active = fine_runs["event"].final_state.grid.active_mask
     fine_times = sorted(set(fine_control).intersection(fine_event))
     peak_effect = max(
-        float(np.sum(np.abs(fine_event[time].concentration_ug_m3[active] - fine_control[time].concentration_ug_m3[active])))
+        float(
+            np.sum(
+                np.abs(
+                    fine_event[time].concentration_ug_m3[active]
+                    - fine_control[time].concentration_ug_m3[active]
+                )
+            )
+        )
         for time in fine_times
     )
     effect_floor = peak_effect * protocol["event_effect_significance_fraction_of_peak"]
@@ -591,18 +640,18 @@ def _append_scalar_series(series, cell_size_m, metrics):
     for member_id, times in metrics["members"].items():
         for time_s, values in times.items():
             for name in ("domain_mean_ug_m3", "total_mass_ug"):
-                series.setdefault(f"{member_id}:{time_s}:{name}", {})[
-                    cell_size_m
-                ] = values[name]
+                series.setdefault(f"{member_id}:{time_s}:{name}", {})[cell_size_m] = (
+                    values[name]
+                )
             for site_id, value in values["stations_ug_m3"].items():
                 series.setdefault(
                     f"{member_id}:{time_s}:station:{site_id}",
                     {},
                 )[cell_size_m] = value
     for time_s, values in metrics["event_effect"].items():
-        series.setdefault(f"event_effect:{time_s}:excess_mass", {})[
-            cell_size_m
-        ] = values["integrated_excess_mass_ug"]
+        series.setdefault(f"event_effect:{time_s}:excess_mass", {})[cell_size_m] = (
+            values["integrated_excess_mass_ug"]
+        )
 
 
 def _relative_difference(candidate, reference, floor):
@@ -611,7 +660,7 @@ def _relative_difference(candidate, reference, floor):
 
 def _mapping(name, value):
     if not isinstance(value, dict):
-        raise ValueError(f"{name} must be an object")
+        raise ValueError(f"{name} must be an object")  # noqa: TRY004 -- protocol validation
     return value
 
 
@@ -626,7 +675,7 @@ def _increasing_positive_values(name, value, *, expected_count=None):
 
 def _increasing_nonnegative_values(name, value):
     if not isinstance(value, list):
-        raise ValueError(f"{name} must be an array")
+        raise ValueError(f"{name} must be an array")  # noqa: TRY004 -- protocol validation
     values = tuple(float(item) for item in value)
     if any(not math.isfinite(item) or item < 0 for item in values):
         raise ValueError(f"{name} must contain nonnegative finite values")

@@ -1,9 +1,9 @@
 import argparse
+import json
+from collections.abc import Sequence
 from dataclasses import replace
 from hashlib import sha256
-import json
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 
@@ -11,20 +11,8 @@ from lima_pm25.domain import (
     SpatialDomain,
     create_lima_pm25_station_catalog,
     create_spatial_domain,
-    plot_spatial_domain,
     load_study_environment_config,
-)
-from lima_pm25.simulation import (
-    animate_synthetic_demo,
-    build_environment_manifest,
-    create_synthetic_study_family_requests,
-    resolve_scenario_family,
-    load_discretization_protocol,
-    run_study_discretization_experiment,
-    run_complete_synthetic_demo,
-    verify_environment_bundle,
-    write_environment_bundle,
-    write_discretization_evidence,
+    plot_spatial_domain,
 )
 from lima_pm25.estimation import (
     ParameterEvidenceClass,
@@ -34,18 +22,30 @@ from lima_pm25.estimation import (
     calibrate_change10_configuration,
     calibrate_gp_from_historical_stations,
     finalize_change10_evidence,
-    load_historical_pm25_csv,
-    load_change10_evaluation_profile,
     load_change10_calibration_artifact,
+    load_change10_evaluation_profile,
+    load_historical_pm25_csv,
     run_change10_retained_evaluation,
     verify_change10_evidence,
-    write_provisional_historical_replay,
+    write_change10_calibration_artifact,
     write_gp_calibration_result,
     write_historical_partition_manifest,
     write_lima_plausibility_profile,
-    write_change10_calibration_artifact,
+    write_provisional_historical_replay,
 )
-from lima_pm25.simulation import load_historical_weather_csv
+from lima_pm25.simulation import (
+    animate_synthetic_demo,
+    build_environment_manifest,
+    create_synthetic_study_family_requests,
+    load_discretization_protocol,
+    load_historical_weather_csv,
+    resolve_scenario_family,
+    run_complete_synthetic_demo,
+    run_study_discretization_experiment,
+    verify_environment_bundle,
+    write_discretization_evidence,
+    write_environment_bundle,
+)
 
 
 def _print_domain_summary(domain: SpatialDomain) -> None:
@@ -324,7 +324,7 @@ def _build_study_evidence(
         (resolved,),
         discretization_evidence=discretization_evidence,
     )
-    destination = output_parent / manifest["fingerprint"]
+    destination = output_parent / str(manifest["fingerprint"])
     if destination.exists():
         verification = verify_environment_bundle(destination)
         if not verification.valid:
@@ -480,7 +480,9 @@ def _run_historical_calibration(
         "noise_stddev_ug_m3": observation_noise_stddev_ug_m3,
         "validation_method": "leave_one_station_out",
         "gp_calibration_sha256": sha256(
-            json.dumps(calibration.evidence_descriptor(), sort_keys=True).encode("utf-8")
+            json.dumps(calibration.evidence_descriptor(), sort_keys=True).encode(
+                "utf-8"
+            )
         ).hexdigest(),
     }
     fingerprint = sha256(
@@ -521,9 +523,7 @@ def _run_historical_calibration(
         raise
     selected = calibration.selected_candidate
     selected_score = next(
-        score
-        for score in calibration.candidate_scores
-        if score.candidate == selected
+        score for score in calibration.candidate_scores if score.candidate == selected
     )
     print(f"Calibración histórica: {destination}")
     print(f"Targets históricos: {calibration.target_count}")
@@ -553,27 +553,36 @@ def _run_historical_calibration(
     )
     profile = _freeze_calibrated_profile(profile, final_calibration)
     final_calibration = replace(final_calibration, profile_sha256=profile.source_sha256)
-    write_change10_calibration_artifact(final_calibration, profile.calibration_artifact_path)
+    write_change10_calibration_artifact(
+        final_calibration, profile.calibration_artifact_path
+    )
     print(f"Estado del perfil: {profile.status}")
-    print(f"Configuración GP final: {final_calibration.synthetic_selected_spatial_m:g} m")
+    print(
+        f"Configuración GP final: {final_calibration.synthetic_selected_spatial_m:g} m"
+    )
     print(f"Artefacto congelado: {profile.calibration_artifact_path}")
     print(f"R2.2 histórico: {final_calibration.historical_r22_status.value}")
     if final_calibration.historical_r22_reasons:
-        print("Criterios incumplidos: " + ", ".join(final_calibration.historical_r22_reasons))
+        print(
+            "Criterios incumplidos: "
+            + ", ".join(final_calibration.historical_r22_reasons)
+        )
 
 
 def _freeze_calibrated_profile(profile, calibration):
     """Persist the actual selection before any retained evaluation is opened."""
     payload = json.loads(profile.source_path.read_text(encoding="utf-8"))
     config = calibration.reconstruction_config
-    payload["gp"].update({
-        "prior_mean_ug_m3": config.prior_mean_ug_m3,
-        "prior_stddev_ug_m3": config.prior_stddev_ug_m3,
-        "x_length_scale_m": config.x_length_scale_m,
-        "y_length_scale_m": config.y_length_scale_m,
-        "temporal_length_scale_s": config.temporal_length_scale_s,
-        "history_duration_s": calibration.history_duration_s,
-    })
+    payload["gp"].update(
+        {
+            "prior_mean_ug_m3": config.prior_mean_ug_m3,
+            "prior_stddev_ug_m3": config.prior_stddev_ug_m3,
+            "x_length_scale_m": config.x_length_scale_m,
+            "y_length_scale_m": config.y_length_scale_m,
+            "temporal_length_scale_s": config.temporal_length_scale_s,
+            "history_duration_s": calibration.history_duration_s,
+        }
+    )
     payload["spatial_calibration"]["historical_station_best_m"] = (
         calibration.historical_station_best_spatial_m
     )
@@ -650,8 +659,7 @@ def _run_change10_evaluation(
     print(f"Escala sintética: {result.synthetic_scale_ug_m3:.3f} ug/m3")
     print(f"Escala de fuentes rutinarias: {result.routine_source_scale:.3f}")
     print(
-        "Escala espacial GP retenida: "
-        f"{result.selected_config.x_length_scale_m:.0f} m"
+        f"Escala espacial GP retenida: {result.selected_config.x_length_scale_m:.0f} m"
     )
     print(f"R2.1: {result.evaluation.fixed_mobile_r21.status.value}")
     print(f"R2.2 histórico: {result.historical_r22_status.value}")

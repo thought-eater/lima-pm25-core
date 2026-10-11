@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import csv
-from hashlib import sha256
 import math
 from bisect import bisect_left, bisect_right
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
+from hashlib import sha256
+from itertools import pairwise
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -230,7 +231,9 @@ class WeatherWindow:
             resource_id=self.dataset.resource_id,
             resource_sha256=self.dataset.resource_sha256,
             station_id=self.dataset.station_id,
-            precipitation_source_policy=self.dataset.precipitation_source_policy,
+            precipitation_source_policy=PrecipitationSourcePolicy(
+                self.dataset.precipitation_source_policy
+            ),
             temperature_c=record.temperature_c,
             relative_humidity_pct=record.relative_humidity_pct,
             temperature_provenance=record.temperature_provenance,
@@ -241,9 +244,9 @@ class WeatherWindow:
         )
 
     def evidence_descriptor(self) -> dict[str, object]:
-        records_payload = "\n".join(
-            repr(record) for record in self.records
-        ).encode("utf-8")
+        records_payload = "\n".join(repr(record) for record in self.records).encode(
+            "utf-8"
+        )
         return {
             "kind": "historical",
             "provider_id": self.dataset.provider_id,
@@ -254,7 +257,9 @@ class WeatherWindow:
             "start_utc": self.start_utc.isoformat(),
             "end_utc": self.end_utc.isoformat(),
             "precipitation_source_policy": (
-                self.dataset.precipitation_source_policy.value
+                PrecipitationSourcePolicy(
+                    self.dataset.precipitation_source_policy
+                ).value
             ),
             "records_sha256": sha256(records_payload).hexdigest(),
             "transition_times_s": list(self.transition_times_s),
@@ -285,19 +290,16 @@ class SyntheticWeatherWindow:
             raise ValueError("start_utc must use UTC")
         _require_positive_finite("duration_s", self.duration_s)
         _require_usable_text("construction_method", self.construction_method)
-        if self.stochastic:
-            if (
-                not isinstance(self.seed, int)
-                or isinstance(self.seed, bool)
-                or self.seed < 0
-            ):
-                raise ValueError(
-                    "Stochastic synthetic weather requires a nonnegative seed"
-                )
+        if self.stochastic and (
+            not isinstance(self.seed, int)
+            or isinstance(self.seed, bool)
+            or self.seed < 0
+        ):
+            raise ValueError("Stochastic synthetic weather requires a nonnegative seed")
         values = tuple(self.values)
         if not values or values[0].starts_at_s != 0:
             raise ValueError("Synthetic weather must define its first value at t=0")
-        for left, right in zip(values, values[1:], strict=False):
+        for left, right in pairwise(values):
             if right.starts_at_s <= left.starts_at_s:
                 raise ValueError("Synthetic weather start times must increase")
         if values[-1].starts_at_s >= self.duration_s:
@@ -375,9 +377,7 @@ class SyntheticWeatherWindow:
                 {
                     "starts_at_s": value.starts_at_s,
                     "wind_speed_m_s": value.forcing.wind_speed_m_s,
-                    "wind_from_direction_deg": (
-                        value.forcing.wind_from_direction_deg
-                    ),
+                    "wind_from_direction_deg": (value.forcing.wind_from_direction_deg),
                     "precipitation_mm_h": value.forcing.precipitation_mm_h,
                 }
                 for value in self.values
@@ -419,7 +419,9 @@ class HistoricalWeatherDataset:
             raise ValueError("maximum_gap must be positive")
         records = tuple(self.records)
         if not records:
-            raise ValueError(f"Station {self.station_id!r} has no usable weather records")
+            raise ValueError(
+                f"Station {self.station_id!r} has no usable weather records"
+            )
 
         timestamps = tuple(record.timestamp_utc for record in records)
         previous: datetime | None = None
@@ -429,14 +431,13 @@ class HistoricalWeatherDataset:
                     "All weather records must belong to the dataset station"
                 )
             if previous is not None and record.timestamp_utc <= previous:
-                raise ValueError("Weather record timestamps must be strictly increasing")
+                raise ValueError(
+                    "Weather record timestamps must be strictly increasing"
+                )
             previous = record.timestamp_utc
 
         unavailable = tuple(self.unavailable_timestamps_utc)
-        if any(
-            current <= previous
-            for previous, current in zip(unavailable, unavailable[1:], strict=False)
-        ):
+        if any(current <= previous for previous, current in pairwise(unavailable)):
             raise ValueError("Unavailable timestamps must be strictly increasing")
         for timestamp in unavailable:
             _require_aware_datetime("unavailable timestamp", timestamp)
@@ -445,7 +446,7 @@ class HistoricalWeatherDataset:
 
         segment_start = timestamps[0]
         segments: list[tuple[datetime, datetime]] = []
-        for left, right in zip(timestamps, timestamps[1:], strict=False):
+        for left, right in pairwise(timestamps):
             unavailable_index = bisect_right(unavailable, left)
             crosses_unavailable = (
                 unavailable_index < len(unavailable)
@@ -497,8 +498,7 @@ class HistoricalWeatherDataset:
         )
         crosses_unavailable = (
             unavailable_index < len(self.unavailable_timestamps_utc)
-            and self.unavailable_timestamps_utc[unavailable_index]
-            < right.timestamp_utc
+            and self.unavailable_timestamps_utc[unavailable_index] < right.timestamp_utc
         )
         if interval > self.maximum_gap or crosses_unavailable:
             raise WeatherCoverageError(
@@ -660,8 +660,7 @@ def load_historical_weather_csv(
         ]
         if missing_columns:
             raise ValueError(
-                "Weather CSV is missing required columns: "
-                f"{', '.join(missing_columns)}"
+                f"Weather CSV is missing required columns: {', '.join(missing_columns)}"
             )
 
         for row in reader:
@@ -715,9 +714,7 @@ def load_historical_weather_csv(
             )
 
     if station_rows == 0:
-        raise ValueError(
-            f"Station {station_id!r} is not present in {source_path.name}"
-        )
+        raise ValueError(f"Station {station_id!r} is not present in {source_path.name}")
 
     return HistoricalWeatherDataset(
         station_id=station_id,
@@ -767,18 +764,21 @@ def _parse_source_timestamp(
 def _parse_measurements(
     row: dict[str, str | None],
     config: WeatherCsvConfig,
-) -> tuple[
-    float | None,
-    float | None,
-    float,
-    float,
-    float,
-    WeatherValueProvenance,
-    WeatherValueProvenance,
-    WeatherValueProvenance,
-    WeatherValueProvenance,
-    WeatherValueProvenance,
-] | None:
+) -> (
+    tuple[
+        float | None,
+        float | None,
+        float,
+        float,
+        float,
+        WeatherValueProvenance,
+        WeatherValueProvenance,
+        WeatherValueProvenance,
+        WeatherValueProvenance,
+        WeatherValueProvenance,
+    ]
+    | None
+):
     temperature = _parse_optional_float(row, config.temperature_column, config)
     humidity = _parse_optional_float(row, config.relative_humidity_column, config)
     precipitation = _parse_optional_float(row, config.precipitation_column, config)
@@ -831,17 +831,13 @@ def _parse_measurements(
         and (
             speed == 0
             or (
-                direction is not None
-                and _source_is_usable(direction_provenance.source)
+                direction is not None and _source_is_usable(direction_provenance.source)
             )
         )
     )
-    precipitation_available = (
-        precipitation is not None
-        and (
-            precipitation_provenance.source == "ecmwf_ifs"
-            or _source_is_usable(precipitation_provenance.source)
-        )
+    precipitation_available = precipitation is not None and (
+        precipitation_provenance.source == "ecmwf_ifs"
+        or _source_is_usable(precipitation_provenance.source)
     )
     if not wind_available or not precipitation_available:
         return None

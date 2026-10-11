@@ -73,7 +73,4 @@ def test_new_precise_observation_reduces_local_spatial_uncertainty() -> None:
     )
 
     assert after.standard_deviation_ug_m3[2, 2] < 1e-3
-    assert (
-        after.standard_deviation_ug_m3[2, 2]
-        < before.standard_deviation_ug_m3[2, 2]
-    )
+    assert after.standard_deviation_ug_m3[2, 2] < before.standard_deviation_ug_m3[2, 2]

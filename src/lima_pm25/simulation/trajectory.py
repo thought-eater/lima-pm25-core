@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import math
-from typing import Protocol, Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
+from itertools import pairwise
+from typing import Protocol
 
 import numpy as np
 import osmnx as ox
@@ -92,9 +94,7 @@ class TimestampedTrajectoryProvider:
         self.points = trajectory
         self.resource_id = resource_id
         self.resource_sha256 = resource_sha256
-        self._points_by_time = {
-            point.simulation_time_s: point for point in trajectory
-        }
+        self._points_by_time = {point.simulation_time_s: point for point in trajectory}
 
     @property
     def coverage_start_s(self) -> float:
@@ -196,7 +196,7 @@ def _validate_policy_compliance(
 
     if policy.maximum_speed_m_s is None:
         return
-    for index, (first, second) in enumerate(zip(points, points[1:], strict=False)):
+    for index, (first, second) in enumerate(pairwise(points)):
         duration_s = second.simulation_time_s - first.simulation_time_s
         distance_m = math.hypot(second.x_m - first.x_m, second.y_m - first.y_m)
         speed_m_s = distance_m / duration_s

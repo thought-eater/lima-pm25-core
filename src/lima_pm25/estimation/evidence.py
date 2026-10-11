@@ -1,20 +1,26 @@
 from __future__ import annotations
 
+import json
+from collections.abc import Sequence
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from hashlib import sha256
-import json
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 
 from lima_pm25.simulation import SimulationRunResult
 
+from .figures import (
+    map_coverage,
+    render_concentration_series,
+    render_mobile_uncertainty,
+    render_replay,
+    render_temporal_aging,
+    used_observations,
+)
 from .reconstruction import ReconstructionConfig
 from .retained import RetainedSyntheticEvaluation
-from .figures import (map_coverage, render_concentration_series, render_replay,
-                      render_mobile_uncertainty, render_temporal_aging, used_observations)
 
 
 def write_retained_evaluation_bundle(
@@ -71,9 +77,7 @@ def write_retained_evaluation_bundle(
                 "measurement_attempt_count": len(run.measurement_attempts),
                 "measurement_batch_count": len(run.measurement_batches),
                 "fixed_only_map_count": len(evaluation.fixed_only_posteriors),
-                "fixed_mobile_map_count": len(
-                    evaluation.fixed_mobile_posteriors
-                ),
+                "fixed_mobile_map_count": len(evaluation.fixed_mobile_posteriors),
                 "mobile_uncertainty_comparison_count": len(
                     evaluation.mobile_uncertainty_changes
                 ),
@@ -111,7 +115,8 @@ def write_retained_evaluation_bundle(
             ),
         )
         export_evaluation_figures(
-            temporary, grid=run.final_state.grid,
+            temporary,
+            grid=run.final_state.grid,
             measurements=run.measurement_attempts,
         )
         _write_checksums(temporary)
@@ -161,9 +166,7 @@ def _metrics_payload(evaluation: RetainedSyntheticEvaluation) -> dict[str, objec
                 "reasons": list(change.reasons),
                 "local_variance_before": list(change.local_variance_before),
                 "local_variance_after": list(change.local_variance_after),
-                "integrated_variance_before": (
-                    change.integrated_variance_before
-                ),
+                "integrated_variance_before": (change.integrated_variance_before),
                 "integrated_variance_after": change.integrated_variance_after,
             }
             for change in evaluation.mobile_uncertainty_changes
@@ -193,50 +196,83 @@ def export_evaluation_figures(destination, *, grid, measurements):
     with np.load(root / "maps.npz", allow_pickle=False) as data:
         if not np.array_equal(data["active_mask"], grid.active_mask):
             raise ValueError("Presentation grid does not match stored maps")
-        timestamps = tuple(datetime.fromisoformat(str(t)) for t in data["timestamps_utc"])
+        timestamps = tuple(
+            datetime.fromisoformat(str(t)) for t in data["timestamps_utc"]
+        )
         truth = data["retained_truth_ug_m3"]
         mean = data["fixed_mobile_mean_ug_m3"]
         stddev = data["fixed_mobile_stddev_ug_m3"]
         fixed_stddev = data["fixed_only_stddev_ug_m3"]
-    observations = used_observations(grid, config, measurements, timestamps,
-                                    timedelta(seconds=configuration["history_duration_s"]))
+    observations = used_observations(
+        grid,
+        config,
+        measurements,
+        timestamps,
+        timedelta(seconds=configuration["history_duration_s"]),
+    )
     indices = tuple(configuration["representative_frame_indices"])
     metrics = json.loads((root / "metrics.json").read_text())
     coverage = map_coverage(mean, stddev, grid.active_mask)
     p50, p99 = np.percentile(truth[:, grid.active_mask], [50, 99])
-    coverage.update({"required_map_count": len(timestamps), "p50_ug_m3": float(p50),
-                     "p99_ug_m3": float(p99), "contrast_ug_m3": float(p99-p50),
-                     "contrast_fraction_of_historical_scale": float((p99-p50)/configuration["scale_ug_m3"]),
-                     "timestamps_utc": [t.isoformat() for t in timestamps]})
+    coverage.update(
+        {
+            "required_map_count": len(timestamps),
+            "p50_ug_m3": float(p50),
+            "p99_ug_m3": float(p99),
+            "contrast_ug_m3": float(p99 - p50),
+            "contrast_fraction_of_historical_scale": float(
+                (p99 - p50) / configuration["scale_ug_m3"]
+            ),
+            "timestamps_utc": [t.isoformat() for t in timestamps],
+        }
+    )
     metrics["map_validation"] = coverage
     if indices:
         figures = root / "figures"
-        render_concentration_series(grid, timestamps, truth, mean, observations, indices, figures)
+        render_concentration_series(
+            grid, timestamps, truth, mean, observations, indices, figures
+        )
         # Middle declared frame, not a frame chosen by its improvement score.
-        index = indices[len(indices)//2]
+        index = indices[len(indices) // 2]
         metrics["illustrated_mobile_uncertainty"] = render_mobile_uncertainty(
-            grid, timestamps, fixed_stddev, stddev, observations, index,
+            grid,
+            timestamps,
+            fixed_stddev,
+            stddev,
+            observations,
+            index,
             figures / "mobile-uncertainty.png",
         )
         metrics["temporal_aging"] = render_temporal_aging(
-            grid, config, timestamps[0], figures / "temporal-aging.png",
+            grid,
+            config,
+            timestamps[0],
+            figures / "temporal-aging.png",
         )
     _write_json(root / "metrics.json", metrics)
     _write_checksums(root)
 
 
-def export_replay_figures(destination, *, grid, config, measurements, history_duration, sites=()):
+def export_replay_figures(
+    destination, *, grid, config, measurements, history_duration, sites=()
+):
     """Export historical maps and counts from the actual eligible input records."""
     root = Path(destination)
     with np.load(root / "posterior_maps.npz", allow_pickle=False) as data:
         if not np.array_equal(data["active_mask"], grid.active_mask):
             raise ValueError("Replay grid does not match stored maps")
-        timestamps = tuple(datetime.fromisoformat(str(t)) for t in data["timestamps_utc"])
+        timestamps = tuple(
+            datetime.fromisoformat(str(t)) for t in data["timestamps_utc"]
+        )
         mean, stddev = data["mean_ug_m3"], data["stddev_ug_m3"]
-    observations = used_observations(grid, config, measurements, timestamps, history_duration)
+    observations = used_observations(
+        grid, config, measurements, timestamps, history_duration
+    )
     figures = root / "figures"
     figures.mkdir(exist_ok=True)
-    render_replay(grid, timestamps, mean, stddev, observations, figures / "replay-maps.png", sites)
+    render_replay(
+        grid, timestamps, mean, stddev, observations, figures / "replay-maps.png", sites
+    )
     metadata = json.loads((root / "metadata.json").read_text())
     metadata["map_validation"] = map_coverage(mean, stddev, grid.active_mask)
     used = {(r.sensor_id, r.timestamp_utc): r for group in observations for r in group}
@@ -244,8 +280,10 @@ def export_replay_figures(destination, *, grid, config, measurements, history_du
     end = datetime.fromisoformat(metadata["window_end_utc"])
     metadata["used_measurements"] = {
         period: {
-            kind: sum(r.sensor_type.value == kind and predicate(r.timestamp_utc)
-                      for r in used.values())
+            kind: sum(
+                r.sensor_type.value == kind and predicate(r.timestamp_utc)
+                for r in used.values()
+            )
             for kind in ("fixed", "mobile")
         }
         for period, predicate in (
@@ -254,9 +292,11 @@ def export_replay_figures(destination, *, grid, config, measurements, history_du
         )
     }
     metadata["used_measurements_by_frame"] = [
-        {"timestamp_utc": t.isoformat(),
-         "fixed": sum(r.sensor_type.value == "fixed" for r in group),
-         "mobile": sum(r.sensor_type.value == "mobile" for r in group)}
+        {
+            "timestamp_utc": t.isoformat(),
+            "fixed": sum(r.sensor_type.value == "fixed" for r in group),
+            "mobile": sum(r.sensor_type.value == "mobile" for r in group),
+        }
         for t, group in zip(timestamps, observations, strict=True)
     ]
     _write_json(root / "metadata.json", metadata)

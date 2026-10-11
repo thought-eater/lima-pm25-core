@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from enum import StrEnum
-import math
 from typing import Protocol
 
 import numpy as np
@@ -88,9 +88,14 @@ class PM25SourceContribution:
 
 
 class PM25SourceProvider(Protocol):
-    source_id: str
-    role: PM25SourceRole
-    provenance: str
+    @property
+    def source_id(self) -> str: ...
+
+    @property
+    def role(self) -> PM25SourceRole: ...
+
+    @property
+    def provenance(self) -> str: ...
 
     @property
     def transition_times_s(self) -> tuple[float, ...]: ...

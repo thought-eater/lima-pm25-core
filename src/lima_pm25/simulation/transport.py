@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import asdict, dataclass, field
 from enum import StrEnum
-import math
-from typing import Callable, Iterator, Sequence
+from itertools import pairwise
 
 import numpy as np
 from shapely.geometry import LineString
@@ -84,9 +85,10 @@ class GaussianKernelSource:
         _require_nonnegative_finite("emission_rate_ug_s", self.emission_rate_ug_s)
         _require_positive_finite("sigma_m", self.sigma_m)
         _require_nonnegative_finite("starts_at_s", self.starts_at_s)
-        if self.ends_at_s is not None:
-            if not math.isfinite(self.ends_at_s) or self.ends_at_s <= self.starts_at_s:
-                raise ValueError("ends_at_s must be finite and greater than starts_at_s")
+        if self.ends_at_s is not None and (
+            not math.isfinite(self.ends_at_s) or self.ends_at_s <= self.starts_at_s
+        ):
+            raise ValueError("ends_at_s must be finite and greater than starts_at_s")
 
     def emitted_mass_ug(self, start_s: float, duration_s: float) -> float:
         interval_end = start_s + duration_s
@@ -125,12 +127,10 @@ class GaussianKernelSource:
 
         center_x, center_y = np.meshgrid(grid.x_centers_m, grid.y_centers_m)
         squared_distance = (center_x - self.x_m) ** 2 + (center_y - self.y_m) ** 2
-        closest_squared_distance = float(
-            np.min(squared_distance[grid.active_mask])
+        closest_squared_distance = float(np.min(squared_distance[grid.active_mask]))
+        exponent = (
+            -0.5 * (squared_distance - closest_squared_distance) / self.sigma_m**2
         )
-        exponent = -0.5 * (
-            squared_distance - closest_squared_distance
-        ) / self.sigma_m**2
         weights = np.zeros(grid.shape, dtype=np.float64)
         weights[grid.active_mask] = np.exp(exponent[grid.active_mask])
         weight_sum = float(np.sum(weights, dtype=np.float64))
@@ -181,9 +181,10 @@ class RoadLineSource:
             self.emission_rate_ug_m_s,
         )
         _require_nonnegative_finite("starts_at_s", self.starts_at_s)
-        if self.ends_at_s is not None:
-            if not math.isfinite(self.ends_at_s) or self.ends_at_s <= self.starts_at_s:
-                raise ValueError("ends_at_s must be finite and greater than starts_at_s")
+        if self.ends_at_s is not None and (
+            not math.isfinite(self.ends_at_s) or self.ends_at_s <= self.starts_at_s
+        ):
+            raise ValueError("ends_at_s must be finite and greater than starts_at_s")
 
     def emitted_mass_ug(
         self,
@@ -440,16 +441,13 @@ class PM25Transport:
 
             concentration, removed_dry = self._apply_exponential_sink(
                 concentration,
-                self.physics.dry_deposition_velocity_m_s
-                / self.physics.mixing_height_m,
+                self.physics.dry_deposition_velocity_m_s / self.physics.mixing_height_m,
                 substep_duration,
             )
             dry_deposited += removed_dry
 
             wet_rate_s = (
-                self.physics.wet_scavenging_per_mm
-                * forcing.precipitation_mm_h
-                / 3600
+                self.physics.wet_scavenging_per_mm * forcing.precipitation_mm_h / 3600
             )
             concentration, removed_wet = self._apply_exponential_sink(
                 concentration,
@@ -551,7 +549,7 @@ class PM25Transport:
         source_id: str,
     ) -> np.ndarray:
         if not isinstance(contribution, PM25SourceContribution):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004 -- preserve source validation contract
                 f"Source {source_id!r} must return PM25SourceContribution"
             )
         if contribution.unit != "ug":
@@ -564,9 +562,7 @@ class PM25Transport:
                 f"does not match grid shape {self.grid.shape}"
             )
         if not np.all(np.isfinite(mass_by_cell)):
-            raise ValueError(
-                f"Source {source_id!r} contribution values must be finite"
-            )
+            raise ValueError(f"Source {source_id!r} contribution values must be finite")
         if np.any(mass_by_cell < 0):
             raise ValueError(
                 f"Source {source_id!r} contribution values must be nonnegative"
@@ -583,9 +579,13 @@ class PM25Transport:
             )
 
         cell_mass = float(np.sum(mass_by_cell, dtype=np.float64))
-        tolerance = 64 * np.finfo(np.float64).eps * max(
-            abs(contribution.integrated_mass_ug),
-            1.0,
+        tolerance = (
+            64
+            * np.finfo(np.float64).eps
+            * max(
+                abs(contribution.integrated_mass_ug),
+                1.0,
+            )
         )
         if not math.isclose(
             cell_mass,
@@ -794,11 +794,7 @@ def iter_simulation(
     while end_time - state.simulation_time_s > 1e-9:
         remaining = end_time - state.simulation_time_s
         next_change = next(
-            (
-                time
-                for time in change_times
-                if time > state.simulation_time_s + 1e-9
-            ),
+            (time for time in change_times if time > state.simulation_time_s + 1e-9),
             end_time,
         )
         step_duration = min(
@@ -857,7 +853,7 @@ def _describe_source(source: PM25SourceProvider) -> SourceDescriptor:
     _require_usable_text("source_id", source_id)
     _require_usable_text("provenance", provenance)
     if not callable(contribution_method):
-        raise ValueError(
+        raise ValueError(  # noqa: TRY004 -- preserve source validation contract
             f"Source {source_id!r} contribution_for_interval must be callable"
         )
     return SourceDescriptor(source_id, role, provenance)
@@ -884,7 +880,7 @@ def _line_weights_on_grid(
     coordinates = np.asarray(line.coords, dtype=np.float64)[:, :2]
     x_min, y_min, _, _ = grid.grid_bounds_m
 
-    for start, end in zip(coordinates[:-1], coordinates[1:], strict=True):
+    for start, end in pairwise(coordinates):
         delta_x, delta_y = end - start
         segment_length = float(np.hypot(delta_x, delta_y))
         if segment_length == 0:
@@ -918,11 +914,7 @@ def _line_weights_on_grid(
             ):
                 ordered_points.append(value)
 
-        for interval_start, interval_end in zip(
-            ordered_points[:-1],
-            ordered_points[1:],
-            strict=True,
-        ):
+        for interval_start, interval_end in pairwise(ordered_points):
             midpoint_fraction = (interval_start + interval_end) / 2
             midpoint_x = start[0] + midpoint_fraction * delta_x
             midpoint_y = start[1] + midpoint_fraction * delta_y

@@ -13,7 +13,6 @@ from lima_pm25.estimation import (
 )
 from lima_pm25.simulation import SensorType
 
-
 HEADERS = (
     "ESTACION",
     "FECHA",
@@ -116,9 +115,7 @@ def test_custom_schema_timezone_and_missing_marker_are_explicit(
     with path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=headers)
         writer.writeheader()
-        writer.writerow(
-            {f"custom_{key}": value for key, value in values.items()}
-        )
+        writer.writerow({f"custom_{key}": value for key, value in values.items()})
     config = PM25CsvConfig(
         station_column="custom_ESTACION",
         date_column="custom_FECHA",
@@ -173,7 +170,9 @@ def test_observed_measurements_exclude_imputed_pm25_and_project_source_coordinat
     assert all(record.sensor_type is SensorType.FIXED for record in records)
     assert all(record.position_source_id == "CAMPO_DE_MARTE" for record in records)
     assert all(record.noise_stddev_ug_m3 == 2 for record in records)
-    assert all("PM2_5_SOURCE=senamhi_observed" in record.provenance for record in records)
+    assert all(
+        "PM2_5_SOURCE=senamhi_observed" in record.provenance for record in records
+    )
     assert all(grid.is_active_xy(record.x_m, record.y_m) for record in records)
 
 

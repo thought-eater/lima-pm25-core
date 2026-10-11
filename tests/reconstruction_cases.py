@@ -1,5 +1,6 @@
 """Grillas y mediciones sintéticas para pruebas de reconstrucción."""
 
+from dataclasses import replace
 from datetime import datetime
 
 import numpy as np
@@ -10,15 +11,14 @@ from lima_pm25.simulation import MeasurementQuality, MeasurementRecord, SensorTy
 
 
 def _reconstruction_config(**overrides: object) -> ReconstructionConfig:
-    values: dict[str, object] = {
-        "prior_mean_ug_m3": 20,
-        "prior_stddev_ug_m3": 15,
-        "x_length_scale_m": 300,
-        "y_length_scale_m": 300,
-        "temporal_length_scale_s": 3600,
-    }
-    values.update(overrides)
-    return ReconstructionConfig(**values)  # type: ignore[arg-type]
+    config = ReconstructionConfig(
+        prior_mean_ug_m3=20,
+        prior_stddev_ug_m3=15,
+        x_length_scale_m=300,
+        y_length_scale_m=300,
+        temporal_length_scale_s=3600,
+    )
+    return replace(config, **overrides)
 
 
 def _reconstructor(
@@ -38,11 +38,7 @@ def _grid(
     columns: int = 2,
     active_mask: np.ndarray | None = None,
 ) -> GridDefinition:
-    mask = (
-        np.ones((rows, columns), dtype=bool)
-        if active_mask is None
-        else active_mask
-    )
+    mask = np.ones((rows, columns), dtype=bool) if active_mask is None else active_mask
     return GridDefinition(
         crs="EPSG:32718",
         domain_bounds_m=np.array([0, 0, columns * 100, rows * 100]),

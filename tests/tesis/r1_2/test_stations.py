@@ -11,11 +11,11 @@ from shapely.geometry import Polygon
 from shapely.ops import transform
 
 from lima_pm25.domain import (
+    LIMA_PM25_STATION_DEFINITIONS,
+    SENAMHI_PM25_PROVENANCE,
     DomainConfig,
     FixedStationCatalog,
     FixedStationDefinition,
-    LIMA_PM25_STATION_DEFINITIONS,
-    SENAMHI_PM25_PROVENANCE,
     SpatialDomain,
     build_grid,
     create_lima_pm25_station_catalog,
@@ -56,7 +56,7 @@ def test_fixed_station_site_is_immutable_and_has_no_sensor_behavior() -> None:
     site = create_lima_pm25_station_catalog(_lima_test_domain()).sites[0]
 
     with pytest.raises(FrozenInstanceError):
-        site.x_m = 0  # type: ignore[misc]
+        site.x_m = 0  # ty: ignore[invalid-assignment] -- exercise immutability
 
     assert not {
         "sampling_interval_s",

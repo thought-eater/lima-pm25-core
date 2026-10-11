@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 import math
+from dataclasses import dataclass, field
 
 from pyproj import CRS, Transformer
 from shapely.geometry import Point
@@ -43,7 +43,10 @@ class FixedStationDefinition:
 
     def __post_init__(self) -> None:
         _require_usable_text("site_id", self.site_id)
-        if not math.isfinite(self.longitude_deg) or not -180 <= self.longitude_deg <= 180:
+        if (
+            not math.isfinite(self.longitude_deg)
+            or not -180 <= self.longitude_deg <= 180
+        ):
             raise ValueError("longitude_deg must be finite and between -180 and 180")
         if not math.isfinite(self.latitude_deg) or not -90 <= self.latitude_deg <= 90:
             raise ValueError("latitude_deg must be finite and between -90 and 90")
@@ -103,7 +106,10 @@ class FixedStationSite:
 
     def __post_init__(self) -> None:
         _require_usable_text("site_id", self.site_id)
-        if not math.isfinite(self.longitude_deg) or not -180 <= self.longitude_deg <= 180:
+        if (
+            not math.isfinite(self.longitude_deg)
+            or not -180 <= self.longitude_deg <= 180
+        ):
             raise ValueError("longitude_deg must be finite and between -180 and 180")
         if not math.isfinite(self.latitude_deg) or not -90 <= self.latitude_deg <= 90:
             raise ValueError("latitude_deg must be finite and between -90 and 90")
@@ -164,7 +170,9 @@ def project_fixed_station_site(
     if not domain.boundary.covers(Point(x_m, y_m)):
         raise ValueError(f"Station {definition.site_id!r} is outside the study domain")
     if not domain.grid.is_active_xy(x_m, y_m):
-        raise ValueError(f"Station {definition.site_id!r} is not in an active grid cell")
+        raise ValueError(
+            f"Station {definition.site_id!r} is not in an active grid cell"
+        )
 
     return FixedStationSite(
         site_id=definition.site_id,

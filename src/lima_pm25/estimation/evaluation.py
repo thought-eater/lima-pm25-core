@@ -1,12 +1,29 @@
 from __future__ import annotations
 
+import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
-import math
 from statistics import NormalDist
-from typing import Sequence
+from typing import Literal
 
 import numpy as np
+
+type PercentileMethod = Literal[
+    "inverted_cdf",
+    "averaged_inverted_cdf",
+    "closest_observation",
+    "interpolated_inverted_cdf",
+    "hazen",
+    "weibull",
+    "linear",
+    "median_unbiased",
+    "normal_unbiased",
+    "lower",
+    "higher",
+    "midpoint",
+    "nearest",
+]
 
 
 class EvaluationStatus(StrEnum):
@@ -65,7 +82,7 @@ class R22AcceptanceProfile:
         if self.minimum_coverage > self.maximum_coverage:
             raise ValueError("minimum_coverage cannot exceed maximum_coverage")
         if not isinstance(self.require_narrower_than_prior, bool):
-            raise ValueError("require_narrower_than_prior must be a boolean")
+            raise ValueError("require_narrower_than_prior must be a boolean")  # noqa: TRY004 -- preserve profile validation contract
         _require_positive_integer("minimum_sample_count", self.minimum_sample_count)
 
 
@@ -96,7 +113,7 @@ def robust_p95_p05_scale(
     calibration_truth: Sequence[np.ndarray],
     active_mask: np.ndarray,
     *,
-    percentile_method: str = "linear",
+    percentile_method: PercentileMethod = "linear",
 ) -> float:
     values = _flatten_active(calibration_truth, active_mask)
     if not values.size or not np.all(np.isfinite(values)):
@@ -410,9 +427,7 @@ def _flatten_active(
     active_mask: np.ndarray,
 ) -> np.ndarray:
     mask = np.asarray(active_mask, dtype=np.bool_)
-    return np.concatenate(
-        [np.asarray(value, dtype=np.float64)[mask] for value in maps]
-    )
+    return np.concatenate([np.asarray(value, dtype=np.float64)[mask] for value in maps])
 
 
 def _require_finite(name: str, value: float) -> None:

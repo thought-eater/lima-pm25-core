@@ -1,12 +1,12 @@
 from __future__ import annotations
 
+import json
+import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import StrEnum
-import json
-import math
 from pathlib import Path
-from typing import Sequence
 
 from lima_pm25.simulation import HistoricalWeatherDataset, WeatherCoverageError
 

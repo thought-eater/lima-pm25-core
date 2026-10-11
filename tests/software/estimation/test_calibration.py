@@ -1,31 +1,31 @@
+import json
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
-import json
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
+from pyproj import Transformer
+from shapely.geometry import box
 
-from lima_pm25.domain import DomainConfig, build_grid
+from lima_pm25.domain import build_grid
 from lima_pm25.estimation import (
-    GPCalibrationCandidate,
-    GPCandidateScore,
     EvaluationStatus,
     GaussianProcessFieldReconstructor,
+    GPCalibrationCandidate,
+    GPCandidateScore,
+    HistoricalPartition,
     HistoricalPM25Dataset,
     HistoricalPM25Record,
-    HistoricalPartition,
     HistoricalWindow,
     calibrate_gp_from_historical_stations,
     initial_gp_calibration_candidates,
     load_change10_calibration_artifact,
     load_change10_evaluation_profile,
-    write_gp_calibration_result,
     write_change10_calibration_artifact,
+    write_gp_calibration_result,
 )
-from pyproj import Transformer
-from shapely.geometry import box
 
 
 def test_initial_candidate_profile_contains_the_declared_48_candidates() -> None:
@@ -98,10 +98,13 @@ def test_rotating_station_calibration_selects_and_persists_one_candidate(
     assert set(payload["station_priors"]) == {"A", "B", "C"}
     for score in result.candidate_scores:
         assert set(score.station_scores) == {"A", "B", "C"}
-        assert score.mean_prior_interval_width_ug_m3 == pytest.approx(sum(
-            values["mean_prior_interval_width_ug_m3"] * values["sample_count"]
-            for values in score.station_scores.values()
-        ) / score.sample_count)
+        assert score.mean_prior_interval_width_ug_m3 == pytest.approx(
+            sum(
+                values["mean_prior_interval_width_ug_m3"] * values["sample_count"]
+                for values in score.station_scores.values()
+            )
+            / score.sample_count
+        )
     with pytest.raises(FileExistsError, match="already exists"):
         write_gp_calibration_result(result, destination)
 
@@ -111,15 +114,20 @@ def test_held_out_values_cannot_change_their_predictions_or_priors(monkeypatch):
     grid, coordinates = _grid_and_coordinates()
     original = _dataset(start, coordinates)
     window = HistoricalWindow(
-        HistoricalPartition.CALIBRATION, start,
-        start + timedelta(hours=2), start + timedelta(hours=8),
+        HistoricalPartition.CALIBRATION,
+        start,
+        start + timedelta(hours=2),
+        start + timedelta(hours=8),
     )
     candidate = GPCalibrationCandidate(
         history_duration=timedelta(hours=2),
-        spatial_length_scale_m=4_000, temporal_length_scale_s=3_600,
+        spatial_length_scale_m=4_000,
+        temporal_length_scale_s=3_600,
     )
     transformer = Transformer.from_crs("EPSG:4326", "EPSG:32718", always_xy=True)
-    station_at = {transformer.transform(*point): station for station, point in coordinates.items()}
+    station_at = {
+        transformer.transform(*point): station for station, point in coordinates.items()
+    }
     captured = []
     reconstruct = GaussianProcessFieldReconstructor.reconstruct_points
 
@@ -129,34 +137,63 @@ def test_held_out_values_cannot_change_their_predictions_or_priors(monkeypatch):
         assert all(record.sensor_id != held_out for record in request.measurements)
         assert all(
             request.reconstruction_timestamp_utc - candidate.history_duration
-            <= record.timestamp_utc <= request.reconstruction_timestamp_utc
+            <= record.timestamp_utc
+            <= request.reconstruction_timestamp_utc
             for record in request.measurements
         )
         posterior = reconstruct(self, request, positions)
         if held_out == "A":
-            captured.append((self.config.prior_mean_ug_m3, self.config.prior_stddev_ug_m3,
-                             posterior.mean_ug_m3[0], posterior.standard_deviation_ug_m3[0]))
+            captured.append(
+                (
+                    self.config.prior_mean_ug_m3,
+                    self.config.prior_stddev_ug_m3,
+                    posterior.mean_ug_m3[0],
+                    posterior.standard_deviation_ug_m3[0],
+                )
+            )
         return posterior
 
-    monkeypatch.setattr(GaussianProcessFieldReconstructor, "reconstruct_points", inspect)
+    monkeypatch.setattr(
+        GaussianProcessFieldReconstructor, "reconstruct_points", inspect
+    )
     results = []
-    for dataset in (original, replace(original, records=tuple(
-        replace(record, value_ug_m3=record.value_ug_m3 + 1_000)
-        if record.station_id == "A" else record
-        for record in original.records
-    ))):
-        results.append(calibrate_gp_from_historical_stations(
-            pm25=dataset, grid=grid, calibration_windows=(window,),
-            station_ids=("A", "B", "C", "CERES"),
-            observation_noise_stddev_ug_m3=1, candidates=(candidate,),
-        ))
+    for dataset in (
+        original,
+        replace(
+            original,
+            records=tuple(
+                replace(record, value_ug_m3=record.value_ug_m3 + 1_000)
+                if record.station_id == "A" and record.value_ug_m3 is not None
+                else record
+                for record in original.records
+            ),
+        ),
+    ):
+        results.append(
+            calibrate_gp_from_historical_stations(
+                pm25=dataset,
+                grid=grid,
+                calibration_windows=(window,),
+                station_ids=("A", "B", "C", "CERES"),
+                observation_noise_stddev_ug_m3=1,
+                candidates=(candidate,),
+            )
+        )
     assert len(captured) == 12
     np.testing.assert_array_equal(captured[:6], captured[6:])
-    donors = [r.value_ug_m3 for r in original.records
-              if r.station_id != "A" and window.start_utc <= r.timestamp_utc < window.end_utc]
-    assert results[0].station_priors["A"] == pytest.approx((np.median(donors), np.std(donors)))
-    assert results[0].candidate_scores[0].station_scores["A"]["rmse_ug_m3"] != (
-        results[1].candidate_scores[0].station_scores["A"]["rmse_ug_m3"]
+    donors = [
+        r.value_ug_m3
+        for r in original.records
+        if r.station_id != "A"
+        and window.start_utc <= r.timestamp_utc < window.end_utc
+        and r.value_ug_m3 is not None
+    ]
+    assert results[0].station_priors["A"] == pytest.approx(
+        (np.median(donors), np.std(donors))
+    )
+    assert (
+        results[0].candidate_scores[0].station_scores["A"]["rmse_ug_m3"]
+        != (results[1].candidate_scores[0].station_scores["A"]["rmse_ug_m3"])
     )
 
 
@@ -165,61 +202,117 @@ def test_historical_width_check_uses_the_held_out_priors():
 
     profile = load_change10_evaluation_profile("config/estimation_evaluation.json")
     score = GPCandidateScore(
-        GPCalibrationCandidate(history_duration=timedelta(hours=6),
-                               spatial_length_scale_m=2_000, temporal_length_scale_s=3_600),
-        3, 1, 1, 0.95, 10, 8, {},
+        GPCalibrationCandidate(
+            history_duration=timedelta(hours=6),
+            spatial_length_scale_m=2_000,
+            temporal_length_scale_s=3_600,
+        ),
+        3,
+        1,
+        1,
+        0.95,
+        10,
+        8,
+        {},
     )
     status, reasons = _historical_r22_status(score, profile)
     assert status is EvaluationStatus.FAIL
     assert reasons == ("historical_posterior_not_narrower_than_prior",)
     assert _historical_r22_status(
-        replace(score, mean_prior_interval_width_ug_m3=12), profile,
+        replace(score, mean_prior_interval_width_ug_m3=12),
+        profile,
     ) == (EvaluationStatus.PASS, ())
 
 
-def test_synthetic_selection_uses_historical_selection_and_freezes_actual_result(tmp_path, monkeypatch):
-    import lima_pm25.cli as cli
-    import lima_pm25.estimation.experiment as experiment
+def test_synthetic_selection_uses_historical_selection_and_freezes_actual_result(
+    tmp_path, monkeypatch
+):
+    from lima_pm25 import cli
+    from lima_pm25.estimation import experiment
 
     path = tmp_path / "profile.json"
     path.write_bytes(Path("config/estimation_evaluation.json").read_bytes())
     profile = load_change10_evaluation_profile(path)
-    historical_config = replace(profile.reconstruction_config,
-                                prior_mean_ug_m3=30, prior_stddev_ug_m3=15,
-                                x_length_scale_m=4_000, y_length_scale_m=4_000,
-                                temporal_length_scale_s=21_600)
+    historical_config = replace(
+        profile.reconstruction_config,
+        prior_mean_ug_m3=30,
+        prior_stddev_ug_m3=15,
+        x_length_scale_m=4_000,
+        y_length_scale_m=4_000,
+        temporal_length_scale_s=21_600,
+    )
     history = timedelta(hours=12)
-    scores = tuple(GPCandidateScore(
-        GPCalibrationCandidate(history_duration=history, spatial_length_scale_m=space,
-                               temporal_length_scale_s=21_600),
-        3, 1, 1, 0.80, 10, 20, {},
-    ) for space in profile.synthetic_spatial_candidates_m)
-    historical = SimpleNamespace(selected_config=historical_config,
-                                 selected_candidate=scores[-1].candidate, candidate_scores=scores)
-    run = SimpleNamespace(run_id="calibration-only", frames=(
-        SimpleNamespace(concentration_ug_m3=np.array([[0.0, 50.0]])),
-    ))
-    monkeypatch.setattr(experiment, "create_synthetic_study_family_requests",
-                        lambda *args, **kwargs: {"control": object()})
-    monkeypatch.setattr(experiment, "_nominal_request", lambda *args, **kwargs: object())
+    scores = tuple(
+        GPCandidateScore(
+            GPCalibrationCandidate(
+                history_duration=history,
+                spatial_length_scale_m=space,
+                temporal_length_scale_s=21_600,
+            ),
+            3,
+            1,
+            1,
+            0.80,
+            10,
+            20,
+            {},
+        )
+        for space in profile.synthetic_spatial_candidates_m
+    )
+    historical = SimpleNamespace(
+        selected_config=historical_config,
+        selected_candidate=scores[-1].candidate,
+        candidate_scores=scores,
+    )
+    run = SimpleNamespace(
+        run_id="calibration-only",
+        frames=(SimpleNamespace(concentration_ug_m3=np.array([[0.0, 50.0]])),),
+    )
+    monkeypatch.setattr(
+        experiment,
+        "create_synthetic_study_family_requests",
+        lambda *args, **kwargs: {"control": object()},
+    )
+    monkeypatch.setattr(
+        experiment, "_nominal_request", lambda *args, **kwargs: object()
+    )
     monkeypatch.setattr(experiment, "run_simulation", lambda request: run)
     seen = []
 
     def evaluate(**kwargs):
         config = kwargs["reconstruction_config"]
-        seen.append((kwargs["history_duration"], config.temporal_length_scale_s, config.prior_mean_ug_m3))
-        return SimpleNamespace(fixed_mobile_r21=SimpleNamespace(
-            status=EvaluationStatus.PASS, rmse_ug_m3=abs(config.x_length_scale_m - 1_000) + 1,
-        ))
+        seen.append(
+            (
+                kwargs["history_duration"],
+                config.temporal_length_scale_s,
+                config.prior_mean_ug_m3,
+            )
+        )
+        return SimpleNamespace(
+            fixed_mobile_r21=SimpleNamespace(
+                status=EvaluationStatus.PASS,
+                rmse_ug_m3=abs(config.x_length_scale_m - 1_000) + 1,
+            )
+        )
 
     monkeypatch.setattr(experiment, "evaluate_retained_synthetic_run", evaluate)
+    # Minimal doubles isolate selection from the patched simulation and evaluation.
     artifact = experiment.calibrate_change10_configuration(
-        domain=SimpleNamespace(grid=SimpleNamespace(active_mask=np.ones((1, 2), dtype=bool))),
-        station_catalog=object(), study_config=object(), profile=profile,
-        pm25=SimpleNamespace(resource_sha256="a" * 64),
-        weather=SimpleNamespace(resource_sha256="b" * 64, select_window=lambda *args: object()),
-        partition=SimpleNamespace(calibration_windows=(SimpleNamespace(start_utc=None),)),
-        historical_calibration=historical, historical_scale_ug_m3=40,
+        domain=SimpleNamespace(
+            grid=SimpleNamespace(active_mask=np.ones((1, 2), dtype=bool))
+        ),  # ty: ignore[invalid-argument-type]
+        station_catalog=object(),  # ty: ignore[invalid-argument-type]
+        study_config=object(),  # ty: ignore[invalid-argument-type]
+        profile=profile,
+        pm25=SimpleNamespace(resource_sha256="a" * 64),  # ty: ignore[invalid-argument-type]
+        weather=SimpleNamespace(
+            resource_sha256="b" * 64, select_window=lambda *args: object()
+        ),  # ty: ignore[invalid-argument-type]
+        partition=SimpleNamespace(
+            calibration_windows=(SimpleNamespace(start_utc=None),)
+        ),  # ty: ignore[invalid-argument-type]
+        historical_calibration=historical,  # ty: ignore[invalid-argument-type]
+        historical_scale_ug_m3=40,
     )
     assert seen == [(history, 21_600, 30)] * 4
     assert artifact.synthetic_selected_spatial_m == 1_000

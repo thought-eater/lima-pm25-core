@@ -7,15 +7,15 @@ import pytest
 from pyproj import Geod
 from shapely.geometry import LineString, box
 
-from lima_pm25.domain import spatial as domain_module
 from lima_pm25.domain import (
-    DomainConfig,
     LIMA_PM25_STATION_DEFINITIONS,
+    DomainConfig,
     build_grid,
     create_spatial_domain,
     load_grid,
     save_grid,
 )
+from lima_pm25.domain import spatial as domain_module
 
 
 def test_domain_config_validates_bounds_and_cell_size() -> None:
@@ -29,10 +29,14 @@ def test_domain_config_validates_bounds_and_cell_size() -> None:
         DomainConfig(road_network_buffer_m=-1)
 
 
-def test_default_domain_gives_campo_de_marte_at_least_its_western_margin_to_south() -> None:
+def test_default_domain_gives_campo_de_marte_at_least_its_western_margin_to_south() -> (
+    None
+):
     config = DomainConfig()
     station = next(
-        site for site in LIMA_PM25_STATION_DEFINITIONS if site.site_id == "CAMPO_DE_MARTE"
+        site
+        for site in LIMA_PM25_STATION_DEFINITIONS
+        if site.site_id == "CAMPO_DE_MARTE"
     )
     station_longitude = station.longitude_deg
     station_latitude = station.latitude_deg
@@ -77,7 +81,10 @@ def test_configuration_fingerprint_tracks_spatial_inputs_not_cache_location(
 ) -> None:
     config = DomainConfig()
     assert replace(config, cache_directory=tmp_path).fingerprint == config.fingerprint
-    assert replace(config, osmnx_cache_directory=tmp_path).fingerprint == config.fingerprint
+    assert (
+        replace(config, osmnx_cache_directory=tmp_path).fingerprint
+        == config.fingerprint
+    )
     assert replace(config, left=config.left + 0.001).fingerprint != config.fingerprint
     assert replace(config, cell_size_m=50).fingerprint != config.fingerprint
     assert replace(config, network_type="walk").fingerprint != config.fingerprint

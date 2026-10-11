@@ -1,14 +1,14 @@
-from datetime import UTC, datetime, timedelta
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
 from lima_pm25.estimation import (
-    HistoricalPM25Dataset,
-    HistoricalPM25Record,
     HistoricalPartition,
     HistoricalPartitionConfig,
+    HistoricalPM25Dataset,
+    HistoricalPM25Record,
     build_historical_partition_manifest,
     write_historical_partition_manifest,
 )
@@ -63,7 +63,9 @@ def test_partition_selects_disjoint_spread_calibration_and_replay_windows() -> N
         and window.context_duration == timedelta(hours=12)
         for window in (*manifest.calibration_windows, *manifest.replay_windows)
     )
-    assert manifest.evidence_descriptor()["station_observed_counts"]["CERES"] == 0
+    observed_counts = manifest.evidence_descriptor()["station_observed_counts"]
+    assert isinstance(observed_counts, dict)
+    assert observed_counts["CERES"] == 0
 
 
 def test_partition_refuses_insufficient_concurrent_station_coverage() -> None:
@@ -113,9 +115,7 @@ def test_partition_manifest_is_persisted_without_overwriting(tmp_path: Path) -> 
     assert payload["selection_method"] == (
         "chronological_fraction_spread_nonoverlapping"
     )
-    assert payload["pm25_observation_policy"] == (
-        "present_senamhi_observed_only"
-    )
+    assert payload["pm25_observation_policy"] == ("present_senamhi_observed_only")
     with pytest.raises(FileExistsError, match="already exists"):
         write_historical_partition_manifest(manifest, destination)
 

@@ -18,8 +18,11 @@ def test_retained_spatial_selection_matches_operational_profile() -> None:
     assert calibration["synthetic_selected_spatial_m"] == 2_000
     assert profile.reconstruction_config.x_length_scale_m == 2_000
     assert profile.reconstruction_config.y_length_scale_m == 2_000
-    assert min(
-        calibration["spatial_candidate_rmse_ug_m3"],
-        key=calibration["spatial_candidate_rmse_ug_m3"].get,
-    ) == "2000"
+    assert (
+        min(
+            calibration["spatial_candidate_rmse_ug_m3"],
+            key=calibration["spatial_candidate_rmse_ug_m3"].get,
+        )
+        == "2000"
+    )
     assert calibration["profile_sha256"] == profile.source_sha256

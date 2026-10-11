@@ -1,6 +1,6 @@
+import json
 from dataclasses import fields
 from datetime import UTC, datetime, timedelta
-import json
 from pathlib import Path
 
 import numpy as np
@@ -24,7 +24,6 @@ from lima_pm25.simulation import (
     MeasurementRecord,
     SensorType,
 )
-
 
 START = datetime(2026, 9, 28, tzinfo=UTC)
 
@@ -76,7 +75,9 @@ def test_successive_batches_publish_increasing_coupled_snapshots() -> None:
 
     assert first.snapshot is not None and second.snapshot is not None
     assert (first.snapshot.sequence_number, second.snapshot.sequence_number) == (1, 2)
-    assert first.snapshot.measurement_cutoff_utc < second.snapshot.measurement_cutoff_utc
+    assert (
+        first.snapshot.measurement_cutoff_utc < second.snapshot.measurement_cutoff_utc
+    )
     assert second.snapshot.reconstruction_timestamp_utc == second_time
     assert second.snapshot.mean_ug_m3.shape == second.snapshot.active_mask.shape
     assert (
@@ -222,9 +223,7 @@ def test_older_or_equal_timestamp_is_rejected_without_mutation() -> None:
 
     for timestamp in (START, current):
         with pytest.raises(SequentialUpdateError, match="strictly later"):
-            updater.update(
-                _batch(_record("LATE", timestamp, SensorType.MOBILE))
-            )
+            updater.update(_batch(_record("LATE", timestamp, SensorType.MOBILE)))
         assert _state_signature(updater) == state
 
 

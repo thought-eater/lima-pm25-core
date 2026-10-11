@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from collections import Counter
-from dataclasses import dataclass
-from enum import StrEnum
 import json
 import math
+from collections import Counter
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from enum import StrEnum
 from pathlib import Path
-from typing import Mapping, Sequence
 
 import numpy as np
 
@@ -88,19 +88,13 @@ class LimaPlausibilityProfile:
             "weather_resource_id": self.weather_resource_id,
             "weather_resource_sha256": self.weather_resource_sha256,
             "weather_station_id": self.weather_station_id,
-            "pm25_observed_source_counts": dict(
-                self.pm25_observed_source_counts
-            ),
+            "pm25_observed_source_counts": dict(self.pm25_observed_source_counts),
             "weather_source_counts": dict(self.weather_source_counts),
             "distributions": {
                 "pm25_ug_m3": _summary_descriptor(self.pm25_ug_m3),
                 "wind_speed_m_s": _summary_descriptor(self.wind_speed_m_s),
-                "precipitation_mm_h": _summary_descriptor(
-                    self.precipitation_mm_h
-                ),
-                "temperature_c": _optional_summary_descriptor(
-                    self.temperature_c
-                ),
+                "precipitation_mm_h": _summary_descriptor(self.precipitation_mm_h),
+                "temperature_c": _optional_summary_descriptor(self.temperature_c),
                 "relative_humidity_pct": _optional_summary_descriptor(
                     self.relative_humidity_pct
                 ),
@@ -117,7 +111,9 @@ class LimaPlausibilityProfile:
                     "name": parameter.name,
                     "value": parameter.value,
                     "unit": parameter.unit,
-                    "evidence_class": parameter.evidence_class.value,
+                    "evidence_class": ParameterEvidenceClass(
+                        parameter.evidence_class
+                    ).value,
                     "evidence": parameter.evidence,
                 }
                 for parameter in self.parameters
@@ -189,12 +185,8 @@ def build_lima_plausibility_profile(
         pm25_ug_m3=_summarize(pm25_values, "ug/m3"),
         wind_speed_m_s=_summarize(wind_speeds, "m/s"),
         precipitation_mm_h=_summarize(precipitation, "mm/h"),
-        temperature_c=(
-            _summarize(temperatures, "degC") if temperatures else None
-        ),
-        relative_humidity_pct=(
-            _summarize(humidity, "%") if humidity else None
-        ),
+        temperature_c=(_summarize(temperatures, "degC") if temperatures else None),
+        relative_humidity_pct=(_summarize(humidity, "%") if humidity else None),
         parameters=parameter_values,
     )
 

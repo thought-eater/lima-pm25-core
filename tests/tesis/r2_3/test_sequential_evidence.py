@@ -1,6 +1,6 @@
-from datetime import UTC, datetime, timedelta
 import csv
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import networkx as nx
@@ -8,6 +8,7 @@ import numpy as np
 from shapely.geometry import LineString, box
 
 from lima_pm25.domain import (
+    SENAMHI_PM25_PROVENANCE,
     AmbientBaseline,
     AtmosphericForcing,
     DomainConfig,
@@ -15,7 +16,6 @@ from lima_pm25.domain import (
     FixedStationSite,
     GridDefinition,
     MobilityPolicy,
-    SENAMHI_PM25_PROVENANCE,
     SpatialDomain,
 )
 from lima_pm25.estimation import (
@@ -42,7 +42,6 @@ from lima_pm25.simulation import (
     run_simulation,
 )
 
-
 START = datetime(2026, 9, 28, tzinfo=UTC)
 
 
@@ -68,8 +67,7 @@ def test_r13_batches_drive_r23_and_persist_truth_isolated_evidence(
     assert verify_sequential_update_bundle(bundle) == ()
     assert len(trace.snapshots) == len(run.measurement_batches) == 3
     assert all(
-        result.log_entry.eligible_mobile_measurement_keys
-        for result in trace.results
+        result.log_entry.eligible_mobile_measurement_keys for result in trace.results
     )
     manifest = json.loads((bundle / "manifest.json").read_text(encoding="utf-8"))
     assert manifest["hidden_truth_included"] is False
@@ -91,9 +89,12 @@ def test_r13_batches_drive_r23_and_persist_truth_isolated_evidence(
     with (bundle / "update_summary.csv").open() as stream:
         rows = list(csv.DictReader(stream))
     for row in rows:
-        snapshot = trace.snapshots[int(row["sequence"])-1]
+        snapshot = trace.snapshots[int(row["sequence"]) - 1]
         assert int(row["history_count"]) == snapshot.observations.used_record_count
-        assert float(row["batch_integrated_variance_reduction"]) == snapshot.uncertainty_reduction.integrated_reduction_ug2_m4
+        assert (
+            float(row["batch_integrated_variance_reduction"])
+            == snapshot.uncertainty_reduction.integrated_reduction_ug2_m4
+        )
 
 
 def test_sequential_bundle_is_non_overwriting_and_tamper_evident(

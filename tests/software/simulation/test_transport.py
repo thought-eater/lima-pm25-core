@@ -3,12 +3,12 @@ import math
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import networkx as nx
 import numpy as np
 import pytest
 from shapely.geometry import LineString, Polygon, box
 
 from lima_pm25.domain import (
-    AmbientBaseline,
     AtmosphericForcing,
     DomainConfig,
     GridDefinition,
@@ -29,8 +29,6 @@ from lima_pm25.simulation.demo import (
 )
 from lima_pm25.simulation.transport import (
     BoundaryMode,
-    GaussianKernelSource,
-    PM25PhysicsConfig,
     PM25State,
     PM25Transport,
     RoadLineSource,
@@ -38,7 +36,13 @@ from lima_pm25.simulation.transport import (
     iter_simulation,
 )
 from tests.transport_cases import (
-    _baseline, _boundary, _cell_volume, _forcing, _physics, _source, _square_grid,
+    _baseline,
+    _boundary,
+    _cell_volume,
+    _forcing,
+    _physics,
+    _source,
+    _square_grid,
 )
 
 
@@ -339,7 +343,7 @@ def test_source_provider_metadata_and_unique_identity_are_required() -> None:
     invalid_sources = (
         _StaticSource(" ", contribution),
         _StaticSource("source", contribution, provenance=""),
-        _StaticSource("source", contribution, role="unknown"),
+        _StaticSource("source", contribution, role="unknown"),  # ty: ignore[invalid-argument-type] -- invalid role
     )
 
     for source in invalid_sources:
@@ -401,7 +405,7 @@ def test_malformed_source_contributions_are_rejected_before_injection() -> None:
                 model.initialize_uniform(_baseline(0)),
                 duration_s=60,
                 forcing=_forcing(),
-                sources=(_StaticSource("malformed", contribution),),
+                sources=(_StaticSource("malformed", contribution),),  # ty: ignore[invalid-argument-type] -- includes non-contribution objects
             )
 
 
@@ -433,11 +437,11 @@ def test_source_metadata_must_remain_stable_during_contribution() -> None:
     class MutatingSource(_StaticSource):
         def contribution_for_interval(
             self,
-            _grid: GridDefinition,
+            grid: GridDefinition,
             *,
             start_s: float,
             duration_s: float,
-        ) -> object:
+        ) -> PM25SourceContribution:
             self.source_id = "changed"
             return self.contribution
 
@@ -610,15 +614,21 @@ def test_incremental_runner_splits_at_forcing_changes_and_is_deterministic() -> 
     def forcing_at(time_s: float) -> AtmosphericForcing:
         return _forcing(precipitation_mm_h=float(time_s >= 1_000))
 
-    arguments = {
-        "duration_s": 2_000,
-        "frame_duration_s": 700,
-        "forcing_at": forcing_at,
-        "forcing_change_times_s": (1_000,),
-        "boundary_mode": BoundaryMode.CLOSED,
-    }
-    first = tuple(iter_simulation(model, initial, **arguments))
-    second = tuple(iter_simulation(model, initial, **arguments))
+    def run() -> tuple[SimulationFrame, ...]:
+        return tuple(
+            iter_simulation(
+                model,
+                initial,
+                duration_s=2_000,
+                frame_duration_s=700,
+                forcing_at=forcing_at,
+                forcing_change_times_s=(1_000,),
+                boundary_mode=BoundaryMode.CLOSED,
+            )
+        )
+
+    first = run()
+    second = run()
 
     assert [frame.state.simulation_time_s for frame in first] == [
         0,
@@ -698,6 +708,8 @@ def test_regional_boundary_changes_split_frames_independently_of_weather() -> No
         1_700,
         2_000,
     ]
+    assert frames[2].regional_boundary is not None
+    assert frames[3].regional_boundary is not None
     assert frames[2].regional_boundary.concentration_ug_m3 == 5
     assert frames[3].regional_boundary.concentration_ug_m3 == 6
     assert all(frame.forcing == frames[0].forcing for frame in frames)
@@ -728,21 +740,21 @@ def test_source_transitions_split_frames_before_transport_and_sinks() -> None:
     )
 
     assert [frame.state.simulation_time_s for frame in frames] == [0, 50, 100]
+    assert frames[1].budget is not None
+    assert frames[2].budget is not None
     assert frames[1].budget.emitted_mass_ug == 0
     assert frames[2].budget.emitted_mass_ug == pytest.approx(50_000)
-    assert frames[2].budget.final_mass_ug == pytest.approx(
-        50_000 * math.exp(-0.5)
-    )
+    assert frames[2].budget.final_mass_ug == pytest.approx(50_000 * math.exp(-0.5))
 
 
 def test_summary_colorbar_has_dedicated_non_overlapping_axis(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     grid = _square_grid(side_cells=10)
-    graph = object()
+    graph = nx.MultiDiGraph()
     domain = SpatialDomain(
         config=DomainConfig(),
-        road_graph=graph,  # type: ignore[arg-type]
+        road_graph=graph,
         boundary=box(0, 0, 1_000, 1_000),
         grid=grid,
         graph_source="test",
@@ -815,7 +827,7 @@ def test_synthetic_demo_uses_four_road_sources_and_three_weather_phases(
     grid = _square_grid(side_cells=10)
     domain = SpatialDomain(
         config=DomainConfig(),
-        road_graph=object(),  # type: ignore[arg-type]
+        road_graph=nx.MultiDiGraph(),
         boundary=box(0, 0, 1_000, 1_000),
         grid=grid,
         graph_source="test",
@@ -828,9 +840,7 @@ def test_synthetic_demo_uses_four_road_sources_and_three_weather_phases(
     )
 
     _, _, sources = _create_synthetic_demo(domain)
-    weather = tuple(
-        _synthetic_demo_forcing(time_s) for time_s in (0, 3_600, 7_200)
-    )
+    weather = tuple(_synthetic_demo_forcing(time_s) for time_s in (0, 3_600, 7_200))
 
     assert [source.source_id for source in sources] == [
         "tupac-amaru",
@@ -867,7 +877,7 @@ def test_demo_road_selection_rejects_an_unknown_name(
     grid = _square_grid(side_cells=10)
     domain = SpatialDomain(
         config=DomainConfig(),
-        road_graph=object(),  # type: ignore[arg-type]
+        road_graph=nx.MultiDiGraph(),
         boundary=box(0, 0, 1_000, 1_000),
         grid=grid,
         graph_source="test",
@@ -890,7 +900,7 @@ def test_synthetic_demo_persists_reproducible_input_metadata(
     grid = _square_grid(side_cells=10)
     domain = SpatialDomain(
         config=DomainConfig(),
-        road_graph=object(),  # type: ignore[arg-type]
+        road_graph=nx.MultiDiGraph(),
         boundary=box(0, 0, 1_000, 1_000),
         grid=grid,
         graph_source="test",
@@ -909,9 +919,7 @@ def test_synthetic_demo_persists_reproducible_input_metadata(
     with np.load(tmp_path / "concentration.npz", allow_pickle=False) as data:
         persisted_source_ids = data["source_ids"].tolist()
 
-    assert scenario["ambient_baseline"]["provider_id"] == (
-        "synthetic-ambient-baseline"
-    )
+    assert scenario["ambient_baseline"]["provider_id"] == ("synthetic-ambient-baseline")
     assert scenario["regional_boundary"]["provider_id"] == (
         "synthetic-regional-boundary"
     )
@@ -921,8 +929,7 @@ def test_synthetic_demo_persists_reproducible_input_metadata(
     assert scenario["grid"]["shape"] == [10, 10]
     assert len(scenario["sources"]) == 4
     assert all(
-        source["source_type"] == "RoadLineSource"
-        for source in scenario["sources"]
+        source["source_type"] == "RoadLineSource" for source in scenario["sources"]
     )
     assert scenario["sources"][-1]["role"] == "counterfactual_event"
     assert scenario["sources"][-1]["starts_at_s"] == 3_600
@@ -938,15 +945,18 @@ def test_synthetic_demo_persists_reproducible_input_metadata(
         entry["meteorology"]["wind_from_direction_deg"]
         for entry in scenario["input_history"]
     } == {90.0, 180.0, 270.0}
-    assert "alfonso-ugarte-event" not in (
-        scenario["input_history"][0]["active_source_ids"]
+    assert (
+        "alfonso-ugarte-event"
+        not in (scenario["input_history"][0]["active_source_ids"])
     )
     event_index = next(
-        index for index, entry in enumerate(scenario["input_history"])
+        index
+        for index, entry in enumerate(scenario["input_history"])
         if entry["interval_start_s"] == 3_600
     )
-    assert "alfonso-ugarte-event" in (
-        scenario["input_history"][event_index]["active_source_ids"]
+    assert (
+        "alfonso-ugarte-event"
+        in (scenario["input_history"][event_index]["active_source_ids"])
     )
     assert [
         entry["source_id"] for entry in serialized_budgets[0]["source_emissions"]
@@ -963,7 +973,9 @@ def test_synthetic_demo_persists_reproducible_input_metadata(
         "alfonso-ugarte-event",
     ]
     assert serialized_budgets[0]["source_emissions"][-1]["emitted_mass_ug"] == 0
-    assert serialized_budgets[event_index]["source_emissions"][-1]["emitted_mass_ug"] > 0
+    assert (
+        serialized_budgets[event_index]["source_emissions"][-1]["emitted_mass_ug"] > 0
+    )
     assert serialized_budgets[-1]["wet_deposited_mass_ug"] > 0
     assert (tmp_path / "pm25_demo.png").is_file()
 
@@ -1043,9 +1055,9 @@ class _StaticSource:
     def __init__(
         self,
         source_id: str,
-        contribution: object,
+        contribution: PM25SourceContribution,
         *,
-        role: object = PM25SourceRole.ROUTINE_ENVIRONMENTAL,
+        role: PM25SourceRole = PM25SourceRole.ROUTINE_ENVIRONMENTAL,
         provenance: str = "test fixture",
     ) -> None:
         self.source_id = source_id
@@ -1053,11 +1065,22 @@ class _StaticSource:
         self.provenance = provenance
         self.contribution = contribution
 
+    @property
+    def transition_times_s(self) -> tuple[float, ...]:
+        return ()
+
+    def evidence_descriptor(self) -> dict[str, object]:
+        return {
+            "source_id": self.source_id,
+            "role": self.role.value,
+            "provenance": self.provenance,
+        }
+
     def contribution_for_interval(
         self,
-        _grid: GridDefinition,
+        grid: GridDefinition,
         *,
         start_s: float,
         duration_s: float,
-    ) -> object:
+    ) -> PM25SourceContribution:
         return self.contribution

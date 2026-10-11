@@ -1,14 +1,14 @@
+import json
 from dataclasses import replace
 from datetime import UTC, datetime
-import json
 from pathlib import Path
 
 import networkx as nx
-import numpy as np
-from shapely.geometry import box
 import pytest
+from shapely.geometry import box
 
 from lima_pm25.domain import (
+    SENAMHI_PM25_PROVENANCE,
     AmbientBaseline,
     AtmosphericForcing,
     DomainConfig,
@@ -18,7 +18,6 @@ from lima_pm25.domain import (
     FixedStationSite,
     MobilityPolicy,
     PM25SourceRole,
-    SENAMHI_PM25_PROVENANCE,
     ScenarioFactor,
     ScenarioFamilyDefinition,
     ScenarioFamilyPurpose,
@@ -31,7 +30,6 @@ from lima_pm25.domain import (
     save_grid,
 )
 from lima_pm25.simulation import (
-    build_environment_manifest,
     GaussianKernelSource,
     HorizontalSensitivityProtocol,
     PM25PhysicsConfig,
@@ -41,15 +39,15 @@ from lima_pm25.simulation import (
     SimulationRunRequest,
     SyntheticWeatherWindow,
     assess_grid_convergence,
+    build_environment_manifest,
     compare_output_schedule_sensitivity,
-    resolve_scenario_family,
-    render_scenario_family_markdown,
     render_environment_markdown,
+    render_scenario_family_markdown,
+    resolve_scenario_family,
     run_horizontal_sensitivity,
     verify_environment_bundle,
     write_environment_bundle,
 )
-
 
 START = datetime(2026, 9, 26, tzinfo=UTC)
 
@@ -64,9 +62,7 @@ def test_matched_control_and_event_family_resolves_one_declared_factor() -> None
 
     assert resolved.family_id == definition.family_id
     assert len(resolved.fingerprint) == 64
-    assert resolved.manifest["members"][1]["changed_factors"] == [
-        "event_sources"
-    ]
+    assert resolved.manifest["members"][1]["changed_factors"] == ["event_sources"]
     assert resolved.manifest["complete_field_is_observed_ground_truth"] is False
     documentation = render_scenario_family_markdown(resolved)
     assert "Hidden-field origin: `simulator_generated`" in documentation
@@ -164,10 +160,14 @@ def test_horizontal_sensitivity_uses_common_coordinates_and_declared_rule() -> N
         lambda grid: _request(grid=grid),
     )
 
-    assert evidence["protocol"]["cell_sizes_m"] == [50, 100, 200]
+    evidence_protocol = evidence["protocol"]
+    assert isinstance(evidence_protocol, dict)
+    assert evidence_protocol["cell_sizes_m"] == [50, 100, 200]
     assert evidence["experimental_recommendation_cell_size_m"] == 100
     assert evidence["recommendation_status"] == "technical_recommendation"
-    assert set(evidence["results_by_cell_size_m"]) == {"50.0", "100.0", "200.0"}
+    results = evidence["results_by_cell_size_m"]
+    assert isinstance(results, dict)
+    assert set(results) == {"50.0", "100.0", "200.0"}
 
 
 def test_output_schedule_sensitivity_compares_shared_instants() -> None:
@@ -397,9 +397,7 @@ def _environment(
             mobile_sampling_interval_s=None,
         ),
         horizontal_candidate_cell_sizes_m=(50, 100, 200),
-        selected_cell_size_status=(
-            SelectionStatus.PROVISIONAL_IMPLEMENTATION_VALUE
-        ),
+        selected_cell_size_status=(SelectionStatus.PROVISIONAL_IMPLEMENTATION_VALUE),
         scenario_families=(family,),
     )
     catalog = FixedStationCatalog(

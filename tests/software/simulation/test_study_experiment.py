@@ -30,4 +30,3 @@ def test_discretization_evidence_is_non_overwriting(tmp_path: Path) -> None:
     assert json.loads(path.read_text(encoding="utf-8")) == evidence
     with pytest.raises(FileExistsError):
         write_discretization_evidence(evidence, path)
-
