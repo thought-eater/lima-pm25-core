@@ -51,6 +51,9 @@ Los experimentos se ejecutan mediante las funciones y opciones del programa:
 - R1.2: `--study-sensitivity`, según el
   [protocolo de discretización](../docs/study-environment.md#reproducción).
 - R1.3: ejemplo integrado con `uv run lima-pm25-core`.
+- Episodios con perfiles y meteorología variable: `--episode-config`, según la
+  [guía de generación](../docs/episode-generation.md). Sus ejecuciones
+  exploratorias se guardan inicialmente en `cache/episodes/`.
 - R2.1–R2.2: `--historical-calibration` y `--estimation-evaluation`, según el
   [procedimiento de calibración y evaluación](../docs/historical-calibration.md).
 - R2.3: procesamiento secuencial de lotes y resumen del conjunto requerido,

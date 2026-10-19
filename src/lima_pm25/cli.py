@@ -34,17 +34,22 @@ from lima_pm25.estimation import (
     write_provisional_historical_replay,
 )
 from lima_pm25.simulation import (
+    EpisodeWeatherMode,
     animate_synthetic_demo,
     build_environment_manifest,
+    compose_episode,
     create_synthetic_study_family_requests,
     load_discretization_protocol,
+    load_episode_generation_config,
     load_historical_weather_csv,
     resolve_scenario_family,
     run_complete_synthetic_demo,
+    run_simulation,
     run_study_discretization_experiment,
     verify_environment_bundle,
     write_discretization_evidence,
     write_environment_bundle,
+    write_run_bundle,
 )
 
 
@@ -85,6 +90,21 @@ def _create_parser() -> argparse.ArgumentParser:
         description="Run the synthetic PM2.5 simulator or inspect its spatial domain."
     )
     mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--episode-config",
+        type=Path,
+        help="generate an episode using temporal sources and partitioned weather",
+    )
+    parser.add_argument("--episode-seed", type=int, default=0)
+    parser.add_argument(
+        "--episode-partition", choices=("training", "evaluation"), default="training"
+    )
+    parser.add_argument(
+        "--episode-weather",
+        choices=tuple(mode.value for mode in EpisodeWeatherMode),
+        default=None,
+    )
+    parser.add_argument("--episode-output", type=Path, default=Path("cache/episodes"))
     mode.add_argument(
         "--animate",
         action="store_true",
@@ -254,6 +274,30 @@ def main(argv: Sequence[str] | None = None) -> None:
     domain = create_spatial_domain(study_config.domain)
     station_catalog = create_lima_pm25_station_catalog(domain)
     _print_domain_summary(domain)
+
+    if args.episode_config:
+        template = create_synthetic_study_family_requests(
+            domain, station_catalog=station_catalog, study_config=study_config
+        )["event"]
+        weather = load_historical_weather_csv(
+            args.weather_data, station_id=args.weather_station
+        )
+        request = compose_episode(
+            template,
+            weather,
+            load_episode_generation_config(args.episode_config),
+            seed=args.episode_seed,
+            partition=args.episode_partition,
+            weather_mode=args.episode_weather,
+        )
+        result = run_simulation(request)
+        destination = args.episode_output / result.run_id
+        write_run_bundle(result, destination)
+        metadata = json.loads(request.episode_parameters_json)
+        print(f"{metadata['weather_label']} — {metadata['partition']}")
+        print(f"Inicio UTC: {request.config.start_utc.isoformat()}")
+        print(f"Resultados: {destination}")
+        return
 
     if args.domain_only:
         preview_path = study_config.domain.cache_directory / "domain_preview.png"

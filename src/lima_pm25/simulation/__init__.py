@@ -6,6 +6,13 @@ from .demo import (
     run_complete_synthetic_demo,
     run_synthetic_demo,
 )
+from .episodes import (
+    EpisodeGenerationConfig,
+    EpisodeWeatherMode,
+    SourceVariation,
+    compose_episode,
+    load_episode_generation_config,
+)
 from .evidence import (
     BundleVerificationResult,
     verify_run_bundle,
@@ -66,7 +73,9 @@ from .trajectory import (
     TrajectoryValidationError,
 )
 from .transport import (
+    AreaSource,
     BoundaryMode,
+    EmissionProfile,
     GaussianKernelSource,
     MassBudget,
     PM25PhysicsConfig,
@@ -79,6 +88,7 @@ from .transport import (
 )
 from .weather import (
     DEFAULT_WEATHER_CSV_CONFIG,
+    CorrelatedWindModel,
     HistoricalWeatherDataset,
     MissingValuePolicy,
     PrecipitationSourcePolicy,
@@ -97,11 +107,16 @@ __all__ = [
     "DEFAULT_WEATHER_CSV_CONFIG",
     "EVENT_ORDER_VERSION",
     "ORCHESTRATION_SCHEMA_VERSION",
+    "AreaSource",
     "BoundaryMode",
     "BundleVerificationResult",
     "ConcentrationFrame",
+    "CorrelatedWindModel",
+    "EmissionProfile",
     "EnvironmentBundleVerificationResult",
     "EpisodeClock",
+    "EpisodeGenerationConfig",
+    "EpisodeWeatherMode",
     "GaussianKernelSource",
     "HistoricalWeatherDataset",
     "HorizontalSensitivityProtocol",
@@ -132,6 +147,7 @@ __all__ = [
     "SimulationRunRequest",
     "SimulationRunResult",
     "SourceMassDiagnostic",
+    "SourceVariation",
     "SyntheticWeatherWindow",
     "TimestampedTrajectoryProvider",
     "TrajectoryCoverageError",
@@ -147,10 +163,12 @@ __all__ = [
     "assess_grid_convergence",
     "build_environment_manifest",
     "compare_output_schedule_sensitivity",
+    "compose_episode",
     "create_lima_fixed_sensor_configs",
     "create_synthetic_study_family_requests",
     "iter_simulation",
     "load_discretization_protocol",
+    "load_episode_generation_config",
     "load_historical_weather_csv",
     "render_discretization_markdown",
     "render_environment_markdown",

@@ -1,0 +1,63 @@
+{
+  "training_start_utc": "2025-01-01T05:00:00+00:00",
+  "training_end_utc": "2026-01-01T05:00:00+00:00",
+  "evaluation_start_utc": "2026-01-01T05:00:00+00:00",
+  "evaluation_end_utc": "2026-07-01T05:00:00+00:00",
+  "weather_weights": {"historical": 1.0, "historical_perturbed": 1.0, "synthetic": 1.0},
+  "provenance": "Synthetic episode-generation example; emission profiles and ranges are illustrative, not measured Lima traffic. Equal weather weights are an example, not a selected training curriculum. Partitions are explicit for this experiment, not a replacement for the retained GP protocol.",
+  "stress": true,
+  "constraint_evidence_ids": [],
+  "perturbation_scale": 0.25,
+  "synthetic_variability_scale": 1.0,
+  "synthetic_precipitation_mm_h": 0.0,
+  "source_variations": [
+    {
+      "source_id": "tupac-amaru",
+      "provenance": "Synthetic morning/evening activity profile; no traffic-count calibration",
+      "daily_hours": [[0, 0.3], [5, 0.3], [7, 1.5], [9, 1.5], [11, 0.8], [16, 0.8], [18, 1.4], [20, 1.4], [23, 0.3], [24, 0.3]],
+      "intensity_range": [0.8, 1.2],
+      "time_shift_s_range": [-900, 900]
+    },
+    {
+      "source_id": "javier-prado-este",
+      "provenance": "Synthetic corridor-specific daily activity, not observed emissions",
+      "daily_hours": [[0, 0.4], [6, 0.4], [8, 1.3], [10, 1.3], [12, 0.9], [17, 0.9], [19, 1.6], [21, 1.0], [24, 0.4]],
+      "intensity_range": [0.8, 1.2],
+      "time_shift_s_range": [-900, 900]
+    },
+    {
+      "source_id": "circunvalacion",
+      "provenance": "Synthetic piecewise-constant daily activity",
+      "interpolation": "constant",
+      "daily_hours": [[0, 0.5], [6, 1.4], [10, 0.9], [17, 1.3], [21, 0.5], [24, 0.5]],
+      "intensity_range": [0.8, 1.2]
+    },
+    {
+      "source_id": "alfonso-ugarte-event",
+      "provenance": "Additional synthetic transient emission; not a multiplier of routine traffic",
+      "intensity_range": [0.7, 1.3],
+      "time_shift_s_range": [-600, 600],
+      "duration_scale_range": [0.75, 1.25],
+      "activation_probability": 0.7
+    },
+    {
+      "source_id": "area-stress",
+      "provenance": "Optional surface-equivalent PM2.5 stress event; not a combustion or plume-rise model",
+      "intensity_range": [0.8, 1.2],
+      "time_shift_s_range": [-300, 300],
+      "duration_scale_range": [0.8, 1.2],
+      "activation_probability": 0.2
+    }
+  ],
+  "area_sources": [
+    {
+      "source_id": "area-stress",
+      "polygon_coordinates_m": [[283000, 8669000], [283600, 8669000], [283600, 8669600], [283000, 8669600]],
+      "emission_rate_ug_m2_s": 5.0,
+      "provenance": "Hypothetical stress footprint in study CRS EPSG:32718; location and rate are synthetic",
+      "starts_at_s": 3600,
+      "ends_at_s": 7200,
+      "profile": {"points": [[0, 0], [3600, 0], [4500, 1], [6300, 1], [7200, 0]], "interpolation": "linear"}
+    }
+  ]
+}

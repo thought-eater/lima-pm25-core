@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import math
 from collections.abc import Sequence
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -243,34 +243,34 @@ def create_synthetic_study_family_requests(
         seed=20260925,
         boundary_mode=BoundaryMode.REGIONAL_INFLOW,
     )
-    shared = {
-        "model": model,
-        "initial_state": initial_state,
-        "weather": weather,
-        "config": run_config,
-        "sensor_configs": (
+    shared = SimulationRunRequest(
+        model=model,
+        initial_state=initial_state,
+        weather=weather,
+        config=run_config,
+        sensor_configs=(
             *create_lima_fixed_sensor_configs(station_catalog),
             mobile_sensor,
         ),
-        "station_catalog": station_catalog,
-        "mobile_position_providers": (mobile_provider,),
-        "regional_boundary": RegionalBoundarySchedule.constant(
+        station_catalog=station_catalog,
+        mobile_position_providers=(mobile_provider,),
+        regional_boundary=RegionalBoundarySchedule.constant(
             _synthetic_demo_regional_boundary(0.0)
         ),
-    }
+    )
     routine_sources = tuple(
         source
         for source in sources
         if source.role is not PM25SourceRole.COUNTERFACTUAL_EVENT
     )
     return {
-        "control": SimulationRunRequest(
-            **shared,
+        "control": replace(
+            shared,
             sources=routine_sources,
             scenario_identity=study_config.scenario_families[0].run_identity("control"),
         ),
-        "event": SimulationRunRequest(
-            **shared,
+        "event": replace(
+            shared,
             sources=sources,
             scenario_identity=study_config.scenario_families[0].run_identity("event"),
         ),

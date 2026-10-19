@@ -220,8 +220,11 @@ class SimulationRunRequest:
     sources: tuple[PM25SourceProvider, ...] = ()
     regional_boundary: RegionalBoundarySchedule | None = None
     scenario_identity: ScenarioRunIdentity | None = None
+    episode_parameters_json: str = "{}"
 
     def __post_init__(self) -> None:
+        if not isinstance(json.loads(self.episode_parameters_json), dict):
+            raise TypeError("Episode parameters must be a JSON object")
         object.__setattr__(self, "sensor_configs", tuple(self.sensor_configs))
         object.__setattr__(
             self,
@@ -626,6 +629,7 @@ def _request_manifest(request: SimulationRunRequest) -> dict[str, object]:
             "numpy_version": np.__version__,
         },
         "scenario_identity": request.scenario_identity,
+        "episode_generation": json.loads(request.episode_parameters_json),
         "run_config": {
             "start_utc": request.config.start_utc,
             "duration_s": request.config.duration_s,

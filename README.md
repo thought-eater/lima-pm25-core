@@ -21,6 +21,10 @@ productos que respaldan los resultados **R1.2–R2.3** de la tesis.
 El **[índice de productos e indicadores verificables](resultados/README.md)**
 enlaza los mapas, métricas, configuraciones y ejecuciones seleccionadas.
 
+La [generación de episodios](docs/episode-generation.md) incorpora perfiles
+horarios de emisión, eventos de estrés y meteorología histórica, perturbada o
+sintética correlacionada, mediante `--episode-config`.
+
 ## Alcance e interpretación
 
 - El dominio seleccionado usa celdas horizontales de **200 m**, con 4 459 celdas

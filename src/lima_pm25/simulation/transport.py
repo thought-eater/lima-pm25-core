@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import math
+from bisect import bisect_right
 from collections.abc import Callable, Iterator, Sequence
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timedelta
 from enum import StrEnum
 from itertools import pairwise
+from zoneinfo import ZoneInfo
 
 import numpy as np
-from shapely.geometry import LineString
+from shapely.geometry import LineString, MultiPolygon, Polygon, box
 
 from lima_pm25.domain import (
     AmbientBaseline,
@@ -58,6 +61,86 @@ class SourceMassDiagnostic:
 
 
 @dataclass(frozen=True, slots=True)
+class EmissionProfile:
+    """Dimensionless rate multipliers, in elapsed seconds; hold the last value."""
+
+    points: tuple[tuple[float, float], ...] = ((0.0, 1.0),)
+    interpolation: str = "constant"
+
+    def __post_init__(self) -> None:
+        points = tuple((float(t), float(value)) for t, value in self.points)
+        if not points or points[0][0] != 0:
+            raise ValueError("Emission profile must start at t=0")
+        if self.interpolation not in {"constant", "linear"}:
+            raise ValueError("Emission interpolation must be constant or linear")
+        for time_s, value in points:
+            _require_nonnegative_finite("profile time", time_s)
+            _require_nonnegative_finite("profile multiplier", value)
+        if any(right[0] <= left[0] for left, right in pairwise(points)):
+            raise ValueError("Emission profile times must strictly increase")
+        object.__setattr__(self, "points", points)
+
+    def value_at(self, time_s: float) -> float:
+        _require_nonnegative_finite("profile time", time_s)
+        index = bisect_right(tuple(t for t, _ in self.points), time_s) - 1
+        left_t, left_value = self.points[index]
+        if self.interpolation == "constant" or index == len(self.points) - 1:
+            return left_value
+        right_t, right_value = self.points[index + 1]
+        return left_value + (right_value - left_value) * (
+            (time_s - left_t) / (right_t - left_t)
+        )
+
+    def integral(self, start_s: float, end_s: float) -> float:
+        _require_nonnegative_finite("profile interval start", start_s)
+        _require_nonnegative_finite("profile interval end", end_s)
+        if end_s <= start_s:
+            return 0.0
+        times = (start_s, *(t for t, _ in self.points if start_s < t < end_s), end_s)
+        total = 0.0
+        for left, right in pairwise(times):
+            value = self.value_at(left)
+            if self.interpolation == "linear":
+                value = (value + self.value_at(right)) / 2
+            total += value * (right - left)
+        return total
+
+    @classmethod
+    def daily(
+        cls,
+        hours: Sequence[tuple[float, float]],
+        *,
+        start_utc: datetime,
+        duration_s: float,
+        interpolation: str = "constant",
+    ) -> EmissionProfile:
+        """Expand a Lima-local daily cycle to an episode, including midnight."""
+        if start_utc.utcoffset() is None:
+            raise ValueError("Daily emission start must be timezone-aware")
+        _require_positive_finite("duration_s", duration_s)
+        cycle = cls(tuple((hour * 3600, value) for hour, value in hours), interpolation)
+        if cycle.points[-1][0] != 86400 or cycle.points[-1][1] != cycle.points[0][1]:
+            raise ValueError(
+                "Daily profile must close at hour 24 with the hour-0 value"
+            )
+        local = start_utc.astimezone(ZoneInfo("America/Lima"))
+        midnight = local.replace(hour=0, minute=0, second=0, microsecond=0)
+        offset = (local - midnight).total_seconds()
+        times = {0.0, duration_s}
+        for day in range(math.ceil((offset + duration_s) / 86400) + 1):
+            for time_s, _ in cycle.points:
+                elapsed = (
+                    midnight + timedelta(days=day, seconds=time_s) - local
+                ).total_seconds()
+                if 0 < elapsed < duration_s:
+                    times.add(elapsed)
+        return cls(
+            tuple((t, cycle.value_at((offset + t) % 86400)) for t in sorted(times)),
+            interpolation,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class GaussianKernelSource:
     """Distribute *emitted mass* around a center; transport disperses it later.
 
@@ -75,6 +158,7 @@ class GaussianKernelSource:
     ends_at_s: float | None = None
     role: PM25SourceRole = PM25SourceRole.SYNTHETIC_VALIDATION
     provenance: str = "synthetic Gaussian kernel"
+    profile: EmissionProfile = field(default_factory=EmissionProfile)
 
     def __post_init__(self) -> None:
         _require_usable_text("source_id", self.source_id)
@@ -97,15 +181,19 @@ class GaussianKernelSource:
             interval_end,
             self.ends_at_s if self.ends_at_s is not None else interval_end,
         )
-        active_duration = max(0.0, active_end - active_start)
-        return self.emission_rate_ug_s * active_duration
+        return self.emission_rate_ug_s * self.profile.integral(active_start, active_end)
 
     @property
     def transition_times_s(self) -> tuple[float, ...]:
         times = [self.starts_at_s]
         if self.ends_at_s is not None:
             times.append(self.ends_at_s)
-        return tuple(times)
+        times.extend(
+            t
+            for t, _ in self.profile.points
+            if t >= self.starts_at_s and (self.ends_at_s is None or t <= self.ends_at_s)
+        )
+        return tuple(sorted(set(times)))
 
     def evidence_descriptor(self) -> dict[str, object]:
         return {
@@ -119,6 +207,7 @@ class GaussianKernelSource:
             "sigma_m": self.sigma_m,
             "starts_at_s": self.starts_at_s,
             "ends_at_s": self.ends_at_s,
+            "profile": asdict(self.profile),
         }
 
     def spatial_weights(self, grid: GridDefinition) -> np.ndarray:
@@ -162,6 +251,7 @@ class RoadLineSource:
     starts_at_s: float = 0.0
     ends_at_s: float | None = None
     role: PM25SourceRole = PM25SourceRole.ROUTINE_ENVIRONMENTAL
+    profile: EmissionProfile = field(default_factory=EmissionProfile)
     _weight_cache: dict[
         int,
         tuple[GridDefinition, LineString, np.ndarray, float],
@@ -198,15 +288,23 @@ class RoadLineSource:
             interval_end,
             self.ends_at_s if self.ends_at_s is not None else interval_end,
         )
-        active_duration = max(0.0, active_end - active_start)
-        return self.emission_rate_ug_m_s * active_length_m * active_duration
+        return (
+            self.emission_rate_ug_m_s
+            * active_length_m
+            * self.profile.integral(active_start, active_end)
+        )
 
     @property
     def transition_times_s(self) -> tuple[float, ...]:
         times = [self.starts_at_s]
         if self.ends_at_s is not None:
             times.append(self.ends_at_s)
-        return tuple(times)
+        times.extend(
+            t
+            for t, _ in self.profile.points
+            if t >= self.starts_at_s and (self.ends_at_s is None or t <= self.ends_at_s)
+        )
+        return tuple(sorted(set(times)))
 
     def evidence_descriptor(self) -> dict[str, object]:
         return {
@@ -218,6 +316,7 @@ class RoadLineSource:
             "emission_rate_ug_m_s": self.emission_rate_ug_m_s,
             "starts_at_s": self.starts_at_s,
             "ends_at_s": self.ends_at_s,
+            "profile": asdict(self.profile),
         }
 
     def spatial_weights(self, grid: GridDefinition) -> tuple[np.ndarray, float]:
@@ -252,6 +351,99 @@ class RoadLineSource:
         weights, active_length = self.spatial_weights(grid)
         emitted_mass = self.emitted_mass_ug(start_s, duration_s, active_length)
         return PM25SourceContribution(weights * emitted_mass, emitted_mass)
+
+
+@dataclass(slots=True)
+class AreaSource:
+    """Uniform surface emission; only intersection with active cells emits.
+
+    This is an equivalent PM2.5 area source, not a fire/plume-rise model.
+    """
+
+    source_id: str
+    polygon: Polygon | MultiPolygon
+    emission_rate_ug_m2_s: float
+    provenance: str
+    starts_at_s: float
+    ends_at_s: float
+    profile: EmissionProfile = field(default_factory=EmissionProfile)
+    role: PM25SourceRole = PM25SourceRole.COUNTERFACTUAL_EVENT
+    _area_cache: dict[
+        int, tuple[GridDefinition, Polygon | MultiPolygon, np.ndarray]
+    ] = field(default_factory=dict, init=False, repr=False, compare=False)
+
+    def __post_init__(self) -> None:
+        _require_usable_text("source_id", self.source_id)
+        _require_usable_text("provenance", self.provenance)
+        self.role = PM25SourceRole(self.role)
+        if (
+            not isinstance(self.polygon, (Polygon, MultiPolygon))
+            or not self.polygon.is_valid
+            or self.polygon.is_empty
+            or not math.isfinite(self.polygon.area)
+            or self.polygon.area <= 0
+        ):
+            raise ValueError(
+                "Area source requires a finite valid polygon with positive area"
+            )
+        _require_nonnegative_finite("emission_rate_ug_m2_s", self.emission_rate_ug_m2_s)
+        _require_nonnegative_finite("starts_at_s", self.starts_at_s)
+        if not math.isfinite(self.ends_at_s) or self.ends_at_s <= self.starts_at_s:
+            raise ValueError("Area event must end after its start")
+
+    @property
+    def transition_times_s(self) -> tuple[float, ...]:
+        return tuple(
+            sorted(
+                {
+                    self.starts_at_s,
+                    self.ends_at_s,
+                    *(
+                        t
+                        for t, _ in self.profile.points
+                        if self.starts_at_s <= t <= self.ends_at_s
+                    ),
+                }
+            )
+        )
+
+    def evidence_descriptor(self) -> dict[str, object]:
+        return {
+            "type": "area",
+            "source_id": self.source_id,
+            "role": self.role.value,
+            "provenance": self.provenance,
+            "polygon_wkt": self.polygon.wkt,
+            "emission_rate_ug_m2_s": self.emission_rate_ug_m2_s,
+            "starts_at_s": self.starts_at_s,
+            "ends_at_s": self.ends_at_s,
+            "profile": asdict(self.profile),
+            "boundary_policy": "emit_only_active_cell_intersection",
+        }
+
+    def contribution_for_interval(
+        self, grid: GridDefinition, *, start_s: float, duration_s: float
+    ) -> PM25SourceContribution:
+        cached = self._area_cache.get(id(grid))
+        if cached is None or cached[0] is not grid or cached[1] is not self.polygon:
+            areas = np.zeros(grid.shape)
+            half = grid.cell_size_m / 2
+            for row, col in np.argwhere(grid.active_mask):
+                x, y = grid.cell_center(int(row), int(col))
+                areas[row, col] = self.polygon.intersection(
+                    box(x - half, y - half, x + half, y + half)
+                ).area
+            if not np.any(areas > 0):
+                raise ValueError(
+                    f"Source {self.source_id!r} is outside the active domain"
+                )
+            cached = (grid, self.polygon, areas)
+            self._area_cache[id(grid)] = cached
+        integral = self.profile.integral(
+            max(start_s, self.starts_at_s), min(start_s + duration_s, self.ends_at_s)
+        )
+        mass = cached[2] * self.emission_rate_ug_m2_s * integral
+        return PM25SourceContribution(mass, float(np.sum(mass)))
 
 
 @dataclass(frozen=True, slots=True)

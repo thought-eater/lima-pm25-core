@@ -47,6 +47,13 @@ de cada celda. La tasa es `µg/(m s)`; los segmentos sobre una cara compartida
 reparten su contribución entre las celdas adyacentes. Las fuentes pueden tener
 tiempos de inicio y fin independientes de las cadencias de sensores.
 
+Ambas fuentes aceptan un `EmissionProfile`: multiplicadores constantes o
+lineales por tramos, integrados exactamente sobre cada intervalo activo.
+`EmissionProfile.daily` expande horarios locales de Lima para el episodio.
+`AreaSource` añade emisiones uniformes por superficie activa, con inicio y fin
+explícitos. Los [perfiles y episodios](episode-generation.md) documentan las
+unidades, el tratamiento de intersecciones y los escenarios de estrés.
+
 ## Integración numérica
 
 Cada subpaso aplica:

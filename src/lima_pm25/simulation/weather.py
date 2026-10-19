@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import csv
+import json
 import math
 from bisect import bisect_left, bisect_right
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
 from hashlib import sha256
 from itertools import pairwise
 from pathlib import Path
 from zoneinfo import ZoneInfo
+
+import numpy as np
 
 from lima_pm25.domain import AtmosphericForcing
 
@@ -193,6 +196,7 @@ class WeatherWindow:
     end_utc: datetime
     records: tuple[WeatherRecord, ...]
     forcing_change_times_s: tuple[float, ...]
+    selection_parameters_json: str = "{}"
 
     @property
     def duration_s(self) -> float:
@@ -262,6 +266,7 @@ class WeatherWindow:
                 ).value
             ),
             "records_sha256": sha256(records_payload).hexdigest(),
+            "selection": json.loads(self.selection_parameters_json),
             "transition_times_s": list(self.transition_times_s),
         }
 
@@ -283,6 +288,11 @@ class SyntheticWeatherWindow:
     construction_method: str = "explicit_schedule"
     stochastic: bool = False
     seed: int | None = None
+    interpolate_wind: bool = False
+    historical_base: WeatherWindow | None = field(
+        default=None, repr=False, compare=False
+    )
+    generation_parameters_json: str = "{}"
 
     def __post_init__(self) -> None:
         _require_aware_datetime("start_utc", self.start_utc)
@@ -302,8 +312,20 @@ class SyntheticWeatherWindow:
         for left, right in pairwise(values):
             if right.starts_at_s <= left.starts_at_s:
                 raise ValueError("Synthetic weather start times must increase")
-        if values[-1].starts_at_s >= self.duration_s:
+        if self.interpolate_wind:
+            if values[-1].starts_at_s != self.duration_s:
+                raise ValueError("Interpolated wind needs an endpoint at episode end")
+        elif values[-1].starts_at_s >= self.duration_s:
             raise ValueError("Synthetic weather transitions must precede episode end")
+        if self.historical_base is not None and (
+            self.historical_base.start_utc != self.start_utc
+            or self.historical_base.duration_s != self.duration_s
+        ):
+            raise ValueError(
+                "Perturbations and historical base must cover the same window"
+            )
+        if not isinstance(json.loads(self.generation_parameters_json), dict):
+            raise TypeError("Weather generation parameters must be a JSON object")
         provider_ids = {value.forcing.provider_id for value in values}
         provenances = {value.forcing.provenance for value in values}
         if len(provider_ids) != 1 or len(provenances) != 1:
@@ -326,7 +348,11 @@ class SyntheticWeatherWindow:
 
     @property
     def transition_times_s(self) -> tuple[float, ...]:
-        return tuple(value.starts_at_s for value in self.values[1:])
+        return tuple(
+            value.starts_at_s
+            for value in self.values[1:]
+            if value.starts_at_s < self.duration_s
+        )
 
     def utc_at_elapsed_s(self, elapsed_s: float) -> datetime:
         if not math.isfinite(elapsed_s) or not 0 <= elapsed_s <= self.duration_s:
@@ -339,11 +365,56 @@ class SyntheticWeatherWindow:
     def forcing_at_elapsed_s(self, elapsed_s: float) -> AtmosphericForcing:
         self.utc_at_elapsed_s(elapsed_s)
         starts = tuple(value.starts_at_s for value in self.values)
-        return self.values[bisect_right(starts, elapsed_s) - 1].forcing
+        index = bisect_right(starts, elapsed_s) - 1
+        left = self.values[index]
+        if not self.interpolate_wind or index == len(self.values) - 1:
+            return left.forcing
+        right = self.values[index + 1]
+        fraction = (elapsed_s - left.starts_at_s) / (
+            right.starts_at_s - left.starts_at_s
+        )
+        u, v = tuple(
+            _linear(a, b, fraction)
+            for a, b in zip(
+                left.forcing.wind_components_m_s,
+                right.forcing.wind_components_m_s,
+                strict=True,
+            )
+        )
+        precipitation = (
+            self.historical_base.forcing_at_elapsed_s(elapsed_s).precipitation_mm_h
+            if self.historical_base is not None
+            else left.forcing.precipitation_mm_h
+        )
+        return _forcing_from_components(
+            u, v, precipitation, self.provider_id, self.provenance
+        )
 
     def diagnostic_at_elapsed_s(self, elapsed_s: float) -> WeatherDiagnostic:
         forcing = self.forcing_at_elapsed_s(elapsed_s)
         provenance = WeatherValueProvenance("synthetic_generated")
+        if self.historical_base is not None:
+            base = self.historical_base.diagnostic_at_elapsed_s(elapsed_s)
+            return replace(
+                base,
+                kind="synthetic",
+                provider_id=self.provider_id,
+                provider_provenance=self.provenance,
+                wind_direction_provenance=WeatherValueProvenance(
+                    "synthetic_perturbation",
+                    (
+                        base.wind_direction_provenance.source,
+                        *base.wind_direction_provenance.upstream_sources,
+                    ),
+                ),
+                wind_speed_provenance=WeatherValueProvenance(
+                    "synthetic_perturbation",
+                    (
+                        base.wind_speed_provenance.source,
+                        *base.wind_speed_provenance.upstream_sources,
+                    ),
+                ),
+            )
         return WeatherDiagnostic(
             timestamp_utc=self.utc_at_elapsed_s(elapsed_s),
             provider_id=forcing.provider_id,
@@ -370,6 +441,11 @@ class SyntheticWeatherWindow:
             "construction_method": self.construction_method,
             "stochastic": self.stochastic,
             "seed": self.seed,
+            "interpolate_wind": self.interpolate_wind,
+            "generation_parameters": json.loads(self.generation_parameters_json),
+            "historical_base": self.historical_base.evidence_descriptor()
+            if self.historical_base is not None
+            else None,
             "start_utc": self.start_utc.isoformat(),
             "end_utc": self.end_utc.isoformat(),
             "precipitation_source_policy": None,
@@ -613,6 +689,60 @@ class HistoricalWeatherDataset:
         )
         return WeatherWindow(self, start, end, records, change_times)
 
+    def within_period(
+        self, start_utc: datetime, end_utc: datetime
+    ) -> HistoricalWeatherDataset:
+        """Restrict records before fitting/sampling; never borrow boundary records."""
+        start, end = _as_utc(start_utc), _as_utc(end_utc)
+        if end <= start:
+            raise ValueError("Weather period must end after its start")
+        return replace(
+            self,
+            records=tuple(
+                record for record in self.records if start <= record.timestamp_utc < end
+            ),
+            unavailable_timestamps_utc=tuple(
+                t for t in self.unavailable_timestamps_utc if start <= t < end
+            ),
+        )
+
+    def sample_window(self, duration: timedelta, *, seed: int) -> WeatherWindow:
+        """Uniformly choose a covered hourly start from this bounded dataset."""
+        _require_seed(seed)
+        if duration <= timedelta(0):
+            raise ValueError("Weather window duration must be positive")
+        candidates = [
+            record.timestamp_utc
+            for left, right in self.contiguous_segments
+            for record in self.records
+            if left <= record.timestamp_utc
+            and record.timestamp_utc + duration <= right
+            and record.timestamp_utc.minute == 0
+            and record.timestamp_utc.second == 0
+            and record.timestamp_utc.microsecond == 0
+        ]
+        if not candidates:
+            raise WeatherCoverageError(
+                "No complete window fits inside the selected period"
+            )
+        rng = np.random.default_rng(seed)
+        window = self.select_window(
+            candidates[int(rng.integers(len(candidates)))], duration
+        )
+        return replace(
+            window,
+            selection_parameters_json=json.dumps(
+                {
+                    "method": "uniform_covered_hourly_start",
+                    "seed": seed,
+                    "candidate_count": len(candidates),
+                    "available_start_utc": self.coverage_start_utc.isoformat(),
+                    "available_end_utc": self.coverage_end_utc.isoformat(),
+                },
+                sort_keys=True,
+            ),
+        )
+
     def _segment_containing(
         self,
         timestamp_utc: datetime,
@@ -630,6 +760,298 @@ class HistoricalWeatherDataset:
             f"{self.coverage_start_utc.isoformat()} to "
             f"{self.coverage_end_utc.isoformat()}"
         )
+
+
+@dataclass(frozen=True, slots=True)
+class CorrelatedWindModel:
+    """Lima-hour means plus a stationary, bivariate hourly AR(1) residual.
+
+    Fitted variability is atmospheric variability, not instrument uncertainty.
+    Precipitation is supplied separately, never inferred from wind residuals.
+    """
+
+    hourly_mean_uv: tuple[tuple[float, float], ...]
+    residual_covariance: tuple[tuple[float, float], tuple[float, float]]
+    persistence: float
+    maximum_speed_m_s: float
+    fitting_evidence_json: str
+
+    def __post_init__(self) -> None:
+        mean = np.asarray(self.hourly_mean_uv, dtype=float)
+        covariance = np.asarray(self.residual_covariance, dtype=float)
+        if mean.shape != (24, 2) or not np.all(np.isfinite(mean)):
+            raise ValueError("Wind model requires 24 finite vector means")
+        if (
+            covariance.shape != (2, 2)
+            or not np.all(np.isfinite(covariance))
+            or not np.allclose(covariance, covariance.T)
+            or np.min(np.linalg.eigvalsh(covariance)) < -1e-12
+        ):
+            raise ValueError("Wind covariance must be symmetric positive semidefinite")
+        if not math.isfinite(self.persistence) or not 0 <= self.persistence < 1:
+            raise ValueError("Wind persistence must be in [0, 1)")
+        _require_nonnegative_finite("maximum_speed_m_s", self.maximum_speed_m_s)
+        object.__setattr__(
+            self, "hourly_mean_uv", tuple(tuple(float(v) for v in row) for row in mean)
+        )
+        object.__setattr__(
+            self,
+            "residual_covariance",
+            tuple(tuple(float(v) for v in row) for row in covariance),
+        )
+        if not isinstance(json.loads(self.fitting_evidence_json), dict):
+            raise TypeError("Wind fitting evidence must be a JSON object")
+
+    @classmethod
+    def fit(cls, training: HistoricalWeatherDataset) -> CorrelatedWindModel:
+        """Fit only the already bounded training dataset, never evaluation data."""
+        records = training.records
+        if any(
+            r.timestamp_utc.minute
+            or r.timestamp_utc.second
+            or r.timestamp_utc.microsecond
+            for r in records
+        ):
+            raise ValueError("Wind fitting requires exact hourly records")
+        local_hours = np.asarray(
+            [
+                r.timestamp_utc.astimezone(ZoneInfo("America/Lima")).hour
+                for r in records
+            ],
+            dtype=np.int64,
+        )
+        counts = np.bincount(local_hours, minlength=24)
+        if np.any(counts < 2):
+            raise ValueError(
+                "Wind fitting needs at least two records for every local hour"
+            )
+        vectors = np.asarray(
+            [(r.eastward_wind_m_s, r.northward_wind_m_s) for r in records]
+        )
+        means = np.asarray(
+            [vectors[local_hours == hour].mean(axis=0) for hour in range(24)]
+        )
+        residuals = vectors - means[local_hours]
+        covariance = residuals.T @ residuals / len(residuals)
+        adjacent = np.asarray(
+            [
+                right.timestamp_utc - left.timestamp_utc == timedelta(hours=1)
+                and training.maximum_gap >= timedelta(hours=1)
+                and not any(
+                    left.timestamp_utc < t < right.timestamp_utc
+                    for t in training.unavailable_timestamps_utc
+                )
+                for left, right in pairwise(records)
+            ]
+        )
+        if not np.any(adjacent):
+            raise ValueError("Wind persistence requires adjacent covered hours")
+        previous, following = residuals[:-1][adjacent], residuals[1:][adjacent]
+        denominator = float(np.sum(previous**2))
+        raw_persistence = (
+            float(np.sum(previous * following)) / denominator
+            if denominator > 0
+            else 0.0
+        )
+        persistence = float(np.clip(raw_persistence, 0.0, 0.99))
+        provenance_counts: dict[str, int] = {}
+        for record in records:
+            for variable, provenance in (
+                ("speed", record.wind_speed_provenance),
+                ("direction", record.wind_direction_provenance),
+            ):
+                key = f"{variable}:{provenance.source}"
+                provenance_counts[key] = provenance_counts.get(key, 0) + 1
+        evidence = {
+            "method": "local_hour_mean_bivariate_ar1",
+            "timezone": "America/Lima",
+            "resource_id": training.resource_id,
+            "resource_sha256": training.resource_sha256,
+            "station_id": training.station_id,
+            "start_utc": records[0].timestamp_utc.isoformat(),
+            "end_utc": records[-1].timestamp_utc.isoformat(),
+            "record_count": len(records),
+            "adjacent_pairs": int(np.sum(adjacent)),
+            "records_sha256": sha256(
+                "\n".join(repr(r) for r in records).encode()
+            ).hexdigest(),
+            "counts_by_local_hour": counts.tolist(),
+            "source_counts": provenance_counts,
+            "raw_persistence": raw_persistence,
+            "persistence_bounds": [0.0, 0.99],
+            "interpretation": "atmospheric variability; not measurement error or full Lima climate validation",
+        }
+        return cls(
+            tuple(map(tuple, means.tolist())),
+            tuple(map(tuple, covariance.tolist())),
+            persistence,
+            float(np.max(np.linalg.norm(vectors, axis=1))),
+            json.dumps(evidence, sort_keys=True),
+        )
+
+    def evidence_descriptor(self) -> dict[str, object]:
+        return {
+            "hourly_mean_uv": self.hourly_mean_uv,
+            "residual_covariance": self.residual_covariance,
+            "persistence": self.persistence,
+            "maximum_speed_m_s": self.maximum_speed_m_s,
+            "fitting": json.loads(self.fitting_evidence_json),
+        }
+
+    def generate(
+        self,
+        *,
+        seed: int,
+        start_utc: datetime,
+        duration_s: float,
+        historical_base: WeatherWindow | None = None,
+        variability_scale: float = 1.0,
+        precipitation_mm_h: float = 0.0,
+    ) -> SyntheticWeatherWindow:
+        """Generate once on clock-hour knots; lookups never draw random numbers."""
+        _require_seed(seed)
+        start = _as_utc(start_utc)
+        _require_positive_finite("duration_s", duration_s)
+        _require_nonnegative_finite("variability_scale", variability_scale)
+        _require_nonnegative_finite("precipitation_mm_h", precipitation_mm_h)
+        if start.minute or start.second or start.microsecond:
+            raise ValueError(
+                "Generated wind episodes must start on an exact clock hour"
+            )
+        if historical_base is not None and (
+            historical_base.start_utc != start
+            or historical_base.duration_s != duration_s
+        ):
+            raise ValueError("Historical base and generated window must match")
+        if historical_base is not None and precipitation_mm_h != 0:
+            raise ValueError("Perturbed weather retains the historical precipitation")
+        count = math.ceil(duration_s / 3600) + 1
+        rng = np.random.default_rng(seed)
+        innovations = rng.multivariate_normal(
+            np.zeros(2),
+            self.residual_covariance,
+            size=count,
+            check_valid="raise",
+            method="eigh",
+        )
+        residual = innovations[0]
+        residuals = [residual]
+        for innovation in innovations[1:]:
+            residual = (
+                self.persistence * residual
+                + math.sqrt(1 - self.persistence**2) * innovation
+            )
+            residuals.append(residual)
+        times = sorted(
+            {
+                0.0,
+                duration_s,
+                *(float(t) for t in range(3600, math.ceil(duration_s), 3600)),
+                *(
+                    historical_base.transition_times_s
+                    if historical_base is not None
+                    else ()
+                ),
+            }
+        )
+        vectors = []
+        limit = self.maximum_speed_m_s
+        if historical_base is not None:
+            # Do not constrain the historical base to the fitting-period maximum.
+            limit = max(
+                limit,
+                *(
+                    math.hypot(r.eastward_wind_m_s, r.northward_wind_m_s)
+                    for r in historical_base.records
+                ),
+            )
+        capped = 0
+        for time_s in times:
+            index = int(time_s // 3600)
+            fraction = time_s / 3600 - index
+            residual = residuals[index]
+            if fraction:
+                residual = residual + fraction * (residuals[index + 1] - residual)
+            if historical_base is None:
+                hour = (
+                    (start + timedelta(seconds=index * 3600))
+                    .astimezone(ZoneInfo("America/Lima"))
+                    .hour
+                )
+                base = np.asarray(self.hourly_mean_uv[hour])
+                if fraction:
+                    base = base + fraction * (
+                        np.asarray(self.hourly_mean_uv[(hour + 1) % 24]) - base
+                    )
+            else:
+                base = np.asarray(
+                    historical_base.forcing_at_elapsed_s(time_s).wind_components_m_s
+                )
+            vector = base + variability_scale * residual
+            speed = float(np.linalg.norm(vector))
+            if speed > limit and not (
+                historical_base is not None and variability_scale == 0
+            ):
+                vector *= limit / speed
+                capped += 1
+            vectors.append(vector)
+        kind = "historical_perturbed" if historical_base is not None else "synthetic"
+        provider_id = f"{kind}-wind-{seed}"
+        provenance = (
+            "synthetic hourly correlated wind constrained by training meteorology"
+        )
+        values = tuple(
+            ScheduledWeatherValue(
+                time_s,
+                _forcing_from_components(
+                    float(vector[0]),
+                    float(vector[1]),
+                    historical_base.forcing_at_elapsed_s(time_s).precipitation_mm_h
+                    if historical_base is not None
+                    else precipitation_mm_h,
+                    provider_id,
+                    provenance,
+                ),
+            )
+            for time_s, vector in zip(times, vectors, strict=True)
+        )
+        parameters = {
+            "weather_mode": kind,
+            "model": self.evidence_descriptor(),
+            "variability_scale": variability_scale,
+            "wind_knot_interval_s": 3600,
+            "speed_limit_m_s": limit,
+            "speed_limited_knots": capped,
+            "precipitation_policy": "historical_unchanged"
+            if historical_base is not None
+            else "explicit_constant_synthetic",
+        }
+        return SyntheticWeatherWindow(
+            start,
+            duration_s,
+            values,
+            construction_method="local_hour_mean_bivariate_ar1"
+            if historical_base is None
+            else "historical_plus_bivariate_ar1",
+            stochastic=True,
+            seed=seed,
+            interpolate_wind=True,
+            historical_base=historical_base,
+            generation_parameters_json=json.dumps(parameters, sort_keys=True),
+        )
+
+
+def _forcing_from_components(
+    u: float, v: float, precipitation: float, provider_id: str, provenance: str
+) -> AtmosphericForcing:
+    speed = math.hypot(u, v)
+    direction = math.degrees(math.atan2(-u, -v)) % 360 if speed else 0.0
+    return AtmosphericForcing(provider_id, provenance, speed, direction, precipitation)
+
+
+def _require_seed(seed: int) -> None:
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ValueError("seed must be a nonnegative integer")
 
 
 def load_historical_weather_csv(

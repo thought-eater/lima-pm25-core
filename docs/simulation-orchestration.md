@@ -18,7 +18,7 @@ transport at:
 
 - weather transitions;
 - regional-boundary transitions;
-- source starts and ends;
+- source starts, ends and temporal-profile knots;
 - fixed or mobile sensor due times;
 - concentration-output times;
 - episode end.
@@ -60,8 +60,9 @@ measurement semantics.
 Historical and explicitly synthetic windows implement the same operational
 contract. Historical windows retain resource identity and hash, station, UTC
 coverage, precipitation policy, and structured per-variable lineage. Synthetic
-windows retain their synthetic provider and configuration and do not claim a
-SENAMHI precipitation policy.
+windows retain their synthetic provider and configuration. Windows with
+synthetic wind perturbations additionally retain the historical base and its
+unchanged precipitation policy/lineage; generated wind is never labeled observed.
 
 The compact `AtmosphericForcing` sent to transport contains wind and
 precipitation. Structured diagnostic lineage remains separate so the engine does
@@ -87,6 +88,10 @@ one. A completed bundle contains:
 the exact mobile positions used. Batches reference accepted attempts rather than
 creating a second measurement source of truth. The manifest records the replay
 input descriptor; no separate mutable used-position history is created.
+
+Generated episodes additionally record `episode_generation` in this same
+manifest: partition, configuration, seed and selected historical window.
+See [episode generation](episode-generation.md) for the CLI and model assumptions.
 
 `checksums.json` is written last and covers every other artifact with SHA-256.
 `verify_run_bundle` identifies missing or changed files. This provides finalized,
