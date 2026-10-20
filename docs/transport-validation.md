@@ -3,7 +3,7 @@
 ## Alcance
 
 Los ensayos comprueban el [modelo de transporte](transport-model.md) con grillas
-métricas e inputs sintéticos deterministas. Comparan procesos aislados con
+métricas y entradas sintéticas deterministas. Comparan procesos aislados con
 referencias analíticas y verifican conservación, estabilidad y sensibilidad al
 refinamiento. No establecen exactitud predictiva para la atmósfera de Lima.
 
@@ -56,8 +56,8 @@ están en [`tests/tesis/r1_3/`](../tests/tesis/r1_3/).
 ## Interpretación de tolerancias
 
 Las tolerancias de desplazamiento y varianza admiten el error de aproximación
-del esquema upwind de primer orden y de la difusión centrada. Los balances de
-masa comprueban contabilidad numérica, por lo que emplean tolerancias mucho
-menores. Un residual próximo a la precisión numérica no implica una exactitud
-atmosférica equivalente. El tiempo de ejecución no es criterio de aceptación
-porque depende del equipo utilizado.
+del esquema de advección a barlovento (*upwind*) de primer orden y de la
+difusión centrada. Los balances de masa comprueban contabilidad numérica, por
+lo que emplean tolerancias mucho menores. Un residual próximo a la precisión
+numérica no implica una exactitud atmosférica equivalente. El tiempo de
+ejecución no es criterio de aceptación porque depende del equipo utilizado.

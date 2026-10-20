@@ -47,10 +47,11 @@ Lima. El modelo no resuelve capas verticales, edificios ni cañones urbanos.
 - **Sintéticos:** el simulador conoce el campo completo. Son la fuente principal
   prevista de episodios de entrenamiento y permiten evaluación controlada.
   El estimador recibe únicamente mediciones; el campo se reserva al evaluador.
-- **Replay histórico:** utiliza meteorología y observaciones fijas elegibles de
-  sus productos, junto con mediciones móviles explícitamente simuladas. Ceres
-  conserva su sitio, pero no aporta observaciones de PM2.5. El replay es una
-  aproximación modelada a condiciones históricas, no un despliegue físico.
+- **Reproducción histórica (*replay*):** utiliza meteorología y observaciones
+  fijas elegibles de sus productos, junto con mediciones móviles explícitamente
+  simuladas. Ceres conserva su sitio, pero no aporta observaciones de PM2.5.
+  El replay es una aproximación modelada a condiciones históricas, no un
+  despliegue físico.
 - **Estrés y contrafactuales:** identifican condiciones fuera de los rangos
   plausibles o cambios deliberados. Un miembro de control es una comparación,
   no verdad histórica; cada contrafactual modifica solo sus factores declarados.

@@ -9,9 +9,9 @@ El procedimiento de R2.1–R2.2 separa tres actividades:
 3. evaluar mapas completos de concentración e incertidumbre sobre campos
    sintéticos retenidos.
 
-El replay histórico usa después la configuración congelada y todas las
-observaciones fijas elegibles disponibles. No es un piloto físico ni dispone de
-un campo histórico completo observado.
+La reproducción histórica (*replay*) usa después la configuración congelada y
+todas las observaciones fijas elegibles disponibles. No es un piloto físico ni
+dispone de un campo histórico completo observado.
 
 ## Insumos suministrados
 
@@ -20,11 +20,12 @@ data/pm25_lima_2025_2026_imputed.csv
 data/var_meteorologicas_lima_2025_2026_imputed.csv
 ```
 
-`load_historical_pm25_csv` preserva cada fila PM2.5, sus coordenadas, timestamp,
-valor ausente o presente y `PM2_5_SOURCE`. Solo un valor presente con
-`PM2_5_SOURCE=senamhi_observed` puede convertirse en medición pública, target de
-calibración o score. Los valores imputados permanecen como evidencia del
-producto, pero no se presentan al GP como observaciones reales.
+`load_historical_pm25_csv` preserva cada fila de PM2.5, sus coordenadas, marca
+de tiempo, valor ausente o presente y `PM2_5_SOURCE`. Solo un valor presente con
+`PM2_5_SOURCE=senamhi_observed` puede convertirse en medición pública, valor
+objetivo de calibración o referencia para calcular métricas. Los valores
+imputados permanecen como evidencia del producto, pero no se presentan al
+proceso gaussiano (GP, por sus siglas en inglés) como observaciones reales.
 
 La meteorología conserva el contrato descrito en
 [`historical-weather.md`](historical-weather.md): viento y precipitación
@@ -53,9 +54,10 @@ ocho ventanas de calibración y cuatro de replay de 24 horas, hasta 24 horas
 previas de contexto y al menos tres estaciones observadas por hora.
 
 Las ventanas se distribuyen sin solapamiento y se seleccionan por cobertura, no
-por desempeño. El manifest registra hashes de los CSV, límites UTC, conteos por
-estación, política de observación y método de selección. Puede persistirse una
-sola vez mediante `write_historical_partition_manifest`.
+por desempeño. El manifiesto registra huellas digitales de contenido (*hashes*)
+de los CSV, límites UTC, conteos por estación, política de observación y método
+de selección. Puede guardarse una sola vez mediante
+`write_historical_partition_manifest`.
 
 Estos valores son decisiones operacionales provisionales del estudio. Cualquier
 modificación debe congelarse antes de abrir evaluaciones retenidas o resultados
@@ -68,7 +70,7 @@ En cada turno, ninguna concentración de la estación objetivo entra al GP, incl
 sus lecturas anteriores. La mediana y desviación estándar previas se calculan una
 sola vez con las otras estaciones de las ventanas de calibración y se reutilizan
 entre candidatos. Las entradas de cada predicción se restringen al historial
-permitido y a timestamps anteriores o simultáneos. Ceres no genera objetivos.
+permitido y a marcas de tiempo anteriores o simultáneas. Ceres no genera objetivos.
 Esta retención no se usa durante el replay final.
 
 El perfil candidato inicial combina historiales de 6, 12 o 24 horas, escalas
@@ -82,14 +84,14 @@ medio son desempates.
 
 `gp_calibration.json` conserva el método, los parámetros previos por estación
 excluida y las métricas agregadas y por estación de cada candidato. El resultado
-es una validación para selección de parámetros; no es un test histórico
+es una validación para selección de parámetros; no es una prueba histórica
 independiente de esa selección.
 
 La predicción de calibración se realiza directamente en la coordenada de la
 estación mediante el mismo GP usado para la grilla, evitando calcular miles de
-celdas para un único target. El producto no declara incertidumbre instrumental
-por lectura; la desviación de ruido histórica es una entrada explícita pendiente
-de sustento y no se inventa dentro del adaptador.
+celdas para un único valor objetivo. El producto no declara incertidumbre
+instrumental por lectura; la desviación de ruido histórica es una entrada
+explícita pendiente de sustento y no se inventa dentro del adaptador.
 
 ## Plausibilidad de escenarios
 
@@ -130,9 +132,10 @@ skill_RMSE = 1 - RMSE_GP / RMSE_prior-only
 
 Antes del retenido, el contraste sintético P99-P50 debe alcanzar al menos 20 % de
 `S`. Los límites son 100 % de mapas válidos, NMAE <= 0,15, NRMSE <= 0,20 y RMSE
-menor que el prior. R2 se reporta como diagnóstico. Una escala no positiva,
-soporte insuficiente, benchmark sin contraste, mapa faltante o valor activo no
-finito produce estado `invalid`, no `pass`.
+menor que el del modelo basado solo en la media previa. R2 se reporta como
+diagnóstico. Una escala no positiva, soporte insuficiente, escenario de
+referencia sin contraste, mapa faltante o valor activo no finito produce estado
+`invalid`, no `pass`.
 
 ## Evaluación R2.2
 
@@ -165,11 +168,12 @@ métricas completas pertenecen a las ejecuciones sintéticas retenidas.
 
 ## Evidencia
 
-`write_retained_evaluation_bundle` persiste configuración, métricas R2.1/R2.2,
-log estructurado, matrices NPZ de verdad retenida, fixed-only y
-fixed-plus-mobile, solo las figuras representativas declaradas y checksums
-verificables. La evidencia numérica completa permanece separada de la cantidad
-limitada de figuras necesarias para inspección y presentación.
+`write_retained_evaluation_bundle` guarda la configuración, las métricas
+R2.1/R2.2, un registro estructurado, las matrices NPZ del campo sintético
+retenido y de las estimaciones con sensores fijos y con fijos más móviles, solo
+las figuras representativas declaradas y las huellas de integridad verificables.
+La evidencia numérica completa permanece separada de la cantidad limitada de
+figuras necesarias para inspección y presentación.
 
 Para repetir la calibración, copiar `config/estimation_evaluation.json` a
 `cache/reproduccion/estimation_evaluation.json` y cambiar en esa copia
@@ -187,13 +191,14 @@ uv run lima-pm25-core \
 
 El valor cero reproduce el perfil técnico congelado, pero no constituye una
 selección científica de incertidumbre instrumental. La salida no sobrescribible
-se guarda por fingerprint bajo el directorio elegido. El artefacto final se
-escribe en la ruta declarada por el perfil de trabajo.
+se guarda bajo el directorio elegido, identificada por su huella digital. El
+artefacto final se escribe en la ruta declarada por el perfil de trabajo.
 
 El perfil actual se encuentra en `config/estimation_evaluation.json` y declara
-directamente la ruta del artefacto. La CLI conserva primero el informe histórico,
-incluida una identificación del procedimiento de exclusión, y después compara las
-escalas espaciales sintéticas usando el historial y la escala temporal elegidos.
+directamente la ruta del artefacto. La interfaz de línea de comandos conserva
+primero el informe histórico, incluida una identificación del procedimiento de
+exclusión, y después compara las escalas espaciales sintéticas usando el
+historial y la escala temporal elegidos.
 La selección obtenida actualiza el perfil existente antes de abrir la evaluación
 retenida. El estado histórico y los motivos de incumplimiento se conservan aunque
 se generen productos diagnósticos posteriores.

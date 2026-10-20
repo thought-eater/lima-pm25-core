@@ -9,7 +9,8 @@ mediciones sin invocar al estimador.
 
 El [perfil seleccionado](../config/estimation_evaluation.json) utiliza escalas
 espaciales de 2 000 m, escala temporal de 3 600 s e historial inclusivo de seis
-horas. La escala espacial del GP es distinta del lado de celda de 200 m.
+horas. La escala espacial del proceso gaussiano (GP, por sus siglas en inglés)
+es distinta del lado de celda de 200 m.
 Los registros `CLIPPED` se excluyen. Los parámetros y sus limitaciones se
 describen en la [calibración histórica](historical-calibration.md).
 

@@ -1,57 +1,64 @@
-# Gaussian Process Reconstruction
+# Reconstrucción mediante procesos gaussianos
 
-## Scientific Role
+## Función en los resultados de tesis
 
-`lima_pm25.estimation` reconstructs the current PM2.5 field from sparse public
-sensor measurements. The posterior mean is the R2.1 concentration estimate and
-the posterior standard deviation is the associated R2.2 model uncertainty. Only
-sensor locations contain measurements; values elsewhere are estimates and must
-not be represented as observed ground truth.
+`lima_pm25.estimation` reconstruye el campo actual de PM2.5 a partir de
+mediciones dispersas de sensores. La media posterior es la estimación de
+concentración de R2.1 y la
+desviación estándar posterior es la incertidumbre del modelo asociada a R2.2.
+Solo hay mediciones en las posiciones de los sensores; los valores en otras
+posiciones son estimaciones y no deben presentarse como valores reales observados.
 
-The estimator consumes `MeasurementRecord` values, which expose observed PM2.5,
-event-time position, UTC timestamp, declared random-noise standard deviation,
-quality, and provenance. Hidden simulator truth and pre-error values are not
-part of the reconstruction request.
+El estimador recibe registros públicos `MeasurementRecord` con la concentración medida,
+la posición en el instante de medición, la marca de tiempo UTC, la desviación
+estándar declarada del ruido aleatorio, la calidad y la procedencia. La solicitud
+de reconstrucción no contiene el campo oculto del simulador ni los valores
+anteriores a la aplicación de errores de medición.
 
-## Model
+## Modelo
 
-The covariance is:
+La función de covarianza (*kernel*) del proceso gaussiano (GP, por sus siglas en
+inglés) es:
 
 ```text
 ConstantKernel(prior_variance)
     * Matern(length_scale=[x_m, y_m, time_s], nu=1.5)
 ```
 
-Coordinates are centered on the grid's southwest bounds but remain in projected
-meters. Time is represented in seconds relative to the requested reconstruction
-instant; prediction cells use time zero and past observations use negative
-relative times. Concentration residuals are fitted relative to the configured
-constant prior mean, so a prediction far from observations approaches the prior
-mean and prior standard deviation.
+Las coordenadas se centran respecto de los límites suroeste de la grilla, pero
+se mantienen en metros del sistema proyectado. El tiempo se expresa en segundos
+relativos al instante de reconstrucción solicitado: las celdas donde se predice
+usan tiempo cero y las observaciones pasadas usan tiempos relativos negativos.
+Los residuos de concentración se ajustan respecto de la media previa constante
+configurada. Por ello, una predicción alejada de las observaciones se aproxima
+a la media y a la desviación estándar previas.
 
-All length scales are explicit and remain fixed during a reconstruction. Their
-selection and limitations are documented in
-[historical calibration](historical-calibration.md). The operational profile is
-selected using calibration data before retained synthetic evaluation.
+Todas las escalas de longitud son explícitas y permanecen fijas durante una
+reconstrucción. Su selección y sus limitaciones se documentan en la
+[calibración histórica](historical-calibration.md). El perfil operacional se
+selecciona con los datos de calibración antes de evaluar los campos sintéticos
+retenidos.
 
-## Temporal Aging
+## Envejecimiento temporal de la información
 
-An observation remains an exact record of its original time. Its ability to
-describe a later field decreases as the difference between its timestamp and
-the reconstruction timestamp grows relative to `temporal_length_scale_s`.
-Consequently, uncertainty is practically zero at the exact space-time support
-of a zero-noise observation and grows toward prior uncertainty at later times.
+Una observación conserva el valor registrado en su instante original. Su
+capacidad de describir un campo posterior disminuye al aumentar la diferencia
+entre su marca de tiempo y el instante de reconstrucción, en relación con
+`temporal_length_scale_s`. Por tanto, la incertidumbre es prácticamente cero en
+la posición y el instante exactos de una observación sin ruido, y crece hacia la
+incertidumbre previa en instantes posteriores.
 
-Every accepted observation supplied in a `ReconstructionRequest` and available
-at or before reconstruction time is used. The caller may provide a deterministic
-subset appropriate to the scenario; the reconstructor does not impose another
-implicit trailing window, maximum sample count, or age-based deletion. Temporal
-relevance within the supplied set is represented by the kernel.
+Se utiliza cada observación aceptada incluida en `ReconstructionRequest` cuyo
+instante sea anterior o igual al de reconstrucción. Quien invoca al módulo
+puede proporcionar un subconjunto determinista adecuado al escenario; el
+reconstructor no impone otra ventana temporal implícita, un máximo de muestras
+ni una eliminación por antigüedad. La relevancia temporal dentro del conjunto
+recibido se representa mediante la función de covarianza.
 
-## Observation Noise
+## Ruido de las mediciones
 
-The baseline simulated sensors declare zero bias and zero random noise. For each
-accepted observation, the regressor receives:
+Los sensores simulados de referencia declaran sesgo y ruido aleatorio nulos.
+Para cada observación aceptada, el regresor recibe:
 
 ```text
 observation_variance = noise_stddev_ug_m3 ** 2
@@ -59,25 +66,27 @@ numerical_jitter = 1e-10 * prior_stddev_ug_m3 ** 2
 alpha = observation_variance + numerical_jitter
 ```
 
-The scale-relative jitter only stabilizes the covariance matrix and is recorded
-separately from physical sensor noise. It is an internal numerical safeguard,
-not a scenario parameter. There is no `WhiteKernel`, because a global residual-
-noise floor would prevent posterior uncertainty from approaching zero at an
-exact baseline observation. Future explicitly configured random sensor noise is
-represented by the per-observation `alpha`; systematic bias is not reinterpreted
-as variance.
-The relative factor `1e-10` follows the scale of the kernel diagonal and remains
-small enough not to materially replace a declared zero-noise observation with a
-noisy one.
+El término de estabilización numérica (*jitter*), relativo a la escala del
+modelo, solo estabiliza la matriz de covarianza y se registra por separado del
+ruido físico del sensor. Es una salvaguarda numérica interna, no un parámetro
+del escenario. No se utiliza `WhiteKernel`: un nivel mínimo global de ruido
+residual impediría que la incertidumbre posterior se aproximara a cero ante una
+medición exacta del sensor de referencia. Si se configura explícitamente ruido
+aleatorio del sensor, este se representa mediante el `alpha` de cada
+observación; el sesgo sistemático no se reinterpreta como varianza.
+El factor relativo `1e-10` sigue la escala de la diagonal de la matriz de
+covarianza y es lo bastante pequeño para no convertir, de manera significativa,
+una observación declarada sin ruido en una observación ruidosa.
 
-Numeric records marked `CLIPPED` are excluded by default because a reported
-bound is not necessarily an exact concentration. Set
-`include_clipped_observations=True` only to treat those bounds as ordinary
-numeric approximations; this does not implement a censored-observation
-likelihood. Observation metadata counts clipped records excluded by this policy
-separately from dropped attempts.
+Los registros numéricos `CLIPPED` se excluyen de forma predeterminada porque un
+límite reportado no es necesariamente una concentración exacta. Configurar
+`include_clipped_observations=True` permite tratar esos límites como
+aproximaciones numéricas ordinarias; no implementa una función de verosimilitud
+para observaciones censuradas. Los metadatos contabilizan por separado los
+registros recortados excluidos por esta política y los intentos con pérdida de
+medición.
 
-## Usage
+## Uso
 
 ```python
 from lima_pm25.estimation import (
@@ -107,41 +116,50 @@ posterior = reconstructor.reconstruct(
 )
 ```
 
-`posterior.mean_ug_m3` and `posterior.standard_deviation_ug_m3` have the grid
-shape. Active cells contain finite predictions. Inactive cells are explicitly
-identified by `posterior.active_mask` and contain `NaN`, not fabricated
-concentrations. Observation metadata reports the ordered fitted keys and
-filtering counts. Declared noise remains authoritative on the referenced
-`MeasurementRecord` values rather than being copied into a parallel metadata
-array. Diagnostics report whether fitting occurred, the configured kernel,
-effective numerical jitter, and log marginal likelihood.
+`posterior.mean_ug_m3` y `posterior.standard_deviation_ug_m3` tienen la forma de
+la grilla. Las celdas activas contienen predicciones finitas. Las celdas
+inactivas se identifican explícitamente mediante `posterior.active_mask` y
+contienen `NaN`, no concentraciones inventadas. Los metadatos de observaciones
+informan las claves ordenadas de los registros usados en el ajuste y los
+conteos de filtrado. El ruido declarado se consulta en los registros
+`MeasurementRecord` referenciados, sin copiarlo en un arreglo paralelo de
+metadatos. Los diagnósticos indican si se realizó el ajuste, la función de
+covarianza configurada, el término efectivo de estabilización numérica y el
+logaritmo de la verosimilitud marginal.
 
-## Computational Behavior
+## Costo computacional
 
-Exact Gaussian Process fitting costs approximately `O(n^3)` time and `O(n^2)`
-memory for `n` accepted observations. Prediction is performed in deterministic
-active-cell chunks to control temporary memory without approximating the
-posterior. The scenario or sequential-update layer must therefore select and
-document a computationally viable observation set. The current provisional R2.3
-sequential profile applies the evaluated six-hour history; this
-one-shot module still does not impose that policy implicitly on other callers.
+El ajuste exacto del proceso gaussiano requiere aproximadamente tiempo `O(n^3)`
+y memoria `O(n^2)` para `n` observaciones aceptadas. La predicción se realiza
+en bloques deterministas de celdas activas para controlar la memoria temporal
+sin aproximar el posterior. Por ello, el escenario o la capa de actualización
+secuencial debe seleccionar y documentar un conjunto de observaciones
+computacionalmente viable. El perfil secuencial provisional de R2.3 aplica el
+historial evaluado de seis horas; este módulo de reconstrucción individual no
+impone esa política de forma implícita a otros usos.
 
-`prediction_chunk_size` is an execution parameter with a default of `2048`. It
-limits the number of active cells passed to each prediction call to control
-temporary memory. It does not change the intended posterior and is not a
-scientific or calibrated scenario parameter. Different hardware may select a
-different positive chunk size.
+`prediction_chunk_size` es un parámetro de ejecución cuyo valor predeterminado
+es `2048`. Limita el número de celdas activas entregadas en cada llamada de
+predicción para controlar la memoria temporal. No cambia el posterior que se
+pretende calcular ni es un parámetro científico o calibrado del escenario. Se
+puede elegir otro tamaño de bloque positivo según el equipo utilizado.
 
-## Limitations
+## Limitaciones
 
-- Posterior standard deviation is model uncertainty, not measured prediction error.
-- The temporal kernel models statistical aging but does not encode wind-driven advection.
-- The Matérn scales and prior require calibration or explicit synthetic-scenario justification.
-- A configured opt-in for `CLIPPED` records treats their bounded values as Gaussian observations rather than using a censored likelihood.
-- A Gaussian posterior mean can be negative; the estimator does not silently clip it and alter the fitted probabilistic model.
-- Historical GP calibration excludes an entire target station, including its
-  past readings and contribution to the fold's prior. Final replay uses every
-  eligible observed fixed reading available at each instant.
-- Complete map error and uncertainty coverage are evaluated against retained
-  synthetic fields available only to the evaluator, never against a surface
-  interpolated from the historical stations.
+- La desviación estándar posterior representa incertidumbre del modelo, no error
+  de predicción medido.
+- La función de covarianza temporal representa envejecimiento estadístico, pero
+  no incorpora la advección producida por el viento.
+- Las escalas de Matérn y la distribución previa requieren calibración o una
+  justificación explícita para el escenario sintético.
+- La inclusión opcional de registros `CLIPPED` trata sus valores limitados como
+  observaciones gaussianas, no mediante una verosimilitud para datos censurados.
+- Una media posterior gaussiana puede ser negativa; el estimador no la recorta
+  silenciosamente, pues eso alteraría el modelo probabilístico ajustado.
+- La calibración histórica del GP excluye por completo la estación objetivo,
+  incluidas sus lecturas pasadas y su aporte a la distribución previa de esa
+  partición. La reproducción histórica (*replay*) final utiliza todas las
+  lecturas fijas observadas elegibles disponibles en cada instante.
+- El error del mapa completo y la cobertura de incertidumbre se evalúan frente
+  a campos sintéticos retenidos, disponibles solo para el evaluador, nunca
+  frente a una superficie interpolada a partir de las estaciones históricas.

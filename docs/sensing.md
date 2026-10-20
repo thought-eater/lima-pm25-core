@@ -1,136 +1,158 @@
-# PM2.5 Sensing
+# Simulación de mediciones de PM2.5
 
-## Scientific Role
+## Función en los resultados de tesis
 
-The simulator supports two explicit scenario families:
+El simulador admite dos familias explícitas de escenarios:
 
-- Contract-qualified historical/replay scenarios preserve supplied SENAMHI
-  values, timestamps, positions, missingness, and provenance.
-- Synthetic scenarios generate a hidden PM2.5 field and sample it at finite
-  sensor positions. Their inputs must be calibrated or constrained by accepted
-  Lima evidence.
+- Los escenarios históricos o de reproducción histórica (*replay*) conservan
+  los valores, marcas de tiempo, posiciones, ausencias y procedencia de SENAMHI
+  según el contrato del producto suministrado.
+- Los escenarios sintéticos generan un campo oculto de PM2.5 y lo muestrean en
+  las posiciones de un conjunto finito de sensores. Sus entradas deben estar
+  calibradas o restringidas por evidencia aceptada para Lima.
 
-Sparse historical station observations are not a complete ground-truth field.
-Generated or imputed values must not be relabeled as observed ground truth.
-Conditions outside Lima's plausible range require an explicit synthetic stress
-test or counterfactual label.
+Las observaciones históricas dispersas de estaciones no constituyen un campo
+completo de referencia. Los valores generados o imputados no deben presentarse
+como valores reales observados. Las condiciones fuera del rango plausible de
+Lima deben identificarse explícitamente como un escenario sintético de estrés
+o un contrafactual.
 
-The sensing service samples the simulated hidden field.
-Historical PM2.5 time-series ingestion is a separate contract and
-must not use the historical-weather adapter.
+El servicio de medición muestrea el campo oculto simulado. La incorporación de
+series históricas de PM2.5 tiene un contrato separado y no debe usar el
+adaptador de meteorología histórica.
 
-## Fixed Sites
+## Estaciones fijas
 
-`lima_pm25.domain` owns immutable PM2.5 station locations. The initial catalog
-contains the four SENAMHI PM2.5 sites inside the study rectangle:
+`lima_pm25.domain` mantiene las ubicaciones inmutables de las estaciones de
+PM2.5. El catálogo inicial contiene los cuatro sitios de SENAMHI dentro del
+rectángulo de estudio:
 
-| Site ID | Longitude | Latitude | Altitude (m) |
+| Identificador del sitio | Longitud | Latitud | Altitud (m) |
 | --- | ---: | ---: | ---: |
 | `CAMPO_DE_MARTE` | -77.0432 | -12.0705 | 117 |
-| `CERES` | -76.92706 | -12.02869 | unavailable |
+| `CERES` | -76.92706 | -12.02869 | no disponible |
 | `SANTA_ANITA` | -76.9714 | -12.043 | 253 |
 | `SAN_JUAN_DE_LURIGANCHO` | -76.99925 | -11.9808 | 240 |
 
-These coordinates come from `pm25_lima_2025_2026_imputed.csv` under contract
-`senamhi-hourly-imputed` version `1.0.0`. They are projected from WGS84 into the
-domain CRS with longitude/latitude axis order and must fall inside the projected
-boundary and an active grid cell.
+Estas coordenadas proceden de `pm25_lima_2025_2026_imputed.csv`, bajo el
+contrato `senamhi-hourly-imputed`, versión `1.0.0`. Se proyectan desde WGS84 al
+sistema de referencia de coordenadas (CRS) del dominio con orden de ejes
+longitud/latitud y deben quedar dentro del límite proyectado y de una celda
+activa de la grilla.
 
-Meteorological-product coordinates remain tied to the meteorological resource.
-Similar station names do not justify averaging or substituting coordinates
-between products.
+Las coordenadas del producto meteorológico permanecen ligadas a su propio
+recurso. La similitud de nombres entre estaciones no justifica promediar ni
+sustituir coordenadas entre productos.
 
-## Sensor Configuration
+## Configuración de sensores
 
-A sensor configuration describes measurement behavior without owning a fixed
-site or mobile trajectory. Fixed sensors reference a station-site ID. Mobile
-sensors reference a provider that declares its identity and projected CRS and
-returns an explicit `(x_m, y_m)` for a sensor ID and elapsed simulation time.
-The sensing service does not interpolate, extrapolate, or repair a missing
-position.
+La configuración de un sensor describe su comportamiento de medición sin
+contener la ubicación fija ni la trayectoria móvil. Los sensores fijos
+referencian un identificador de sitio del catálogo. Los móviles referencian un
+proveedor que declara su identidad y su CRS proyectado, y devuelve una posición
+explícita `(x_m, y_m)` para un identificador de sensor y un tiempo transcurrido
+de simulación. El servicio de medición no interpola, extrapola ni corrige una
+posición ausente.
 
-The initial fixed configuration is hourly and starts at `t=0`, assuming that the
-episode starts on an exact clock hour. Mobile interval and first due time are
-both explicit per sensor. Five minutes (`300 s`) is provisional scenario input,
-not a calibrated scientific default.
+La configuración fija inicial es horaria y comienza en `t=0`, suponiendo que el
+episodio empieza en una hora exacta del reloj. El intervalo móvil y el primer
+instante programado son explícitos para cada sensor. Cinco minutos (`300 s`)
+es una entrada provisional del escenario, no un valor científico predeterminado
+y calibrado.
 
-Every runtime state retains its next due elapsed time. Advancing across several
-due instants processes each one in chronological order, with simultaneous ties
-ordered by sensor ID.
+Cada estado de ejecución conserva el próximo tiempo transcurrido de medición.
+Si se avanza a través de varios instantes programados, se procesa cada uno en
+orden cronológico; las mediciones simultáneas se ordenan por identificador de
+sensor.
 
-Sensor cadence does not control source emissions. Synthetic point and road
-sources emit continuous interval mass from rates in `ug/s` or `ug/(m s)` and may
-start, stop, or change at arbitrary simulation seconds. Source transitions,
-weather changes, sensor due times, and configured outputs are independent engine
-boundaries. Solver-stability substeps remain internal to transport; supplied
-trajectory points affect execution only when a sensor position is due.
+La cadencia de los sensores no controla las emisiones. Las fuentes sintéticas
+puntuales y viales emiten masa continua por intervalo a partir de tasas en
+`ug/s` o `ug/(m s)`, y pueden comenzar, terminar o cambiar en segundos
+arbitrarios de la simulación. Las transiciones de fuentes, los cambios
+meteorológicos, los instantes de medición y las salidas configuradas delimitan
+intervalos del motor de forma independiente. Los subpasos de estabilidad del
+integrador numérico son internos al transporte; los puntos de trayectoria
+suministrados afectan la ejecución solo cuando corresponde obtener la posición
+de un sensor para medir.
 
-A mobile position may follow a permitted road briefly outside the concentration
-grid. That due time produces an `OUTSIDE_ACTIVE_GRID` attempt containing its
-position but no numeric PM2.5 value. The attempt remains in measurement history,
-is excluded from reconstruction inputs, and the sensor advances to its next
-configured due time.
+Una posición móvil puede seguir una vía permitida brevemente fuera de la grilla
+de concentración. En ese instante se genera un intento `OUTSIDE_ACTIVE_GRID`
+con su posición, pero sin valor numérico de PM2.5. El intento permanece en el
+historial de mediciones, se excluye de las entradas de reconstrucción y el
+sensor avanza a su próximo instante programado.
 
-## Truth Sampling
+## Muestreo del campo oculto
 
-Concentration uses `ug/m3`. Positions and grid distances use meters in the
-projected domain CRS. The transport model stores one finite-volume concentration
-per active control cell. Sensor sampling therefore:
+La concentración se expresa en `ug/m3`. Las posiciones y distancias de la grilla
+se expresan en metros del CRS proyectado del dominio. El modelo de transporte
+almacena una concentración de volumen finito por celda de control activa. Por
+ello, el muestreo del sensor:
 
-1. Resolves the projected position with `GridDefinition.xy_to_cell()`.
-2. Returns that cell's concentration when it is active.
-3. Raises `SamplingSupportError` outside the grid or in an inactive cell when
-   called directly.
+1. Localiza la posición proyectada con `GridDefinition.xy_to_cell()`.
+2. Devuelve la concentración de esa celda si está activa.
+3. Genera `SamplingSupportError` fuera de la grilla o en una celda inactiva
+   cuando se invoca directamente.
 
-The sampler never interpolates neighbors or repairs an unsupported position by
-searching for a nearest active cell. Internal cell faces use the domain's
-half-open convention: a point exactly on a face belongs to the cell to its east
-or north. Mobile readings can jump when they cross a face because the finite-
-volume state contains no resolved sub-cell gradient.
-`SensingService` calls this sampler only when a mobile position belongs to an
-active cell; otherwise it records a failed `OUTSIDE_ACTIVE_GRID` attempt and
-continues.
+El muestreador nunca interpola entre celdas vecinas ni corrige una posición sin
+soporte buscando la celda activa más cercana. Las caras internas usan la
+convención semiabierta del dominio: un punto exactamente sobre una cara
+pertenece a la celda situada al este o al norte. Las lecturas móviles pueden
+presentar saltos al cruzar una cara porque el estado de volúmenes finitos no
+resuelve gradientes dentro de una celda.
+`SensingService` invoca este muestreador solo cuando la posición móvil pertenece
+a una celda activa; en caso contrario, registra un intento fallido
+`OUTSIDE_ACTIVE_GRID` y continúa.
 
-## Observation Errors
+## Errores de medición
 
-The observation pipeline is:
+La secuencia de medición es:
 
 ```text
 candidate = sampled_truth + bias + gaussian_noise
-dropout decision
-fixed zero lower bound and optional configured upper saturation
+decisión de pérdida de medición
+límite inferior fijo en cero y saturación superior opcional configurada
 ```
 
-The Lima baseline uses zero bias, zero noise standard deviation, and zero
-dropout. Its accepted observation therefore equals the containing cell's hidden
-truth exactly. Error behavior is activated only through explicit sensor
-configuration.
+En el esquema anterior, `sampled_truth` es la concentración interna muestreada,
+`bias` es el sesgo y `gaussian_noise` es el ruido gaussiano. Después se decide
+si se pierde la medición (*dropout*) y se aplica un límite inferior fijo de
+cero y, si está configurada, una saturación superior.
 
-A dropped attempt has quality `DROPPED` and `value_ug_m3=None`; it is not a
-zero-concentration observation. A numeric value changed by the zero lower bound
-or optional upper saturation has quality `CLIPPED`. No generic upper value is
-assumed: saturation applies only when a scenario configures it explicitly. An
-unsupported mobile position has quality
-`OUTSIDE_ACTIVE_GRID` and also has no numeric value, but remains distinguishable
-from random dropout. Seeded stochastic behavior uses only the episode NumPy
-random generator and deterministic `(timestamp, sensor_id)` processing order.
+La configuración de referencia para Lima utiliza sesgo nulo, desviación
+estándar del ruido nula y probabilidad de pérdida nula. Por tanto, su medición
+aceptada coincide exactamente con el campo oculto de la celda que la contiene.
+Los errores solo se activan mediante configuración explícita del sensor.
 
-## Records And Isolation
+Un intento perdido tiene calidad `DROPPED` y `value_ug_m3=None`; no es una
+medición de concentración cero. Un valor numérico modificado por el límite
+inferior cero o por la saturación superior opcional tiene calidad `CLIPPED`.
+No se supone un límite superior genérico: la saturación se aplica solo cuando
+el escenario la configura explícitamente. Una posición móvil sin soporte tiene
+calidad `OUTSIDE_ACTIVE_GRID` y tampoco contiene valor numérico, pero se
+distingue de una pérdida aleatoria. El comportamiento estocástico con semilla
+utiliza únicamente el generador aleatorio de NumPy del episodio y el orden de
+procesamiento determinista `(timestamp, sensor_id)`.
 
-Public `MeasurementRecord` values contain sensor identity and type, aware UTC
-time, elapsed simulation time, event-time projected position and CRS, observed
-value, quality, declared noise, position-source identity, and provenance. Mobile
-records use their position provider ID as `position_source_id`; the applicable
-mobility restrictions belong to the run configuration rather than each attempt.
-Records do not contain sampled hidden truth or any pre-error value.
+## Registros y aislamiento del campo oculto
 
-The full history retains attempts in deterministic chronological order.
-`accepted_records` returns only records with finite numeric observations. The
-sensing service does not retain a second private history of sampled truth,
-random draws, or pre-bound values; reproducibility relies on the recorded
-configuration, seed, software environment, fields, positions, and public
-attempts.
+Los registros públicos `MeasurementRecord` contienen identidad y tipo de
+sensor, tiempo UTC con zona horaria, tiempo transcurrido de simulación,
+posición proyectada en el instante de medición y su CRS, valor medido, calidad,
+ruido declarado, identidad de la fuente de posición y procedencia. Los
+registros móviles utilizan el identificador del proveedor de posiciones como
+`position_source_id`; las restricciones de movilidad aplicables pertenecen a
+la configuración de la ejecución, no a cada intento. Los registros no contienen
+el valor muestreado del campo oculto ni valores anteriores a los errores.
 
-Emission sources and sensors are unrelated entities: sources add PM2.5 mass to
-the hidden field, while sensors observe the resulting concentration. Neither
-sensor state nor measurements are stored on the OSMnx road graph.
+El historial completo conserva los intentos en orden cronológico determinista.
+`accepted_records` devuelve solo registros con mediciones numéricas finitas.
+El servicio de medición no conserva un segundo historial privado del campo
+muestreado, de los sorteos aleatorios ni de los valores anteriores a la
+aplicación de límites. La reproducibilidad depende de la configuración, la
+semilla, el entorno de software, los campos, las posiciones y los intentos
+públicos registrados.
+
+Las fuentes de emisión y los sensores son entidades independientes: las
+fuentes añaden masa de PM2.5 al campo oculto y los sensores miden la
+concentración resultante. Ni el estado de los sensores ni las mediciones se
+almacenan en el grafo vial de OSMnx.
