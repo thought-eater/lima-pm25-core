@@ -1,7 +1,7 @@
 [project]
 name = "lima-pm25-core"
 version = "0.1.0"
-description = "Core PM2.5 domain, simulation, and map-estimation models for Lima"
+description = "Modelos de dominio, simulación y estimación de mapas de PM2.5 para Lima"
 readme = "README.md"
 authors = [
     { name = "thought-eater", email = "135585422+thought-eater@users.noreply.github.com" }
@@ -31,6 +31,7 @@ module-name = "lima_pm25"
 
 [dependency-groups]
 dev = [
+    "ipykernel>=7.4.0",
     "pytest>=9.0.2",
     "ruff>=0.17.0",
     "ty>=0.0.86",

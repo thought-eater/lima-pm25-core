@@ -134,7 +134,7 @@ y memoria `O(n^2)` para `n` observaciones aceptadas. La predicción se realiza
 en bloques deterministas de celdas activas para controlar la memoria temporal
 sin aproximar el posterior. Por ello, el escenario o la capa de actualización
 secuencial debe seleccionar y documentar un conjunto de observaciones
-computacionalmente viable. El perfil secuencial provisional de R2.3 aplica el
+computacionalmente viable. El perfil secuencial seleccionado para R2.3 aplica el
 historial evaluado de seis horas; este módulo de reconstrucción individual no
 impone esa política de forma implícita a otros usos.
 

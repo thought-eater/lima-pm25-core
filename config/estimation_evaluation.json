@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "evidence_schema_version": 2,
-  "status": "provisional_pending_adviser",
+  "status": "frozen_for_thesis",
   "historical_observation_noise_stddev_ug_m3": 0.0,
   "gp": {
     "prior_mean_ug_m3": 19.6,
@@ -45,19 +45,11 @@
     36
   ],
   "uncertainty_numerical_tolerance": 1e-09,
-  "verification": {
-    "pytest_command": "uv run --offline --no-sync pytest --junitxml=cache/tests/station-holdout.xml",
-    "passed": 227,
-    "failed": 0,
-    "errored": 0,
-    "skipped": 0,
-    "build_command": "uv build --offline --no-python-downloads",
-    "build_status": "passed"
-  },
   "notes": [
-    "The profile freezes the zero-noise GP pilot only for provisional technical execution.",
-    "It is not an adviser-approved instrument-noise or Lima-physics calibration.",
-    "A later accepted profile requires a distinct configuration identity and retained evaluation."
+    "Perfil fijado para la evaluación de R2.1–R2.3 dentro del alcance de esta tesis.",
+    "La desviación estándar nula del ruido histórico es un supuesto de medición ideal, no una caracterización instrumental de SENAMHI.",
+    "Los supuestos físicos se adoptan para el alcance de la tesis; no constituyen una calibración atmosférica específica de Lima.",
+    "Los informes de pruebas conservados describen sus ejecuciones originales; no son una verificación nueva de cada reproducción."
   ],
   "historical_validation_method": "leave_one_station_out"
 }

@@ -10,7 +10,8 @@
   "historical_validation_method": "leave_one_station_out",
   "history_duration_s": 21600.0,
   "pm25_resource_sha256": "54f845390ca35cbe5648cf0c5a3c173cc0317cbbf2717918fabea45c85cac766",
-  "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+  "profile_sha256": "5ca0de26ca34f74d3cedb7b43aa28c3771b2046aed667b180538ad4ea84a4444",
+  "publication_note": "Reedición documental en español de la calibración conservada. El perfil original fue d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5; se conservan todos los parámetros, métricas y el identificador de ejecución, sin recalibración.",
   "reconstruction_config": {
     "include_clipped_observations": false,
     "prior_mean_ug_m3": 19.6,

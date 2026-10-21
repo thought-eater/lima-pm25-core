@@ -49,7 +49,7 @@ El perfil de solo lectura del producto PM2.5 suministrado encontró:
 ## Partición histórica
 
 `build_historical_partition_manifest` aplica una regla cronológica reproducible.
-El perfil provisional usa 70 % inicial para calibración, 30 % final para replay,
+El perfil del estudio usa 70 % inicial para calibración, 30 % final para replay,
 ocho ventanas de calibración y cuatro de replay de 24 horas, hasta 24 horas
 previas de contexto y al menos tres estaciones observadas por hora.
 
@@ -59,9 +59,9 @@ de los CSV, límites UTC, conteos por estación, política de observación y mé
 de selección. Puede guardarse una sola vez mediante
 `write_historical_partition_manifest`.
 
-Estos valores son decisiones operacionales provisionales del estudio. Cualquier
-modificación debe congelarse antes de abrir evaluaciones retenidas o resultados
-finales.
+Estos valores son decisiones operacionales fijadas para el estudio. Cualquier
+cambio corresponde a otro experimento y debe fijarse antes de abrir sus
+evaluaciones retenidas o resultados finales.
 
 ## Calibración del proceso gaussiano
 
@@ -90,8 +90,10 @@ independiente de esa selección.
 La predicción de calibración se realiza directamente en la coordenada de la
 estación mediante el mismo GP usado para la grilla, evitando calcular miles de
 celdas para un único valor objetivo. El producto no declara incertidumbre
-instrumental por lectura; la desviación de ruido histórica es una entrada
-explícita pendiente de sustento y no se inventa dentro del adaptador.
+instrumental por lectura. El perfil adopta explícitamente ruido nulo como
+supuesto de medición ideal; esto no caracteriza la incertidumbre instrumental
+de SENAMHI. El adaptador no inventa una estimación de ese ruido y su
+caracterización empírica queda fuera del alcance de esta tesis.
 
 ## Plausibilidad de escenarios
 
@@ -106,7 +108,7 @@ meteorología admitida. El perfil real inicial obtuvo:
 | Humedad relativa (`%`) | 86 | 60 | 98 | 100 |
 | Precipitación (`mm/h`) | 0,0 | 0,0 | 0,0 | 1,3 |
 
-PM2.5, viento, temperatura y humedad usan provisionalmente P01–P99 como
+PM2.5, viento, temperatura y humedad usan P01–P99 como
 envolvente nominal. La precipitación es cero-inflada: como P99 también es cero,
 usa mínimo–máximo observado para no clasificar toda lluvia válida como estrés.
 Una precipitación torrencial seguiría fuera de la envolvente de Lima.
@@ -140,7 +142,7 @@ referencia sin contraste, mapa faltante o valor activo no finito produce estado
 ## Evaluación R2.2
 
 Cada media posterior se conserva con la desviación estándar del mismo posterior,
-grilla, máscara, instante y corte observacional. El perfil provisional exige
+grilla, máscara, instante y corte observacional. El perfil del estudio exige
 incertidumbre finita y no negativa, cobertura histórica rotativa entre 90 % y
 98 % para intervalos nominales del 95 %, ancho histórico posterior medio menor
 que el promedio de los anchos previos de las mismas predicciones excluidas,
@@ -190,7 +192,7 @@ uv run lima-pm25-core \
 ```
 
 El valor cero reproduce el perfil técnico congelado, pero no constituye una
-selección científica de incertidumbre instrumental. La salida no sobrescribible
+caracterización empírica de incertidumbre instrumental. La salida no sobrescribible
 se guarda bajo el directorio elegido, identificada por su huella digital. El
 artefacto final se escribe en la ruta declarada por el perfil de trabajo.
 
@@ -210,7 +212,9 @@ La ejecución `f68cc53e…` evaluó 48 candidatos sobre 576 objetivos (192 por
 estación). La mejor configuración histórica utilizó seis horas de historial,
 4 000 m y una hora de escala temporal: MAE 8,8269 µg/m³, RMSE 12,2947 µg/m³ y
 cobertura 94,9653 %. La comparación sintética seleccionó 2 000 m, conservando el
-historial y la escala temporal elegidos. El perfil final es `d4b9abf1…`.
+historial y la escala temporal elegidos. El perfil publicado `5ca0de26…`
+conserva esos mismos parámetros; su nueva huella corresponde a la corrección
+documental, no a una recalibración.
 
 | Escala espacial sintética (m) | RMSE de calibración (µg/m³) |
 | --- | ---: |
@@ -226,7 +230,8 @@ particiones. La reducción del 0,006 % cumple estrictamente el criterio de ancho
 pero muestra que las otras estaciones apenas informan esas ubicaciones bajo la
 escala espacial seleccionada. Esta cobertura no demuestra reconstrucción precisa.
 
-La evaluación retenida `19010dd4…` conservó 37 mapas completos y obtuvo:
+La evaluación retenida original `19010dd4…`, publicada en la reedición
+documental `5b9504c3…`, conservó 37 mapas completos y obtuvo:
 
 | Indicador | Solo fijas | Fijas y móvil |
 | --- | ---: | ---: |

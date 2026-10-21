@@ -1,4 +1,4 @@
-# Python-generated files
+# Archivos generados por Python
 __pycache__/
 *.py[oc]
 build/
@@ -8,8 +8,8 @@ wheels/
 .pytest_cache/
 .ruff_cache/
 
-# Virtual environments
+# Entornos virtuales
 .venv
 cache/
 
-# Selected thesis products under resultados/ are intentionally versioned.
+# Los productos seleccionados de tesis en resultados/ se versionan deliberadamente.

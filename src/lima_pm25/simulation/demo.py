@@ -146,7 +146,7 @@ def run_complete_synthetic_demo(
         sampling_interval_s=300.0,
         first_due_time_s=0.0,
         mobile_position_provider_id=mobile_provider.provider_id,
-        provenance="synthetic mobile sensing demonstration",
+        provenance="demostración sintética de medición móvil",
         noise_stddev_ug_m3=1.0,
     )
     weather = SyntheticWeatherWindow(
@@ -220,7 +220,7 @@ def create_synthetic_study_family_requests(
         sampling_interval_s=study_config.temporal.mobile_sampling_interval_s,
         first_due_time_s=0.0,
         mobile_position_provider_id=mobile_provider.provider_id,
-        provenance="synthetic mobile sensing demonstration",
+        provenance="demostración sintética de medición móvil",
         noise_stddev_ug_m3=1.0,
     )
     weather = SyntheticWeatherWindow(
@@ -522,7 +522,7 @@ def _create_synthetic_demo(
             source_id=source_id,
             line=_road_corridor_by_name(domain, road_fragment, road_edges),
             emission_rate_ug_m_s=rate,
-            provenance=f"synthetic emissions on OSM geometry for {road_name}",
+            provenance=f"emisiones sintéticas sobre geometría OSM de {road_name}",
             starts_at_s=3_600.0 if event else 0.0,
             ends_at_s=7_200.0 if event else _SYNTHETIC_DEMO_DURATION_S,
             role=role,
@@ -533,7 +533,7 @@ def _create_synthetic_demo(
         AmbientBaseline(
             provider_id="synthetic-ambient-baseline",
             concentration_ug_m3=8.0,
-            provenance="synthetic PM2.5 mechanics demonstration",
+            provenance="demostración sintética del funcionamiento del modelo de PM2.5",
         )
     )
     return model, state, tuple(sources)
@@ -594,7 +594,7 @@ def _synthetic_demo_forcing(simulation_time_s: float) -> AtmosphericForcing:
         precipitation_mm_h = 2.0
     return AtmosphericForcing(
         provider_id="synthetic-meteorology",
-        provenance="synthetic PM2.5 mechanics demonstration",
+        provenance="demostración sintética del funcionamiento del modelo de PM2.5",
         wind_speed_m_s=wind_speed_m_s,
         wind_from_direction_deg=wind_from_direction_deg,
         precipitation_mm_h=precipitation_mm_h,
@@ -607,7 +607,7 @@ def _synthetic_demo_regional_boundary(
     return RegionalBoundaryForcing(
         provider_id="synthetic-regional-boundary",
         concentration_ug_m3=8.0,
-        provenance="synthetic PM2.5 mechanics demonstration",
+        provenance="demostración sintética del funcionamiento del modelo de PM2.5",
     )
 
 
@@ -1020,7 +1020,7 @@ def _build_pm25_summary_figure(
         if frame.budget is not None
     )
     figure.suptitle(
-        "Demostracion sintetica de la mecanica de PM2.5 "
+        "Demostración sintética del funcionamiento del modelo de PM2.5 "
         f"(residual absoluto acumulado: {residual:.3g} ug)\n"
         "verde: estacion | cian: rutina | magenta: evento | gris: inactiva | "
         "flecha blanca: destino del viento"

@@ -65,11 +65,13 @@ def test_matched_control_and_event_family_resolves_one_declared_factor() -> None
     assert resolved.manifest["members"][1]["changed_factors"] == ["event_sources"]
     assert resolved.manifest["complete_field_is_observed_ground_truth"] is False
     documentation = render_scenario_family_markdown(resolved)
-    assert "Hidden-field origin: `simulator_generated`" in documentation
+    assert "Origen del campo oculto: `simulator_generated`" in documentation
     assert "event_sources" in documentation
-    assert "Weather provenance: `synthetic study-evidence test`" in documentation
-    assert "role=`counterfactual_event`" in documentation
-    assert "Complete observed ground truth: `false`" in documentation
+    assert (
+        "Procedencia meteorológica: `synthetic study-evidence test`" in documentation
+    )
+    assert "rol=`counterfactual_event`" in documentation
+    assert "Campo completo de referencia observado: no disponible" in documentation
 
 
 def test_family_rejects_an_undeclared_factor_difference() -> None:
@@ -223,7 +225,7 @@ def test_environment_bundle_is_portable_and_keeps_exact_station_position(
     )
     documentation = render_environment_markdown(manifest)
     assert manifest["fingerprint"] in documentation
-    assert "vertically averaged" in documentation
+    assert "verticalmente promediada" in documentation
     assert manifest["software"]["source_tree_sha256"] is not None
     assert (bundle / "scenario_documentation.md").is_file()
 

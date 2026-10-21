@@ -23,8 +23,9 @@ def test_versioned_study_configuration_loads_with_explicit_statuses() -> None:
     assert (
         config.selected_cell_size_status is SelectionStatus.TECHNICAL_SELECTION_COMPLETE
     )
-    assert config.vertical.evidence_status is EvidenceStatus.SYNTHETIC_DEMO
+    assert config.vertical.evidence_status is EvidenceStatus.MODELING_ASSUMPTION
     assert config.temporal.mobile_sampling_interval_s == 300
+    assert config.temporal.mobile_sampling_status is SelectionStatus.CONFIRMED
     assert (
         config.temporal.concentration_output_status
         is SelectionStatus.TECHNICAL_SELECTION_COMPLETE

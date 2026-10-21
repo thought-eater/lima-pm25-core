@@ -58,14 +58,14 @@ def _print_domain_summary(domain: SpatialDomain) -> None:
     print(f"Nodos: {domain.road_graph.number_of_nodes()}")
     print(f"Aristas: {domain.road_graph.number_of_edges()}")
     print(f"Grafo cargado desde: {domain.graph_source}")
-    print(f"Grid cargado desde: {domain.grid_source}")
+    print(f"Grilla cargada desde: {domain.grid_source}")
     print(
-        "Grid: "
+        "Grilla: "
         f"{domain.grid.rows} filas x {domain.grid.columns} columnas "
         f"({domain.grid.cell_size_m:g} m)"
     )
     print(
-        "Dimension del grid: "
+        "Dimensión de la grilla: "
         f"{domain.grid.width_m:.2f} m x {domain.grid.height_m:.2f} m"
     )
     print(f"Celdas activas: {domain.grid.active_mask.sum()}")
@@ -74,26 +74,26 @@ def _print_domain_summary(domain: SpatialDomain) -> None:
 def _positive_float(value: str) -> float:
     parsed = float(value)
     if parsed <= 0:
-        raise argparse.ArgumentTypeError("value must be greater than zero")
+        raise argparse.ArgumentTypeError("el valor debe ser mayor que cero")
     return parsed
 
 
 def _nonnegative_float(value: str) -> float:
     parsed = float(value)
     if parsed < 0:
-        raise argparse.ArgumentTypeError("value must be nonnegative")
+        raise argparse.ArgumentTypeError("el valor debe ser no negativo")
     return parsed
 
 
 def _create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run the synthetic PM2.5 simulator or inspect its spatial domain."
+        description="Ejecutar el simulador sintético de PM2.5 o examinar su dominio espacial."
     )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument(
         "--episode-config",
         type=Path,
-        help="generate an episode using temporal sources and partitioned weather",
+        help="generar un episodio con fuentes temporales y meteorología particionada",
     )
     parser.add_argument("--episode-seed", type=int, default=0)
     parser.add_argument(
@@ -108,120 +108,120 @@ def _create_parser() -> argparse.ArgumentParser:
     mode.add_argument(
         "--animate",
         action="store_true",
-        help="show the synthetic simulation as an accelerated animation",
+        help="mostrar la simulación sintética como animación acelerada",
     )
     mode.add_argument(
         "--domain-only",
         action="store_true",
-        help="only build and render the static spatial domain",
+        help="construir y visualizar únicamente el dominio espacial estático",
     )
     mode.add_argument(
         "--study-evidence",
         action="store_true",
-        help="build the configured R1.2 study-environment evidence bundle",
+        help="generar el paquete configurado de evidencia del entorno de estudio R1.2",
     )
     mode.add_argument(
         "--study-sensitivity",
         action="store_true",
-        help="run the predeclared R1.2 spatial and temporal experiments",
+        help="ejecutar los experimentos espaciales y temporales predeclarados de R1.2",
     )
     mode.add_argument(
         "--historical-calibration",
         action="store_true",
-        help="profile supplied Lima data and calibrate GP candidates",
+        help="caracterizar los datos suministrados de Lima y calibrar candidatos del GP",
     )
     mode.add_argument(
         "--estimation-evaluation",
         action="store_true",
-        help="run the frozen provisional retained R2.1/R2.2 evaluation",
+        help="ejecutar la evaluación retenida R2.1/R2.2 con el perfil fijado",
     )
     parser.add_argument(
         "--playback-speed",
         type=_positive_float,
         default=60.0,
-        help="simulated seconds per wall-clock second in animation mode (default: 60)",
+        help="segundos simulados por segundo real en la animación (predeterminado: 60)",
     )
     parser.add_argument(
         "--frame-seconds",
         type=_positive_float,
         default=60.0,
-        help="simulated seconds between animation frames (default: 60)",
+        help="segundos simulados entre cuadros de animación (predeterminado: 60)",
     )
     parser.add_argument(
         "--start-paused",
         action="store_true",
-        help="open animation at t=0 and wait for the Reproducir button",
+        help="abrir la animación en t=0 y esperar al botón Reproducir",
     )
     parser.add_argument(
         "--study-config",
         type=Path,
         default=Path("config/study_environment.json"),
-        help="versioned study configuration (default: config/study_environment.json)",
+        help="configuración del estudio (predeterminada: config/study_environment.json)",
     )
     parser.add_argument(
         "--study-output",
         type=Path,
         default=Path("resultados/r1_2_entorno/paquetes"),
-        help="parent directory for optional study evidence packages",
+        help="directorio principal de los paquetes opcionales de evidencia del estudio",
     )
     parser.add_argument(
         "--discretization-evidence",
         type=Path,
         default=Path("resultados/r1_2_entorno/discretization_evidence.json"),
-        help="completed discretization evidence included when present",
+        help="informe de discretización que se incorpora si está disponible",
     )
     parser.add_argument(
         "--sensitivity-protocol",
         type=Path,
         default=Path("config/discretization_protocol.json"),
-        help="predeclared sensitivity protocol",
+        help="protocolo de sensibilidad predeclarado",
     )
     parser.add_argument(
         "--sensitivity-output",
         type=Path,
         default=Path("resultados/r1_2_entorno/discretization_evidence.json"),
-        help="non-overwriting experiment output",
+        help="destino nuevo del experimento; no se sobrescriben resultados",
     )
     parser.add_argument(
         "--pm25-data",
         type=Path,
         default=Path("data/pm25_lima_2025_2026_imputed.csv"),
-        help="source-qualified historical PM2.5 CSV",
+        help="CSV histórico de PM2.5 con procedencia por dato",
     )
     parser.add_argument(
         "--weather-data",
         type=Path,
         default=Path("data/var_meteorologicas_lima_2025_2026_imputed.csv"),
-        help="source-qualified historical meteorological CSV",
+        help="CSV meteorológico histórico con procedencia por dato",
     )
     parser.add_argument(
         "--weather-station",
         default="CAMPO_DE_MARTE",
-        help="meteorological station used as spatially uniform forcing",
+        help="estación meteorológica utilizada como entrada espacialmente uniforme",
     )
     parser.add_argument(
         "--historical-output",
         type=Path,
         default=Path("resultados/r2_1_r2_2_estimacion/calibracion_historica"),
-        help="parent directory for historical calibration artifacts",
+        help="directorio principal de los productos de calibración histórica",
     )
     parser.add_argument(
         "--historical-noise-stddev",
         type=_nonnegative_float,
         default=None,
-        help="explicit PM2.5 observation-noise standard deviation in ug/m3",
+        help="desviación estándar explícita del ruido de medición de PM2.5 en µg/m³",
     )
     parser.add_argument(
         "--estimation-profile",
         type=Path,
         default=Path("config/estimation_evaluation.json"),
-        help="frozen R2.1/R2.2 evaluation profile",
+        help="perfil fijado de evaluación R2.1/R2.2",
     )
     parser.add_argument(
         "--estimation-output",
         type=Path,
         default=Path("resultados/r2_1_r2_2_estimacion/evaluacion"),
-        help="parent directory for retained evaluation evidence",
+        help="directorio principal de la evidencia de evaluación retenida",
     )
     return parser
 
@@ -242,8 +242,8 @@ def main(argv: Sequence[str] | None = None) -> None:
     if args.historical_calibration:
         if args.historical_noise_stddev is None:
             parser.error(
-                "--historical-calibration requires "
-                "--historical-noise-stddev; no scientific default is assumed"
+                "--historical-calibration requiere "
+                "--historical-noise-stddev; no se supone un valor científico predeterminado"
             )
         _run_historical_calibration(
             args.study_config,
@@ -306,7 +306,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             preview_path,
             station_catalog=station_catalog,
         )
-        print(f"Diagnostico espacial: {preview_path}")
+        print(f"Diagnóstico espacial: {preview_path}")
         return
 
     if args.animate:
@@ -329,7 +329,7 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     total_residual = sum(budget.numerical_residual_ug for budget in budgets)
     print(f"Tiempo simulado: {final_state.simulation_time_s / 3600:g} h")
-    print(f"PM2.5 maximo final: {final_state.concentration_ug_m3.max():.3f} ug/m3")
+    print(f"PM2.5 máximo final: {final_state.concentration_ug_m3.max():.3f} µg/m³")
     print(f"Residual acumulado de masa: {total_residual:.6g} ug")
     print(f"Resultados: {results_path}")
 
@@ -468,35 +468,35 @@ def _run_historical_calibration(
                 200.0,
                 "m",
                 ParameterEvidenceClass.SYNTHETIC,
-                "provisional synthetic mechanics value; pending Lima evidence",
+                "altura efectiva constante adoptada como supuesto simplificador aceptado para el alcance de la tesis; no medida ni calibrada para Lima",
             ),
             ScenarioParameterEvidence(
                 "horizontal_diffusivity_m2_s",
                 25.0,
                 "m2/s",
                 ParameterEvidenceClass.SYNTHETIC,
-                "provisional mechanics value; horizontal Lima calibration pending",
+                "difusividad horizontal constante adoptada como supuesto del modelo para el alcance de la tesis; no calibrada específicamente para Lima",
             ),
             ScenarioParameterEvidence(
                 "dry_deposition_velocity_m_s",
                 0.001,
                 "m/s",
                 ParameterEvidenceClass.LITERATURE_CONSTRAINED,
-                "generic PM2.5 order supported by Zhang et al. 2014; not Lima-specific",
+                "orden de magnitud genérico de PM2.5 sustentado en Zhang et al. 2014; no específico de Lima",
             ),
             ScenarioParameterEvidence(
                 "wet_scavenging_per_mm",
                 0.03,
                 "1/mm",
                 ParameterEvidenceClass.LITERATURE_CONSTRAINED,
-                "generic below-cloud PM2.5 coefficient order; Lima rain is sparse",
+                "orden de magnitud genérico del coeficiente de lavado de PM2.5 bajo nubes; precipitación escasa en Lima",
             ),
             ScenarioParameterEvidence(
                 "routine_road_source_rates",
                 110.0,
                 "ug/(m s)",
                 ParameterEvidenceClass.SYNTHETIC,
-                "representative demo scale; not an inferred Lima emission rate",
+                "escala representativa de demostración; no es una tasa de emisión inferida para Lima",
             ),
         ),
     )
@@ -570,7 +570,7 @@ def _run_historical_calibration(
         score for score in calibration.candidate_scores if score.candidate == selected
     )
     print(f"Calibración histórica: {destination}")
-    print(f"Targets históricos: {calibration.target_count}")
+    print(f"Valores objetivo históricos: {calibration.target_count}")
     print(
         "GP seleccionado: "
         f"historial={selected.history_duration.total_seconds() / 3600:g} h, "
@@ -711,6 +711,6 @@ def _run_change10_evaluation(
         "Cobertura sintética diagnóstica: "
         f"{result.evaluation.fixed_mobile_r22.empirical_coverage:.3f}"
     )
-    print(f"Replay histórico provisional: {replay_destination}")
-    print("Verificación integral del bundle: válida")
+    print(f"Reproducción histórica: {replay_destination}")
+    print("Verificación de integridad del paquete: válida")
     print(f"Estado del perfil: {profile.status}")

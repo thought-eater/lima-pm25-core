@@ -1,8 +1,12 @@
 # Productos e indicadores verificables — R1.2–R2.3
 
 Este índice relaciona los resultados de tesis con su configuración, procedimiento
-de verificación y evidencia conservada. Los identificadores completos distinguen
-las ejecuciones y permiten consultar sus manifiestos.
+de verificación y evidencia conservada. Los manifiestos identifican las
+ejecuciones y, cuando corresponde, su reedición documental.
+
+Este directorio conserva únicamente la evidencia seleccionada que se enlaza a
+continuación, con los archivos completos de cada paquete. Las ejecuciones
+reemplazadas y los duplicados no forman parte del conjunto publicado.
 
 ## Correspondencia con los IOV
 
@@ -39,7 +43,7 @@ no representa una superficie observada de Lima.
   partición, candidatos y exclusión completa de cada estación, también del previo.
 - [Calibración final](r2_1_r2_2_estimacion/calibracion_historica/final_calibration.json):
   parámetros seleccionados y evaluación histórica del perfil operacional.
-- [Evaluación y replay `19010dd4…`](r2_1_r2_2_estimacion/evaluacion/19010dd4072b1d5a484ca25c656265b8df72f32703b60bca99749558970726e2/):
+- [Evaluación y replay, reedición `5b9504c3…`](r2_1_r2_2_estimacion/evaluacion/5b9504c3208dd3689921cf38517fe1036b22880967e094ccdd63c318627c131e/):
   `synthetic_retained/` conserva el campo y las mediciones; `r2_evaluation/`,
   los mapas, métricas y figuras; `historical_replay/`, mapas y entradas con procedencia.
 
@@ -56,16 +60,24 @@ calibración. El replay carece de una superficie histórica completa de referenc
 
 ## R2.3: actualización secuencial
 
-- [Ejemplo `8724a669…`, perfil `d4b9abf1…`](r2_3_actualizacion/example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-d4b9abf19e23/):
+- [Ejemplo `8724a669…`, perfil publicado `5ca0de26…`](r2_3_actualizacion/example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-5ca0de26ca34/):
   36 estados, lotes públicos, registros de actualización y tabla derivada.
 - [Resumen de casos requeridos](r2_3_actualizacion/required-case-report-publicado.json).
 
 El ejemplo incorpora exactamente una vez 35 mediciones móviles y conserva un
 diagnóstico de reducción por lote móvil. Su paquete no contiene el campo oculto.
-El resumen registra la ejecución de los 18 casos requeridos; el total del
-conjunto de pruebas del repositorio no sustituye ese denominador.
+El resumen conserva la ejecución histórica de los 18 casos requeridos; el total
+del conjunto de pruebas del repositorio no sustituye ese denominador. No afirma
+que se hayan vuelto a ejecutar las pruebas durante la reedición documental.
 
 ## Reproducción e identidad
+
+La publicación en español corrige textos y estados administrativos obsoletos,
+sin repetir experimentos ni modificar los parámetros seleccionados. Las
+matrices, mediciones, métricas y figuras de las reediciones de R2.1–R2.3 son
+idénticas a las originales. Las notas de sus manifiestos distinguen la reedición
+de la ejecución de origen. Los textos de procedencia de los registros originales
+se conservan literalmente, aunque estén en inglés.
 
 Los procedimientos están en [entorno](../docs/study-environment.md#reproducción),
 [simulación](../docs/simulation-orchestration.md),
@@ -74,9 +86,11 @@ Los procedimientos están en [entorno](../docs/study-environment.md#reproducció
 la raíz del repositorio y usar destinos nuevos: los exportadores rechazan
 sobrescribir experimentos.
 
-Los manifiestos y hashes describen las ejecuciones conservadas, incluidas sus
-rutas originales. Una reproducción usa la configuración y la identidad de su
-propia ejecución. Las entradas de R1.1 se suministran en [`data/`](../data/).
+Las huellas de los informes históricos de pruebas identifican la configuración
+de su ejecución original, anterior a la traducción. No son resultados nuevos de
+pruebas o de construcción del paquete. Una reproducción usa la configuración
+y la identidad de su propia ejecución. Las entradas de R1.1 se suministran en
+[`data/`](../data/).
 
 Las comprobaciones de software y empaquetado se explican en
 [`tests/README.md`](../tests/README.md). Las salidas temporales y los XML de

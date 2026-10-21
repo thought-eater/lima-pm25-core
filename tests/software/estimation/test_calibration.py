@@ -20,12 +20,30 @@ from lima_pm25.estimation import (
     HistoricalPM25Record,
     HistoricalWindow,
     calibrate_gp_from_historical_stations,
+    finalize_change10_evidence,
     initial_gp_calibration_candidates,
     load_change10_calibration_artifact,
     load_change10_evaluation_profile,
+    verify_change10_evidence,
     write_change10_calibration_artifact,
     write_gp_calibration_result,
 )
+
+
+def test_evidence_finalization_does_not_claim_new_software_verification(tmp_path) -> None:
+    profile = load_change10_evaluation_profile("config/estimation_evaluation.json")
+    identity = tmp_path / "identity.json"
+    identity.write_text(json.dumps({"profile_sha256": "otro-perfil"}))
+    with pytest.raises(ValueError, match="perfil de evaluación"):
+        finalize_change10_evidence(destination=tmp_path, profile=profile)
+    identity.write_text(json.dumps({"profile_sha256": profile.source_sha256}))
+
+    finalize_change10_evidence(destination=tmp_path, profile=profile)
+
+    assert not (tmp_path / "verification_report.json").exists()
+    assert verify_change10_evidence(tmp_path) == ()
+    with pytest.raises(FileExistsError):
+        finalize_change10_evidence(destination=tmp_path, profile=profile)
 
 
 def test_initial_candidate_profile_contains_the_declared_48_candidates() -> None:

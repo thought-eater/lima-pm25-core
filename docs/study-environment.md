@@ -37,10 +37,11 @@ columna de aire verticalmente promediada:
 volumen efectivo = área horizontal × altura efectiva de mezcla
 ```
 
-La concentración se expresa en µg/m³. La altura constante de 200 m es una
-aproximación provisional aceptada para el alcance de la tesis, según lo
-comunicado por el autor; no es una altura atmosférica medida o calibrada para
-Lima. El modelo no resuelve capas verticales, edificios ni cañones urbanos.
+La concentración se expresa en µg/m³. La altura efectiva constante de 200 m se
+adopta como supuesto simplificador aceptado para el alcance de la tesis. No es
+una altura atmosférica medida o calibrada para Lima; su determinación local
+queda fuera del alcance de este trabajo. El modelo no resuelve capas
+verticales, edificios ni cañones urbanos.
 
 ## Escenarios y campo de referencia
 
@@ -73,7 +74,7 @@ explícitos o mediante ambos mecanismos. Obtener un campo en un instante supone
 integrar numéricamente hasta él, no disponer de una solución analítica continua.
 
 El experimento seleccionó 300 s para conservar campos completos. La cadencia
-móvil de cinco minutos es un parámetro provisional separado; no es una
+móvil de cinco minutos es un parámetro del escenario separado; no es una
 resolución temporal universal.
 
 ## Experimentos de discretización

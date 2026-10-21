@@ -1142,7 +1142,7 @@ def load_historical_weather_csv(
         station_id=station_id,
         provider_id=provider_id or f"historical-weather:{station_id.casefold()}",
         provenance=provenance
-        or f"supplied R1.1 meteorological product {source_path.name}",
+        or f"producto meteorológico R1.1 suministrado {source_path.name}",
         records=tuple(records),
         maximum_gap=config.maximum_gap,
         unavailable_timestamps_utc=tuple(unavailable),

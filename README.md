@@ -34,8 +34,9 @@ sintética correlacionada, mediante `--episode-config`.
 - El replay histórico combina observaciones fijas disponibles con mediciones
   móviles simuladas, conservando su procedencia. Ceres pertenece al catálogo,
   pero no tiene valores observados de PM2.5 en el producto suministrado.
-- El modelo utiliza una altura efectiva constante de 200 m como aproximación
-  provisional; no resuelve perfiles verticales ni cañones urbanos.
+- El modelo adopta una altura efectiva constante de 200 m como supuesto
+  simplificador aceptado para el alcance de la tesis; no es una altura medida o
+  calibrada para Lima ni resuelve perfiles verticales o cañones urbanos.
 - La planificación de rutas por aprendizaje por refuerzo y el despliegue físico
   quedan fuera del alcance de estos resultados.
 

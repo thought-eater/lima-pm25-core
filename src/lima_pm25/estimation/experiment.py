@@ -60,7 +60,6 @@ class Change10EvaluationProfile:
     uncertainty_numerical_tolerance: float
     source_path: Path
     source_sha256: str
-    verification: dict[str, object]
 
 
 @dataclass(frozen=True, slots=True)
@@ -206,7 +205,6 @@ def load_change10_evaluation_profile(
         uncertainty_numerical_tolerance=tolerance,
         source_path=source,
         source_sha256=sha256(source.read_bytes()).hexdigest(),
-        verification=dict(payload["verification"]),
     )
 
 
@@ -513,7 +511,7 @@ def _nominal_request(
             line=source.line,
             emission_rate_ug_m_s=source.emission_rate_ug_m_s * source_scale,
             provenance=(
-                f"output-constrained provisional nominal source; scale={source_scale:g}; "
+                f"fuente nominal restringida por concentración; escala={source_scale:g}; "
                 f"base={source.provenance}"
             ),
             starts_at_s=0.0,
@@ -526,7 +524,7 @@ def _nominal_request(
         AmbientBaseline(
             provider_id="provisional-nominal-ambient",
             concentration_ug_m3=ambient_value,
-            provenance="historical calibration median; not observed field truth",
+            provenance="mediana histórica de calibración; no es un campo observado",
         )
     )
     return replace(
@@ -544,7 +542,7 @@ def _nominal_request(
             RegionalBoundaryForcing(
                 provider_id="provisional-nominal-boundary",
                 concentration_ug_m3=ambient_value,
-                provenance="historical calibration median boundary",
+                provenance="frontera basada en la mediana histórica de calibración",
             )
         ),
         scenario_identity=None,
@@ -621,7 +619,7 @@ def write_provisional_historical_replay(
             provider_id="historical-replay-ambient",
             concentration_ug_m3=ambient_value,
             provenance=(
-                "median of eligible observed PM2.5 context; model input, not field truth"
+                "mediana del contexto observado elegible de PM2.5; entrada del modelo, no campo de referencia observado"
             ),
         )
     )
@@ -655,8 +653,8 @@ def write_provisional_historical_replay(
                     source.emission_rate_ug_m_s * routine_source_scale
                 ),
                 provenance=(
-                    "frozen output-constrained replay source; "
-                    f"scale={routine_source_scale:g}; base={source.provenance}"
+                    "fuente fijada para reproducción histórica y restringida por concentración; "
+                    f"escala={routine_source_scale:g}; base={source.provenance}"
                 ),
                 starts_at_s=0.0,
                 ends_at_s=duration.total_seconds(),
@@ -669,7 +667,7 @@ def write_provisional_historical_replay(
                 provider_id="historical-replay-boundary",
                 concentration_ug_m3=ambient_value,
                 provenance=(
-                    "historical-context median boundary; constrained replay input"
+                    "frontera basada en la mediana del contexto histórico; entrada restringida para reproducción histórica"
                 ),
             )
         ),
@@ -718,7 +716,7 @@ def write_provisional_historical_replay(
             for station_id in partition.station_ids
         }
         metadata = {
-            "purpose": "provisional_historical_deployment_proxy",
+            "purpose": "historical_deployment_proxy",
             "window_start_utc": window.start_utc.isoformat(),
             "window_end_utc": replay_end.isoformat(),
             "historical_weather_resource": weather.resource_id,
@@ -727,9 +725,9 @@ def write_provisional_historical_replay(
             "hidden_field_available_to_gp": False,
             "profile_status": profile.status,
             "limitations": [
-                "The complete replay field is model-generated, not observed Lima truth.",
-                "Routine source rates and unresolved physics remain provisional.",
-                "Ceres has no historical PM2.5 readings in the supplied product.",
+                "El campo completo de la reproducción histórica procede del modelo; no es una superficie observada de Lima.",
+                "Las tasas de emisión y los parámetros físicos no calibrados son supuestos adoptados para el alcance de la tesis, no estimaciones locales medidas.",
+                "Ceres no tiene lecturas históricas de PM2.5 en el producto suministrado.",
             ],
         }
         (output / "metadata.json").write_text(
@@ -756,24 +754,12 @@ def finalize_change10_evidence(
     profile: Change10EvaluationProfile,
 ) -> Path:
     root = Path(destination)
-    verification_path = root / "verification_report.json"
     checksums_path = root / "checksums.json"
-    if verification_path.exists() or checksums_path.exists():
-        raise FileExistsError("Change-10 evidence is already finalized")
-    build_artifacts = {}
-    for artifact in sorted(Path("dist").glob("lima_pm25_core-0.1.0*")):
-        if artifact.is_file():
-            build_artifacts[artifact.name] = sha256(artifact.read_bytes()).hexdigest()
-    verification_payload = {
-        "experiment_fingerprint": root.name,
-        "profile_sha256": profile.source_sha256,
-        **profile.verification,
-        "build_artifacts_sha256": build_artifacts,
-    }
-    verification_path.write_text(
-        f"{json.dumps(verification_payload, indent=2, sort_keys=True)}\n",
-        encoding="utf-8",
-    )
+    if checksums_path.exists():
+        raise FileExistsError("La evidencia de evaluación ya está finalizada")
+    identity = json.loads((root / "identity.json").read_text(encoding="utf-8"))
+    if identity["profile_sha256"] != profile.source_sha256:
+        raise ValueError("La evidencia no corresponde al perfil de evaluación")
     files = {
         artifact.relative_to(root).as_posix(): sha256(artifact.read_bytes()).hexdigest()
         for artifact in sorted(root.rglob("*"))

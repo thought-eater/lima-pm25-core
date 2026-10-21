@@ -1,12 +1,12 @@
 {
   "configuration": {
-    "calibration_artifact_sha256": "cf08e52a4f4deec1fb92788f267680f29155ee635da29b2d9c1de86bfd7e4a99",
+    "calibration_artifact_sha256": "486104af785fdcfde40a43539187c7de78209e0cdd578ad943d23d4007514375",
     "calibration_artifact_source": "resultados/r2_1_r2_2_estimacion/calibracion_historica/final_calibration.json",
     "history_duration": 21600.0,
     "prediction_chunk_size": 2048,
-    "profile_sha256": "d4b9abf19e23d121561e9943386d12402d6ca5cd8ac15154d443148d6247a1f5",
+    "profile_sha256": "5ca0de26ca34f74d3cedb7b43aa28c3771b2046aed667b180538ad4ea84a4444",
     "profile_source": "config/estimation_evaluation.json",
-    "profile_status": "provisional_pending_adviser",
+    "profile_status": "frozen_for_thesis",
     "reconstruction_config": {
       "include_clipped_observations": false,
       "prior_mean_ug_m3": 19.6,
@@ -28,6 +28,7 @@
   },
   "hidden_truth_included": false,
   "input_batch_count": 36,
+  "publication_note": "Reedición documental del ejemplo example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-d4b9abf19e23. Los lotes, estados cartográficos, registros de actualización y diagnósticos son los originales, sin nueva ejecución del actualizador.",
   "purpose": "r23_sequential_map_update_evidence",
   "schema_version": 1,
   "snapshot_count": 36,

@@ -145,7 +145,7 @@ from lima_pm25.estimation import (
 profile = load_change10_evaluation_profile("config/estimation_evaluation.json")
 bundle = Path(
     "resultados/r2_3_actualizacion/"
-    "example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-d4b9abf19e23"
+    "example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-5ca0de26ca34"
 )
 write_r23_required_case_report(
     required_case_manifest="config/sequential_update_required_cases.json",
@@ -158,6 +158,9 @@ write_r23_required_case_report(
 
 El [ejemplo seleccionado](../resultados/README.md#r23-actualización-secuencial)
 conserva 36 estados y 35 mediciones móviles incorporadas exactamente una vez.
+Su reedición documental reutiliza los mismos lotes, matrices y diagnósticos.
+El resumen publicado de 18 casos conserva los resultados y las huellas de la
+ejecución histórica de pruebas, no una nueva comprobación de esta reedición.
 La comprobación funcional no establece latencia de tiempo real ni desempeño de
 campo. El conjunto completo de software y la construcción del paquete se
 ejecutan por separado de este criterio de aceptación.

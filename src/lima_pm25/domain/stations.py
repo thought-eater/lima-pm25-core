@@ -206,7 +206,7 @@ def plot_fixed_station_catalog(axis, catalog: FixedStationCatalog):
         edgecolor="#111111",
         linewidth=0.9,
         zorder=8,
-        label="Estacion fija de PM2.5",
+        label="Estación fija de PM2.5",
     )
     annotations = tuple(
         axis.annotate(

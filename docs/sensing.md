@@ -57,8 +57,8 @@ posición ausente.
 La configuración fija inicial es horaria y comienza en `t=0`, suponiendo que el
 episodio empieza en una hora exacta del reloj. El intervalo móvil y el primer
 instante programado son explícitos para cada sensor. Cinco minutos (`300 s`)
-es una entrada provisional del escenario, no un valor científico predeterminado
-y calibrado.
+es el intervalo adoptado para el escenario, no un valor científico universal
+ni una cadencia calibrada para Lima.
 
 Cada estado de ejecución conserva el próximo tiempo transcurrido de medición.
 Si se avanza a través de varios instantes programados, se procesa cada uno en
