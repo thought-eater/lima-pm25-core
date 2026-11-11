@@ -84,6 +84,10 @@ Los módulos de simulación y estimación consumen los contratos del dominio.
 El motor genera mediciones públicas; el estimador las recibe sin acceder al
 campo oculto. Todo el código pertenece a una única distribución Python.
 
+La API del [reconstructor GP](docs/gaussian-process-reconstruction.md) admite
+un kernel explícito para comparaciones controladas, conservando el kernel
+Matérn predeterminado del perfil operacional.
+
 ## Pruebas y reproducción
 
 ```bash

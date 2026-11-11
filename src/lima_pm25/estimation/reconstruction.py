@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 import numpy as np
 from numpy.typing import ArrayLike, DTypeLike
 from pyproj import CRS
+from sklearn.base import clone
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import ConstantKernel, Kernel, Matern
 
@@ -178,6 +179,7 @@ class GaussianProcessFieldReconstructor:
         config: ReconstructionConfig,
         *,
         prediction_chunk_size: int = DEFAULT_PREDICTION_CHUNK_SIZE,
+        kernel: Kernel | None = None,
     ) -> None:
         if (
             isinstance(prediction_chunk_size, bool)
@@ -187,35 +189,23 @@ class GaussianProcessFieldReconstructor:
             raise ValueError("prediction_chunk_size must be a positive integer")
         self.config = config
         self.prediction_chunk_size = prediction_chunk_size
+        if kernel is not None and not isinstance(kernel, Kernel):
+            raise TypeError("kernel debe ser un kernel de scikit-learn")
+        # La covarianza opcional se copia y nunca se optimiza. El llamador debe
+        # registrar su especificación; config conserva media y escala del jitter.
+        self.kernel = _build_kernel(config) if kernel is None else clone(kernel)
 
     def reconstruct(self, request: ReconstructionRequest) -> PosteriorField:
         records, observation_metadata = select_reconstruction_observations(
             request,
             self.config,
         )
-        kernel = _build_kernel(self.config)
+        kernel = self.kernel
         numerical_jitter = _numerical_jitter_ug_m3_squared(self.config)
-        if not records:
-            mean, standard_deviation = _prior_arrays(request.grid, self.config)
-            return PosteriorField(
-                mean_ug_m3=mean,
-                standard_deviation_ug_m3=standard_deviation,
-                active_mask=request.grid.active_mask,
-                reconstruction_timestamp_utc=request.reconstruction_timestamp_utc,
-                observations=observation_metadata,
-                diagnostics=ReconstructionDiagnostics(
-                    posterior_fitted=False,
-                    kernel=str(kernel),
-                    numerical_jitter_ug_m3_squared=numerical_jitter,
-                    log_marginal_likelihood=None,
-                ),
-            )
-
-        regressor = _fit_regressor(
-            request,
-            records,
-            self.config,
-            numerical_jitter,
+        regressor = (
+            _fit_regressor(request, records, self.config, numerical_jitter, kernel)
+            if records
+            else GaussianProcessRegressor(kernel=kernel, optimizer=None)
         )
 
         mean, standard_deviation = _predict_active_cells(
@@ -232,10 +222,12 @@ class GaussianProcessFieldReconstructor:
             reconstruction_timestamp_utc=request.reconstruction_timestamp_utc,
             observations=observation_metadata,
             diagnostics=ReconstructionDiagnostics(
-                posterior_fitted=True,
-                kernel=str(regressor.kernel_),
+                posterior_fitted=bool(records),
+                kernel=str(regressor.kernel_ if records else kernel),
                 numerical_jitter_ug_m3_squared=numerical_jitter,
-                log_marginal_likelihood=float(regressor.log_marginal_likelihood_value_),
+                log_marginal_likelihood=(
+                    float(regressor.log_marginal_likelihood_value_) if records else None
+                ),
             ),
         )
 
@@ -259,33 +251,12 @@ class GaussianProcessFieldReconstructor:
             request,
             self.config,
         )
-        kernel = _build_kernel(self.config)
+        kernel = self.kernel
         numerical_jitter = _numerical_jitter_ug_m3_squared(self.config)
-        if not records:
-            mean = np.full(positions.shape[0], self.config.prior_mean_ug_m3)
-            standard_deviation = np.full(
-                positions.shape[0],
-                self.config.prior_stddev_ug_m3,
-            )
-            return PointPosterior(
-                positions,
-                mean,
-                standard_deviation,
-                request.reconstruction_timestamp_utc,
-                observation_metadata,
-                ReconstructionDiagnostics(
-                    posterior_fitted=False,
-                    kernel=str(kernel),
-                    numerical_jitter_ug_m3_squared=numerical_jitter,
-                    log_marginal_likelihood=None,
-                ),
-            )
-
-        regressor = _fit_regressor(
-            request,
-            records,
-            self.config,
-            numerical_jitter,
+        regressor = (
+            _fit_regressor(request, records, self.config, numerical_jitter, kernel)
+            if records
+            else GaussianProcessRegressor(kernel=kernel, optimizer=None)
         )
         x_origin, y_origin, _, _ = request.grid.grid_bounds_m
         features = np.column_stack(
@@ -301,15 +272,17 @@ class GaussianProcessFieldReconstructor:
         )
         return PointPosterior(
             positions,
-            residual_mean + self.config.prior_mean_ug_m3,
-            standard_deviation,
+            np.atleast_1d(residual_mean) + self.config.prior_mean_ug_m3,
+            np.atleast_1d(standard_deviation),
             request.reconstruction_timestamp_utc,
             observation_metadata,
             ReconstructionDiagnostics(
-                posterior_fitted=True,
-                kernel=str(regressor.kernel_),
+                posterior_fitted=bool(records),
+                kernel=str(regressor.kernel_ if records else kernel),
                 numerical_jitter_ug_m3_squared=numerical_jitter,
-                log_marginal_likelihood=float(regressor.log_marginal_likelihood_value_),
+                log_marginal_likelihood=(
+                    float(regressor.log_marginal_likelihood_value_) if records else None
+                ),
             ),
         )
 
@@ -396,6 +369,7 @@ def _fit_regressor(
     records: tuple[MeasurementRecord, ...],
     config: ReconstructionConfig,
     numerical_jitter_ug_m3_squared: float,
+    kernel: Kernel,
 ) -> GaussianProcessRegressor:
     features, targets, alpha = _training_arrays(
         request,
@@ -404,7 +378,7 @@ def _fit_regressor(
         numerical_jitter_ug_m3_squared,
     )
     regressor = GaussianProcessRegressor(
-        kernel=_build_kernel(config),
+        kernel=kernel,
         alpha=alpha,
         optimizer=None,
         normalize_y=False,
@@ -488,17 +462,6 @@ def _predict_active_cells(
 
 def _numerical_jitter_ug_m3_squared(config: ReconstructionConfig) -> float:
     return RELATIVE_NUMERICAL_JITTER * config.prior_stddev_ug_m3**2
-
-
-def _prior_arrays(
-    grid: GridDefinition,
-    config: ReconstructionConfig,
-) -> tuple[np.ndarray, np.ndarray]:
-    mean = np.full(grid.shape, np.nan, dtype=np.float64)
-    standard_deviation = np.full(grid.shape, np.nan, dtype=np.float64)
-    mean[grid.active_mask] = config.prior_mean_ug_m3
-    standard_deviation[grid.active_mask] = config.prior_stddev_ug_m3
-    return mean, standard_deviation
 
 
 def _require_utc_datetime(name: str, value: datetime) -> None:

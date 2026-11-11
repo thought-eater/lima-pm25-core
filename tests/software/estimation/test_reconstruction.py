@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 
 import numpy as np
 import pytest
+from sklearn.gaussian_process.kernels import ConstantKernel, Matern
 
 from lima_pm25.domain import GridDefinition
 from lima_pm25.estimation import (
@@ -19,6 +20,83 @@ from tests.reconstruction_cases import (
     _reconstructor,
     _record,
 )
+
+
+def test_explicit_default_kernel_matches_default_grid_and_point_predictions() -> None:
+    config = _reconstruction_config()
+    kernel = ConstantKernel(225, constant_value_bounds="fixed") * Matern(
+        [300, 300, 3600], length_scale_bounds="fixed", nu=1.5
+    )
+    default = GaussianProcessFieldReconstructor(config)
+    explicit = GaussianProcessFieldReconstructor(config, kernel=kernel)
+    now = datetime(2026, 9, 14, tzinfo=UTC)
+    for records in ((), (_record("sensor", now, value=35, noise_stddev=1),)):
+        request = ReconstructionRequest(
+            grid=_grid(), reconstruction_timestamp_utc=now, measurements=records
+        )
+        a, b = default.reconstruct(request), explicit.reconstruct(request)
+        np.testing.assert_array_equal(a.mean_ug_m3, b.mean_ug_m3)
+        np.testing.assert_array_equal(
+            a.standard_deviation_ug_m3, b.standard_deviation_ug_m3
+        )
+        point = explicit.reconstruct_points(request, [(50, 50), (150, 150)])
+        np.testing.assert_allclose(point.mean_ug_m3, b.mean_ug_m3[[0, 1], [0, 1]])
+
+
+def test_supplied_kernel_sets_empty_prior_and_is_copied() -> None:
+    kernel = ConstantKernel(25, constant_value_bounds="fixed") * Matern(
+        [100, 100, 3600], length_scale_bounds="fixed", nu=1.5
+    )
+    model = GaussianProcessFieldReconstructor(_reconstruction_config(), kernel=kernel)
+    kernel.k1.constant_value = 100
+    request = ReconstructionRequest(
+        grid=_grid(active_mask=np.array([[True, False], [True, True]])),
+        reconstruction_timestamp_utc=datetime(2026, 9, 14, tzinfo=UTC),
+        measurements=(),
+    )
+    result = model.reconstruct(request)
+    assert np.all(result.standard_deviation_ug_m3[request.grid.active_mask] == 5)
+    assert np.isnan(result.standard_deviation_ug_m3[0, 1])
+    point = model.reconstruct_points(request, [(50, 50)])
+    assert point.mean_ug_m3[0] == 20 and point.standard_deviation_ug_m3[0] == 5
+    assert not result.diagnostics.posterior_fitted
+
+
+def test_additive_kernel_uses_one_joint_conditioning_system() -> None:
+    config = _reconstruction_config()
+    now = datetime(2026, 9, 14, tzinfo=UTC)
+    kernel = ConstantKernel(112.5, constant_value_bounds="fixed") * (
+        Matern([300, 300, 3600], length_scale_bounds="fixed", nu=1.5)
+        + Matern([50, 50, 3600], length_scale_bounds="fixed", nu=1.5)
+    )
+    records = (
+        _record("a", now, x_m=25, y_m=75, value=35, noise_stddev=2),
+        _record(
+            "b",
+            now - timedelta(seconds=300),
+            x_m=175,
+            y_m=125,
+            value=12,
+            noise_stddev=1,
+        ),
+        _record("future", now + timedelta(seconds=300), value=99),
+    )
+    request = ReconstructionRequest(
+        grid=_grid(), reconstruction_timestamp_utc=now, measurements=records
+    )
+    model = GaussianProcessFieldReconstructor(config, kernel=kernel)
+    posterior = model.reconstruct_points(request, [(50, 50), (150, 150)])
+    x = np.array([[25, 75, 0], [175, 125, -300]], dtype=float)
+    queries = np.array([[50, 50, 0], [150, 150, 0]], dtype=float)
+    covariance = kernel(x) + np.diag([4 + 225e-10, 1 + 225e-10])
+    cross = kernel(queries, x)
+    expected_mean = 20 + cross @ np.linalg.solve(covariance, [15, -8])
+    expected_variance = kernel.diag(queries) - np.sum(
+        cross * np.linalg.solve(covariance, cross.T).T, axis=1
+    )
+    np.testing.assert_allclose(posterior.mean_ug_m3, expected_mean)
+    np.testing.assert_allclose(posterior.standard_deviation_ug_m3**2, expected_variance)
+    assert posterior.observations.future_record_count == 1
 
 
 def test_empty_history_returns_the_configured_masked_prior() -> None:
