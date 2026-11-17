@@ -127,6 +127,49 @@ metadatos. Los diagnósticos indican si se realizó el ajuste, la función de
 covarianza configurada, el término efectivo de estabilización numérica y el
 logaritmo de la verosimilitud marginal.
 
+## Kernel opcional para comparaciones controladas
+
+La API acepta `GaussianProcessFieldReconstructor(config, kernel=kernel)` con
+un kernel de scikit-learn. El reconstructor lo copia y utiliza una única
+matriz de covarianza para condicionar todas las mediciones conjuntamente;
+`optimizer=None` mantiene sus parámetros sin ajuste automático. Se conservan
+la selección de registros, coordenadas reales, ruido y predicción por bloques.
+
+Con un kernel explícito, su diagonal determina la varianza previa, también
+cuando no hay observaciones. `config.prior_mean_ug_m3` sigue siendo la media
+previa y `config.prior_stddev_ug_m3` sigue fijando la escala del jitter.
+Quien invoca debe guardar la especificación completa del kernel junto al
+protocolo: los parámetros de `ReconstructionConfig` por sí solos no describen
+una covarianza alternativa. Los diagnósticos registran el kernel efectivo.
+
+El kernel predeterminado sigue siendo el Matérn espacio-temporal descrito
+arriba. La API opcional no cambia el perfil calibrado ni adopta un candidato
+experimental en los productos existentes.
+
+## API adaptativa opcional
+
+`fit_adaptive_posterior(request, base, settings, initial)` ajusta mediante
+L-BFGS-B acotado la amplitud y las escalas espacial isotrópica y temporal de
+Matérn ν=1,5. `GPFitConfig` declara límites, máximo de iteraciones y mínimos de
+datos; `GPParameters` conserva el estado. Media, ruido instrumental y jitter
+siguen anclados al perfil original. Solo se usan mediciones elegibles, nunca
+una superficie de referencia.
+
+`AdaptiveMapUpdater(grid, base, history_duration, settings)` agrupa cada lote
+simultáneo, rechaza reintroducciones y exige avance cronológico. `update`
+calcula opcionalmente una referencia que excluye móviles nuevos, pero conserva
+los anteriores y agrega fijas nuevas. Ambas ramas parten de los mismos
+parámetros previos; solo se conserva la factual. `predict` no reajusta.
+Una referencia solo fijas requiere su propia instancia independiente.
+
+Los diagnósticos registran verosimilitud antes/después, convergencia, iteraciones,
+tiempo de ajuste más predicción y límites alcanzados en orden
+amplitud/espacio/tiempo. Se retiene el mejor punto finito; mejoras de hasta
+`1e-8` en log-verosimilitud se tratan como numéricas. Esta API apoya el candidato
+experimental de O3; el reconstructor y perfil operacional de R2 siguen siendo
+los descritos anteriormente. Un ajuste que baja la varianza no demuestra menor
+error y la incertidumbre no incluye la incertidumbre de los hiperparámetros.
+
 ## Costo computacional
 
 El ajuste exacto del proceso gaussiano requiere aproximadamente tiempo `O(n^3)`

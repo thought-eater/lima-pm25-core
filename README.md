@@ -87,6 +87,8 @@ campo oculto. Todo el código pertenece a una única distribución Python.
 La API del [reconstructor GP](docs/gaussian-process-reconstruction.md) admite
 un kernel explícito para comparaciones controladas, conservando el kernel
 Matérn predeterminado del perfil operacional.
+La misma documentación describe la API adaptativa opcional para ajustar
+amplitud y escalas mediante mediciones causales, utilizada por el candidato de O3.
 
 ## Pruebas y reproducción
 
