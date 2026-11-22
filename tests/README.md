@@ -44,6 +44,11 @@ El XML es una salida temporal para calcular el resumen de casos requeridos.
 El producto de tesis es el [resumen seleccionado](../resultados/README.md#r23-actualización-secuencial)
 junto con los estados y registros del ejemplo.
 
+El resumen publicado conserva la ejecución histórica que lo produjo. La
+reedición documental en español no vuelve a ejecutar esos casos ni actualiza
+sus totales. Los exportadores de evaluación no copian resultados de pruebas o
+de construcción desde la configuración para presentarlos como recién ejecutados.
+
 ## Experimentos y productos
 
 Los experimentos se ejecutan mediante las funciones y opciones del programa:

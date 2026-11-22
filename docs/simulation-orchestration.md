@@ -1,77 +1,88 @@
-# R1.3 Simulation Orchestration
+# Motor integrado de simulación — R1.3
 
-## Purpose
+## Propósito
 
-The complete engine combines PM2.5 transport, source-qualified weather,
-regional boundaries, emission sources, fixed sensors, and supplied mobile replay
-positions on one UTC-aware timeline. It does not reconstruct maps, select
-routes, invoke Gymnasium, or expose hidden truth through public measurements.
+El motor completo combina transporte de PM2.5, meteorología con procedencia
+explícita, condiciones de frontera regionales, fuentes de emisión, sensores
+fijos y posiciones móviles suministradas para reproducción de trayectorias
+(*replay*) en una misma línea temporal UTC con zona horaria. No reconstruye
+mapas, selecciona rutas, invoca Gymnasium ni expone el campo oculto mediante
+las mediciones públicas.
 
-`iter_simulation` remains a low-level transport utility. `run_simulation` is the
-R1.3 composition root used when field and measurement evidence are required.
+`iter_simulation` sigue siendo una utilidad de transporte de bajo nivel.
+`run_simulation` integra los componentes de R1.3 cuando se requiere evidencia
+del campo y de las mediciones.
 
-## Time model
+## Modelo temporal
 
-Every run has an aware UTC start and nonnegative elapsed seconds. Inputs queried
-at elapsed time `t` govern the half-open interval `[t, next_t)`. The engine splits
-transport at:
+Cada ejecución tiene un inicio UTC con zona horaria y segundos transcurridos
+no negativos. Las entradas consultadas en el tiempo transcurrido `t` rigen el
+intervalo semiabierto `[t, next_t)`. El motor divide el transporte en:
 
-- weather transitions;
-- regional-boundary transitions;
-- source starts, ends and temporal-profile knots;
-- fixed or mobile sensor due times;
-- concentration-output times;
-- episode end.
+- transiciones meteorológicas;
+- transiciones de las condiciones de frontera regionales;
+- inicios, finales y puntos de cambio de los perfiles temporales de fuentes;
+- instantes programados de medición de sensores fijos o móviles;
+- instantes de salida de concentración;
+- final del episodio.
 
-Numerical stability substeps are internal to `PM25Transport.step`. Replay points
-that are not measurement due times do not split transport.
+Los subpasos de estabilidad numérica son internos a `PM25Transport.step`. Los
+puntos de trayectoria que no coinciden con instantes de medición no dividen el
+transporte.
 
-`SimulationRunConfig` accepts a regular
-`concentration_output_interval_s`, explicit ordered
-`concentration_output_times_s`, or both. Duplicate instants from the two sources
-resolve to one output boundary, and episode end remains an output. Explicit
-times permit a complete field at an irregular requested instant without exposing
-or persisting every internal stability substep.
+`SimulationRunConfig` acepta un intervalo regular
+`concentration_output_interval_s`, instantes explícitos y ordenados
+`concentration_output_times_s`, o ambos. Los instantes duplicados entre las
+dos fuentes se resuelven como un único punto de salida, y el final del episodio
+siempre se conserva como salida. Los tiempos explícitos permiten obtener un
+campo completo en un instante irregular solicitado, sin exponer ni guardar
+cada subpaso interno de estabilidad.
 
-After an interval reaches a boundary, the engine records a configured field,
-samples due sensors in sensor-ID order, and forms a batch from numeric records.
-Sensors due at `t=0` sample the initial field before interval emissions or
-transport. `DROPPED` and `OUTSIDE_ACTIVE_GRID` attempts remain in history but do
-not enter accepted batches; numeric `ACCEPTED` and `CLIPPED` records do.
+Al llegar al límite de un intervalo, el motor registra el campo si está
+configurado para ese instante, muestrea los sensores programados en orden de
+identificador y forma un lote con los registros numéricos. Los sensores
+programados en `t=0` muestrean el campo inicial antes de las emisiones o el
+transporte del intervalo. Los intentos `DROPPED` y `OUTSIDE_ACTIVE_GRID`
+permanecen en el historial, pero no entran en los lotes aceptados; los registros
+numéricos `ACCEPTED` y `CLIPPED` sí entran.
 
-## Replay preflight
+## Validación previa de la reproducción de trayectorias
 
-The one-shot R1.3 engine validates the complete run before transport advances:
+El motor de R1.3 valida la ejecución completa antes de avanzar el transporte:
 
-- the weather window has the same UTC start and duration;
-- every provider exposes its transitions or is explicitly constant;
-- the boundary mode and regional-boundary schedule agree;
-- sensor and station references are valid;
-- every mobile replay due time has an explicit position;
-- source and output schedules are finite and ordered.
+- la ventana meteorológica tiene el mismo inicio UTC y duración;
+- cada proveedor expone sus transiciones o es explícitamente constante;
+- el modo de frontera y el calendario de condiciones regionales son coherentes;
+- las referencias a sensores y estaciones son válidas;
+- cada instante móvil programado tiene una posición explícita;
+- los calendarios de fuentes y salidas contienen tiempos finitos y ordenados.
 
-This is a replay contract. An interactive navigation agent cannot declare unknown
-future positions and is outside the scope of R1.3. Such an agent
-may later reuse the same boundary-by-boundary mechanics without changing R1.3
-measurement semantics.
+Este contrato reproduce trayectorias suministradas. Un agente interactivo de
+navegación no puede declarar posiciones futuras todavía desconocidas y queda
+fuera del alcance de R1.3. En el futuro, un agente podría reutilizar la misma
+mecánica de avance entre eventos sin cambiar el significado de las mediciones
+de R1.3.
 
-## Weather and lineage
+## Meteorología y linaje de los datos
 
-Historical and explicitly synthetic windows implement the same operational
-contract. Historical windows retain resource identity and hash, station, UTC
-coverage, precipitation policy, and structured per-variable lineage. Synthetic
-windows retain their synthetic provider and configuration. Windows with
-synthetic wind perturbations additionally retain the historical base and its
-unchanged precipitation policy/lineage; generated wind is never labeled observed.
+Las ventanas históricas y las explícitamente sintéticas implementan el mismo
+contrato operacional. Las históricas conservan la identidad y la huella digital
+de contenido (*hash*) del recurso, la estación, la cobertura UTC, la política
+de precipitación y el linaje estructurado por variable. Las sintéticas
+conservan su proveedor y configuración sintéticos. Las ventanas con
+perturbaciones sintéticas del viento conservan además la base histórica y su
+política y linaje de precipitación sin cambios; el viento generado nunca se
+identifica como observado.
 
-The compact `AtmosphericForcing` sent to transport contains wind and
-precipitation. Structured diagnostic lineage remains separate so the engine does
-not parse provenance strings or reapply upstream quality control.
+La estructura compacta `AtmosphericForcing` enviada al transporte contiene
+viento y precipitación. El linaje estructurado de diagnóstico se mantiene
+separado para que el motor no tenga que interpretar cadenas de procedencia
+ni repetir el control de calidad del productor.
 
-## Run bundle
+## Paquete de la ejecución
 
-`write_run_bundle` writes a new destination and refuses to overwrite an existing
-one. A completed bundle contains:
+`write_run_bundle` escribe en un destino nuevo y rechaza sobrescribir uno
+existente. Un paquete completo contiene:
 
 ```text
 <run-id>/
@@ -83,48 +94,53 @@ one. A completed bundle contains:
 `-- checksums.json
 ```
 
-`concentration.npz` stores elapsed times, UTC timestamps, the
-`[time, row, column]` field, grid centers, active mask, and CRS. Attempts retain
-the exact mobile positions used. Batches reference accepted attempts rather than
-creating a second measurement source of truth. The manifest records the replay
-input descriptor; no separate mutable used-position history is created.
+`concentration.npz` almacena los tiempos transcurridos, las marcas de tiempo
+UTC, el campo con dimensiones `[time, row, column]` —tiempo, fila y columna—,
+los centros de la grilla, la máscara activa y el sistema de referencia de
+coordenadas (CRS). Los intentos conservan las posiciones móviles exactas
+utilizadas. Los lotes referencian intentos aceptados en lugar de crear una
+segunda fuente de mediciones. El manifiesto registra el descriptor de entrada
+de la trayectoria; no se crea un historial mutable separado de posiciones
+utilizadas.
 
-Generated episodes additionally record `episode_generation` in this same
-manifest: partition, configuration, seed and selected historical window.
-See [episode generation](episode-generation.md) for the CLI and model assumptions.
+Los episodios generados registran además `episode_generation` en el mismo
+manifiesto: partición, configuración, semilla y ventana histórica seleccionada.
+La [generación de episodios](episode-generation.md) describe la interfaz de
+línea de comandos y los supuestos del modelo.
 
-`checksums.json` is written last and covers every other artifact with SHA-256.
-`verify_run_bundle` identifies missing or changed files. This provides finalized,
-tamper-evident evidence; it does not claim operating-system immutability or
-byte-identical archives across different software platforms.
+`checksums.json` se escribe al final e incluye las huellas SHA-256 de todos
+los demás archivos. `verify_run_bundle` identifica archivos ausentes o
+modificados. Así se obtiene evidencia finalizada cuyas alteraciones pueden
+detectarse; no se afirma que sea inmutable a nivel del sistema operativo ni
+idéntica byte a byte entre distintas plataformas de software.
 
-## Complete example
+## Ejemplo completo
 
-Run:
+Ejecutar desde la raíz del repositorio:
 
 ```bash
 uv run lima-pm25-core
 ```
 
-The example uses the explicitly synthetic mechanics scenario, four fixed PM2.5
-sites, one supplied road-constrained mobile replay sampled every five minutes,
-and seeded optional mobile noise. It writes a bundle under:
+El ejemplo utiliza un escenario explícitamente sintético de demostración del
+funcionamiento del motor, cuatro sitios fijos de PM2.5, una trayectoria móvil
+suministrada y restringida a la red vial con mediciones cada cinco minutos, y
+ruido móvil opcional controlado por semilla. Escribe un paquete en:
 
 ```text
 resultados/r1_3_simulacion/<run-id>/
 ```
 
-The console example loads `--study-config` (by default
-`config/study_environment.json`) and uses its selected output schedule.
-Outputs use `resultados/r1_3_simulacion/<run-id>/`.
-The sensitivity experiment separately retains its summary, not a second set of
-complete run bundles. Software tests are executed with pytest; they are not
-another simulation product.
+El ejemplo de consola carga `--study-config`, cuyo valor predeterminado es
+`config/study_environment.json`, y utiliza el calendario de salidas seleccionado
+en esa configuración. El experimento de sensibilidad conserva su resumen por
+separado, no un segundo conjunto de paquetes completos. Las pruebas de software
+se ejecutan con pytest; no constituyen otro producto de simulación.
 
-Repeating the same configuration reuses the already verified bundle rather than
-overwriting it. The example proves mechanics and the R1.3 execution contract; its
-weather, emissions, and physical coefficients remain uncalibrated and must not
-be cited as observed Lima conditions.
+Repetir la misma configuración reutiliza el paquete ya verificado, en lugar
+de sobrescribirlo. El ejemplo demuestra el funcionamiento y el contrato de
+ejecución de R1.3; su meteorología, emisiones y coeficientes físicos siguen sin
+estar calibrados y no deben citarse como condiciones observadas de Lima.
 
 ## Comprobación funcional
 

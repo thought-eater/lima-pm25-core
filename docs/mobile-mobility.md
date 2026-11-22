@@ -1,71 +1,80 @@
-# Mobile-sensor mobility
+# Movilidad de los sensores móviles
 
-## Role
+## Función
 
-The mobility contract documents and enforces the restrictions applied to
-externally supplied mobile-sensor positions. It validates positions; it does not
-select a route, action, reward, or navigation policy.
+El contrato de movilidad documenta y aplica las restricciones de las posiciones
+de sensores móviles suministradas externamente. Valida posiciones; no
+selecciona rutas, acciones, recompensas ni una política de navegación.
 
-`MobilityPolicy` is immutable during a run. Changing an experimental setting
-means creating another policy instance. This preserves the configuration used by
-an existing run without preventing later experiments from selecting different
-values.
+`MobilityPolicy` es inmutable durante una ejecución. Para cambiar una condición
+experimental se crea otra instancia de la política. Así se conserva la
+configuración de una ejecución existente sin impedir que experimentos
+posteriores seleccionen otros valores.
 
-## Road mobility policy
+## Política de movilidad vial
 
-Construct `MobilityPolicy(road_tolerance_m=...)` with an explicitly selected
-position-to-road tolerance in meters. This value has no scientific default; the
-scenario must explain why its selected tolerance is appropriate. The supplied
-`SpatialDomain` provides the projected OSM `drive` graph and its exterior buffer,
-so the policy does not repeat those settings.
+Construir `MobilityPolicy(road_tolerance_m=...)` con una tolerancia explícita,
+en metros, para la distancia entre la posición y la vía. Este valor no tiene
+un valor científico predeterminado: el escenario debe justificar por qué la
+tolerancia elegida es adecuada. `SpatialDomain` proporciona el grafo OSM
+`drive` proyectado y su margen exterior, por lo que la política no repite esa
+configuración.
 
-`maximum_speed_m_s` is optional and has no scientific default. Leaving it as
-`None` performs no speed validation. A study scenario that selects a speed must
-record its justification rather than treating a test value as a Lima constant.
+`maximum_speed_m_s` es opcional y no tiene un valor científico predeterminado.
+Si se deja en `None`, no se valida la rapidez. Un escenario que seleccione una
+rapidez máxima debe registrar su justificación, en lugar de tratar un valor de
+prueba como una constante de Lima.
 
-Distances use meters, elapsed time uses seconds, and speed uses meters per
-second, as indicated by the parameter names. Invalid trajectories are rejected;
-positions are never snapped to a road or replaced.
+Las distancias se expresan en metros, el tiempo transcurrido en segundos y la
+rapidez en metros por segundo, como indican los nombres de los parámetros.
+Las trayectorias inválidas se rechazan; las posiciones nunca se ajustan
+automáticamente a una vía ni se reemplazan.
 
-## Study boundary and road buffer
+## Límite de estudio y margen de la red vial
 
-The concentration grid remains tied to the configured study boundary. The road
-network is downloaded over a slightly larger WGS84 bounding box so a vehicle can
-follow connected streets just outside that grid. The initial configurable
-`road_network_buffer_m` is 50 m.
+La grilla de concentración permanece ligada al límite de estudio configurado.
+La red vial se descarga sobre un rectángulo WGS84 ligeramente mayor para que
+un vehículo pueda seguir calles conectadas justo fuera de la grilla. El valor
+inicial configurable de `road_network_buffer_m` es 50 m.
 
-The default southern study boundary is extended to `-12.079` so the fixed Campo
-de Marte site is not disproportionately close to the southern edge. Fixed-site
-coordinates remain the source-qualified coordinates of their real buildings;
-changing a study boundary never changes a station coordinate.
+El límite sur predeterminado del estudio se extiende hasta `-12.079` para que
+la estación fija de Campo de Marte no quede desproporcionadamente cerca del
+borde sur. Las coordenadas fijas conservan las posiciones de sus edificios
+reales según el producto de origen; cambiar el límite de estudio nunca modifica
+la coordenada de una estación.
 
-The 50 m road-network buffer and the road-position tolerance are different:
+El margen de 50 m de la red vial y la tolerancia de posición respecto de una
+vía son distintos:
 
-- the domain-owned buffer controls how far the downloaded mobility network and
-  permitted excursions extend beyond the concentration domain;
-- the tolerance controls how far a supplied position may be from an OSM road
-  geometry.
+- el margen, definido por el dominio, controla cuánto se extienden la red de
+  movilidad descargada y los recorridos permitidos fuera del dominio de
+  concentración;
+- la tolerancia controla a qué distancia puede estar una posición suministrada
+  de la geometría de una vía OSM.
 
-Both are configuration, not calibrated scientific constants.
+Ambos son parámetros de configuración, no constantes científicas calibradas.
 
-## Supplied trajectories
+## Trayectorias suministradas
 
-A `TimestampedTrajectoryProvider` consumes immutable `TrajectoryPoint` records
-for one sensor. Times must increase strictly and coordinates must be finite in
-the projected domain CRS. Every sensor due time must have an explicit recorded
-position. The provider does not interpolate, extrapolate, snap, or repair a
-missing position.
+`TimestampedTrajectoryProvider` recibe registros inmutables `TrajectoryPoint`
+para un sensor. Los tiempos deben ser estrictamente crecientes y las
+coordenadas, finitas en el sistema de referencia de coordenadas (CRS) proyectado
+del dominio. Cada instante programado de medición debe tener una posición
+registrada explícita. El proveedor no interpola, extrapola, ajusta a una vía
+ni corrige una posición ausente.
 
-Each supplied position is checked against the selected road tolerance and
-the domain's `road_network_buffer_m`. A maximum speed is checked only when the scenario has
-configured one. There is no maximum-gap rule: position availability is verified
-directly at the sensor due times.
+Cada posición suministrada se comprueba frente a la tolerancia vial elegida y
+al `road_network_buffer_m` del dominio. La rapidez máxima se comprueba solo si
+el escenario la ha configurado. No hay una regla de separación temporal máxima
+entre posiciones: su disponibilidad se verifica directamente en los instantes
+programados de medición.
 
-The provider has a `provider_id`, used as `position_source_id` in each processed
-due-time `MeasurementRecord`. Its value identifies the provider, not the
-content of an external trajectory file. An optional input `resource_id` and
-content hash identify that file once in the run or environment bundle when
-available. The provider remains stateless after validation;
-each processed position is retained in chronological measurement history, so
-successful and unsupported attempts do not require a duplicate mutable
-`used_positions` history.
+El proveedor tiene un `provider_id`, utilizado como `position_source_id` en
+cada `MeasurementRecord` procesado en un instante programado. Su valor
+identifica al proveedor, no al contenido de un archivo externo de trayectoria.
+Cuando están disponibles, un `resource_id` de entrada opcional y una huella
+digital de contenido (*hash*) identifican ese archivo una sola vez en el paquete
+de la ejecución o del entorno. El proveedor no mantiene estado mutable después
+de la validación. Cada posición procesada se conserva en el historial
+cronológico de mediciones, de modo que los intentos válidos y los que quedan
+fuera del soporte no requieren un historial mutable duplicado `used_positions`.

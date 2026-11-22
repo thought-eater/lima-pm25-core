@@ -37,20 +37,22 @@ columna de aire verticalmente promediada:
 volumen efectivo = área horizontal × altura efectiva de mezcla
 ```
 
-La concentración se expresa en µg/m³. La altura constante de 200 m es una
-aproximación provisional aceptada para el alcance de la tesis, según lo
-comunicado por el autor; no es una altura atmosférica medida o calibrada para
-Lima. El modelo no resuelve capas verticales, edificios ni cañones urbanos.
+La concentración se expresa en µg/m³. La altura efectiva constante de 200 m se
+adopta como supuesto simplificador aceptado para el alcance de la tesis. No es
+una altura atmosférica medida o calibrada para Lima; su determinación local
+queda fuera del alcance de este trabajo. El modelo no resuelve capas
+verticales, edificios ni cañones urbanos.
 
 ## Escenarios y campo de referencia
 
 - **Sintéticos:** el simulador conoce el campo completo. Son la fuente principal
   prevista de episodios de entrenamiento y permiten evaluación controlada.
   El estimador recibe únicamente mediciones; el campo se reserva al evaluador.
-- **Replay histórico:** utiliza meteorología y observaciones fijas elegibles de
-  sus productos, junto con mediciones móviles explícitamente simuladas. Ceres
-  conserva su sitio, pero no aporta observaciones de PM2.5. El replay es una
-  aproximación modelada a condiciones históricas, no un despliegue físico.
+- **Reproducción histórica (*replay*):** utiliza meteorología y observaciones
+  fijas elegibles de sus productos, junto con mediciones móviles explícitamente
+  simuladas. Ceres conserva su sitio, pero no aporta observaciones de PM2.5.
+  El replay es una aproximación modelada a condiciones históricas, no un
+  despliegue físico.
 - **Estrés y contrafactuales:** identifican condiciones fuera de los rangos
   plausibles o cambios deliberados. Un miembro de control es una comparación,
   no verdad histórica; cada contrafactual modifica solo sus factores declarados.
@@ -72,7 +74,7 @@ explícitos o mediante ambos mecanismos. Obtener un campo en un instante supone
 integrar numéricamente hasta él, no disponer de una solución analítica continua.
 
 El experimento seleccionó 300 s para conservar campos completos. La cadencia
-móvil de cinco minutos es un parámetro provisional separado; no es una
+móvil de cinco minutos es un parámetro del escenario separado; no es una
 resolución temporal universal.
 
 ## Experimentos de discretización

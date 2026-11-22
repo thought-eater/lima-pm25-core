@@ -1,5 +1,13 @@
 """R2.1-R2.3 map estimation APIs."""
 
+from .adaptive import (
+    AdaptiveMapUpdater,
+    AdaptivePosterior,
+    GPFitConfig,
+    GPFitDiagnostics,
+    GPParameters,
+    fit_adaptive_posterior,
+)
 from .calibration import (
     GPCalibrationCandidate,
     GPCalibrationResult,
@@ -109,6 +117,8 @@ __all__ = [
     "DEFAULT_PM25_CSV_CONFIG",
     "R23_REQUIRED_CASE_SCHEMA_VERSION",
     "SEQUENTIAL_EVIDENCE_SCHEMA_VERSION",
+    "AdaptiveMapUpdater",
+    "AdaptivePosterior",
     "Change10CalibrationArtifact",
     "Change10EvaluationProfile",
     "Change10EvaluationResult",
@@ -117,6 +127,9 @@ __all__ = [
     "GPCalibrationCandidate",
     "GPCalibrationResult",
     "GPCandidateScore",
+    "GPFitConfig",
+    "GPFitDiagnostics",
+    "GPParameters",
     "GaussianProcessFieldReconstructor",
     "HistoricalPM25Dataset",
     "HistoricalPM25Record",
@@ -163,6 +176,7 @@ __all__ = [
     "evaluate_retained_synthetic_run",
     "evaluate_uncertainty_change",
     "finalize_change10_evidence",
+    "fit_adaptive_posterior",
     "grid_sha256",
     "initial_gp_calibration_candidates",
     "load_change10_calibration_artifact",

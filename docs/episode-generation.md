@@ -49,8 +49,9 @@ Para aumentar o reducir una fuente habitual se modifica su propio perfil.
 Otra fuente representa masa adicional. Esto evita contar de nuevo la emisión
 habitual al representar un evento.
 
-`AreaSource` recibe un polígono en el CRS métrico de la grilla, tasa en
-`µg/(m² s)`, inicio, fin y perfil. Distribuye uniformemente por superficie de
+`AreaSource` recibe un polígono en el sistema de referencia de coordenadas (CRS)
+métrico de la grilla, tasa en `µg/(m² s)`, inicio, fin y perfil. Distribuye
+uniformemente por superficie de
 intersección con cada celda activa. La parte exterior o inactiva **no emite
 dentro del dominio ni se redistribuye**. Sin intersección positiva, la fuente
 es inválida. El descriptor registra `emit_only_active_cell_intersection`.
@@ -103,7 +104,7 @@ viento espacialmente heterogéneo. Las emisiones requieren sustento independient
 `EpisodeGenerationConfig` establece periodos UTC disjuntos de entrenamiento y
 evaluación, pesos meteorológicos y variaciones por fuente. Los intervalos son
 `[inicio, fin)`: se filtran registros **antes** de ajustar o seleccionar
-ventanas. El endpoint de interpolación también pertenece a la partición.
+ventanas. El extremo de interpolación también pertenece a la partición.
 Se elige uniformemente entre inicios horarios con cobertura completa.
 
 El modelo usado en evaluación se ajusta solo con entrenamiento. Una ventana
@@ -145,7 +146,8 @@ Sin `--episode-weather`, se selecciona según `weather_weights`.
 Se reutiliza `write_run_bundle`; un destino existente se rechaza. La
 configuración y las realizaciones integran la identidad de la ejecución.
 
-La CLI usa la plantilla de tres horas del ejemplo, sus sensores y trayectoria.
+La interfaz de línea de comandos usa la plantilla de tres horas del ejemplo,
+sus sensores y trayectoria.
 `compose_episode` acepta otras solicitudes con duración y trayectoria completas.
 No amplía implícitamente trayectorias ni implementa un agente interactivo.
 
@@ -156,9 +158,10 @@ Los episodios nominales requieren `constraint_evidence_ids`; declarar estos
 identificadores no sustituye el sustento ni la evaluación de parámetros.
 
 El ejemplo usa 2025 para ajuste y reserva 2026 para evaluación. Es una partición
-de este experimento; el protocolo retenido del GP conserva su propia partición.
+de este experimento; el protocolo retenido del proceso gaussiano (GP, por sus
+siglas en inglés) conserva su propia partición.
 Antes de entrenar al agente deben alinearse las particiones de todos sus
-insumos y reservarse las ventanas del replay final.
+insumos y reservarse las ventanas de la reproducción histórica (*replay*) final.
 
 ## Verificación
 
@@ -168,10 +171,11 @@ y covarianza/persistencia en una referencia estocástica controlada.
 `reconstruct_measurement_series` y las métricas existentes permiten evaluar
 episodios entregando al GP solo mediciones públicas.
 
-La diversidad reduce memorización, pero no garantiza ausencia de *reward
-hacking* ni convierte la incertidumbre del GP en incertidumbre meteorológica
-total. El replay final conserva observaciones fijas elegibles y mediciones
-móviles simuladas, sin una superficie histórica observada completa.
+La diversidad reduce memorización, pero no garantiza ausencia de explotación
+de la señal de recompensa (*reward hacking*) ni convierte la incertidumbre del
+GP en incertidumbre meteorológica total. El replay final conserva observaciones
+fijas elegibles y mediciones móviles simuladas, sin una superficie histórica
+observada completa.
 
 Referencias técnicas: [NumPy, flujos aleatorios](https://numpy.org/doc/stable/reference/random/parallel.html),
 [normal multivariante](https://numpy.org/doc/stable/reference/random/generated/numpy.random.Generator.multivariate_normal.html),

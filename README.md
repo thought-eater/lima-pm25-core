@@ -34,8 +34,9 @@ sintética correlacionada, mediante `--episode-config`.
 - El replay histórico combina observaciones fijas disponibles con mediciones
   móviles simuladas, conservando su procedencia. Ceres pertenece al catálogo,
   pero no tiene valores observados de PM2.5 en el producto suministrado.
-- El modelo utiliza una altura efectiva constante de 200 m como aproximación
-  provisional; no resuelve perfiles verticales ni cañones urbanos.
+- El modelo adopta una altura efectiva constante de 200 m como supuesto
+  simplificador aceptado para el alcance de la tesis; no es una altura medida o
+  calibrada para Lima ni resuelve perfiles verticales o cañones urbanos.
 - La planificación de rutas por aprendizaje por refuerzo y el despliegue físico
   quedan fuera del alcance de estos resultados.
 
@@ -82,6 +83,12 @@ resultados/     productos experimentales seleccionados
 Los módulos de simulación y estimación consumen los contratos del dominio.
 El motor genera mediciones públicas; el estimador las recibe sin acceder al
 campo oculto. Todo el código pertenece a una única distribución Python.
+
+La API del [reconstructor GP](docs/gaussian-process-reconstruction.md) admite
+un kernel explícito para comparaciones controladas, conservando el kernel
+Matérn predeterminado del perfil operacional.
+La misma documentación describe la API adaptativa opcional para ajustar
+amplitud y escalas mediante mediciones causales, utilizada por el candidato de O3.
 
 ## Pruebas y reproducción
 

@@ -42,7 +42,8 @@ def test_change10_profile_supplies_the_evaluated_r23_policy(tmp_path) -> None:
     assert config.reconstruction_config == profile.reconstruction_config
     assert config.history_duration == profile.history_duration
     assert not config.reconstruction_config.include_clipped_observations
-    assert config.profile_status == "provisional_pending_adviser"
+    assert profile.status == "frozen_for_thesis"
+    assert config.profile_status == profile.status
     assert config.calibration_artifact_sha256
     assert config.calibration_artifact_source == str(artifact)
 

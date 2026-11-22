@@ -398,18 +398,18 @@ def render_scenario_family_markdown(family: ResolvedScenarioFamily) -> str:
     purpose = family.manifest["purpose"]
     origin = family.manifest["hidden_field_origin"]
     lines = [
-        f"# Scenario family: {family.family_id}",
+        f"# Familia de escenarios: {family.family_id}",
         "",
-        f"- Purpose: `{purpose}`",
-        f"- Fingerprint: `{family.fingerprint}`",
-        f"- Control member: `{family.manifest['control_member_id']}`",
-        f"- Hidden-field origin: `{origin}`",
-        "- Constraint evidence: `"
-        + (", ".join(family.manifest["constraint_evidence_ids"]) or "none")
+        f"- Propósito: `{purpose}`",
+        f"- Huella digital: `{family.fingerprint}`",
+        f"- Miembro de control: `{family.manifest['control_member_id']}`",
+        f"- Origen del campo oculto: `{origin}`",
+        "- Evidencia de restricciones: `"
+        + (", ".join(family.manifest["constraint_evidence_ids"]) or "ninguna")
         + "`",
-        "- Complete observed ground truth: `false`",
+        "- Campo completo de referencia observado: no disponible",
         "",
-        "| Member | Control | Changed factors | Weather | Calibration evidence |",
+        "| Miembro | Control | Factores modificados | Meteorología | Evidencia de calibración |",
         "| --- | --- | --- | --- | --- |",
     ]
     members = family.manifest["members"]
@@ -418,8 +418,8 @@ def render_scenario_family_markdown(family: ResolvedScenarioFamily) -> str:
     for member in members:
         request = _mapping("family member request", member["request"])
         weather = _mapping("weather", request["weather"])
-        factors = ", ".join(member["changed_factors"]) or "none"
-        calibration = member["calibration_evidence_id"] or "none"
+        factors = ", ".join(member["changed_factors"]) or "ninguno"
+        calibration = member["calibration_evidence_id"] or "ninguna"
         lines.append(
             f"| `{member['member_id']}` | `{str(member['is_control']).lower()}` "
             f"| {factors} | `{weather.get('kind')}` | `{calibration}` |"
@@ -430,35 +430,35 @@ def render_scenario_family_markdown(family: ResolvedScenarioFamily) -> str:
         lines.extend(
             (
                 "",
-                f"## Member: {member['member_id']}",
+                f"## Miembro: {member['member_id']}",
                 "",
-                f"- Weather provider: `{weather.get('provider_id')}`",
-                f"- Weather provenance: `{weather.get('provenance')}`",
-                f"- Weather resource: `{weather.get('resource_id')}`",
-                f"- Weather station: `{weather.get('station_id')}`",
-                f"- Covered UTC window: `{weather.get('start_utc')}` to `{weather.get('end_utc')}`",
-                f"- Precipitation policy: `{weather.get('precipitation_source_policy')}`",
-                f"- Synthetic construction method: `{weather.get('construction_method')}`",
-                f"- Synthetic seed: `{weather.get('seed')}`",
+                f"- Proveedor meteorológico: `{weather.get('provider_id')}`",
+                f"- Procedencia meteorológica: `{weather.get('provenance')}`",
+                f"- Recurso meteorológico: `{weather.get('resource_id')}`",
+                f"- Estación meteorológica: `{weather.get('station_id')}`",
+                f"- Ventana UTC cubierta: `{weather.get('start_utc')}` a `{weather.get('end_utc')}`",
+                f"- Política de precipitación: `{weather.get('precipitation_source_policy')}`",
+                f"- Método de construcción sintética: `{weather.get('construction_method')}`",
+                f"- Semilla sintética: `{weather.get('seed')}`",
                 "",
-                "Sources:",
+                "Fuentes:",
                 "",
             )
         )
         sources = _list_of_mappings("sources", request["sources"])
         if not sources:
-            lines.append("- none")
+            lines.append("- ninguna")
         for source in sources:
             lines.append(
-                f"- `{source.get('source_id')}`: role=`{source.get('role')}`, "
-                f"provenance=`{source.get('provenance')}`"
+                f"- `{source.get('source_id')}`: rol=`{source.get('role')}`, "
+                f"procedencia=`{source.get('provenance')}`"
             )
     lines.extend(
         (
             "",
             (
-                "Generated fields remain model outputs. Sparse historical PM2.5 "
-                "stations are not a complete observed truth surface."
+                "Los campos generados son salidas del modelo. Las estaciones "
+                "históricas dispersas de PM2.5 no constituyen una superficie observada completa."
             ),
         )
     )
@@ -474,18 +474,18 @@ def render_environment_markdown(manifest: Mapping[str, object]) -> str:
     temporal = _mapping("temporal_policy", manifest["temporal_policy"])
     families = _list_of_mappings("scenario_families", manifest["scenario_families"])
     lines = [
-        f"# Study environment: {manifest['environment_id']}",
+        f"# Entorno de estudio: {manifest['environment_id']}",
         "",
-        f"- Manifest fingerprint: `{manifest['fingerprint']}`",
+        f"- Huella digital del manifiesto: `{manifest['fingerprint']}`",
         f"- CRS: `{spatial['crs']}`",
-        f"- Cell size: `{spatial['cell_size_m']} m`",
-        f"- Grid shape: `{spatial['shape']}`",
-        f"- Active cells: `{spatial['active_cells']}`",
-        f"- Effective mixing height: `{vertical['mixing_height_m']} m`",
-        f"- Vertical evidence status: `{vertical['evidence_status']}`",
-        f"- Temporal model: `{temporal['model']}`",
+        f"- Tamaño de celda: `{spatial['cell_size_m']} m`",
+        f"- Forma de la grilla: `{spatial['shape']}`",
+        f"- Celdas activas: `{spatial['active_cells']}`",
+        f"- Altura efectiva de mezcla: `{vertical['mixing_height_m']} m`",
+        f"- Clasificación del sustento vertical: `{vertical['evidence_status']}`",
+        f"- Modelo temporal: `{temporal['model']}`",
         "",
-        "## Scenario families",
+        "## Familias de escenarios",
         "",
     ]
     for family in families:
@@ -493,11 +493,11 @@ def render_environment_markdown(manifest: Mapping[str, object]) -> str:
     lines.extend(
         (
             "",
-            "## Interpretation limits",
+            "## Límites de interpretación",
             "",
-            "- The grid is horizontal and vertically averaged; it has no vertical layers.",
-            "- Synthetic hidden fields are not complete observed Lima ground truth.",
-            "- Historical replay is a model-conditioned deployment proxy, not a field pilot.",
+            "- La grilla es horizontal y verticalmente promediada; no tiene capas verticales.",
+            "- Los campos sintéticos ocultos no son superficies observadas completas de Lima.",
+            "- La reproducción histórica aproxima condiciones de despliegue mediante un modelo; no es un piloto de campo.",
         )
     )
     return "\n".join(lines)
@@ -508,19 +508,19 @@ def render_discretization_markdown(evidence: Mapping[str, object]) -> str:
     horizontal = _mapping("horizontal", evidence["horizontal"])
     temporal = _mapping("temporal", evidence["temporal"])
     lines = [
-        "# Discretization evidence",
+        "# Evidencia de discretización",
         "",
-        f"- Protocol fingerprint: `{evidence['protocol_fingerprint']}`",
-        f"- Selected horizontal cell size: `{selection['cell_size_m']} m`",
+        f"- Huella digital del protocolo: `{evidence['protocol_fingerprint']}`",
+        f"- Tamaño horizontal de celda seleccionado: `{selection['cell_size_m']} m`",
         (
-            "- Selected concentration-output interval: "
+            "- Intervalo seleccionado de salida de concentración: "
             f"`{selection['concentration_output_interval_s']} s`"
         ),
-        f"- Status: `{selection['status']}`",
+        f"- Estado: `{selection['status']}`",
         "",
-        "## Horizontal adjacent comparisons",
+        "## Comparaciones entre discretizaciones horizontales adyacentes",
         "",
-        "| Comparison | Passes | Probe max | Mean max | Excess-mass max | Centroid max (m) |",
+        "| Comparación | Cumple | Diferencia máxima en estaciones | Diferencia máxima de la media | Diferencia máxima de masa adicional | Distancia máxima del centroide (m) |",
         "| --- | --- | ---: | ---: | ---: | ---: |",
     ]
     for name, comparison in horizontal["adjacent_comparisons"].items():
@@ -534,9 +534,9 @@ def render_discretization_markdown(evidence: Mapping[str, object]) -> str:
     lines.extend(
         (
             "",
-            "## Temporal comparisons to 300 s",
+            "## Comparaciones temporales respecto de 300 s",
             "",
-            "| Comparison | Passes | Shared-field max | Mean total trajectory loss | Mean event trajectory loss |",
+            "| Comparación | Cumple | Diferencia máxima en campos compartidos | Pérdida media de trayectoria total | Pérdida media de trayectoria del evento |",
             "| --- | --- | ---: | ---: | ---: |",
         )
     )
@@ -548,7 +548,7 @@ def render_discretization_markdown(evidence: Mapping[str, object]) -> str:
             f"{trajectory['mean_total_field_l1_relative_difference']:.6g} | "
             f"{trajectory['mean_meaningful_event_effect_l1_relative_difference']:.6g} |"
         )
-    lines.extend(("", "## Claim limits", ""))
+    lines.extend(("", "## Límites de las conclusiones", ""))
     for claim in _mapping("protocol", evidence["protocol"]).get("claim_limits", ()):
         lines.append(f"- {claim}")
     return "\n".join(lines)

@@ -133,6 +133,7 @@
   "failed": 0,
   "missing": 0,
   "passed": 18,
+  "publication_note": "Resumen de la ejecución histórica de los 18 casos requeridos. Se actualiza únicamente la ubicación del informe numérico original, cuyo contenido y huella no cambian. La huella de configuración y la del manifiesto de casos corresponden a la ejecución original, no a pruebas nuevas de esta reedición documental.",
   "required_case_count": 18,
   "runtime_accepted": true,
   "runtime_verification": {
@@ -162,7 +163,7 @@
     "junit_xml_sha256": "f2dd4c56f00f3910eb822139a5834c2b8b855884654b80262fc1c8c9482fd3c5",
     "required_case_manifest": "config/sequential_update_required_cases.json",
     "required_case_manifest_sha256": "fdb702e650e198bb36527f150afb19c008c8c396a4ae6322c0564b74d0604802",
-    "runtime_verification_report": "resultados/r2_3_actualizacion/example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-d4b9abf19e23/verification_report.json",
+    "runtime_verification_report": "resultados/r2_3_actualizacion/example-8724a669a4989b98373cfec01b2d067d8f06938e1b4986e1e39243c0b286559c-5ca0de26ca34/verification_report.json",
     "runtime_verification_report_sha256": "52170c79e0e8c79c4feffa7d960667767af84bb9ca5b9fec52adda8bb18eb87a"
   }
 }

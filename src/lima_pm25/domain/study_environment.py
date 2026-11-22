@@ -23,6 +23,7 @@ class SelectionStatus(StrEnum):
 
 
 class EvidenceStatus(StrEnum):
+    MODELING_ASSUMPTION = "modeling_assumption"
     SYNTHETIC_DEMO = "synthetic_demo"
     EVIDENCE_CONSTRAINED = "evidence_constrained"
     CALIBRATED = "calibrated"

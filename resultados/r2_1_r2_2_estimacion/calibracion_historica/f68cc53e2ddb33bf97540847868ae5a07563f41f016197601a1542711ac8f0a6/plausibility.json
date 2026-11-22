@@ -70,35 +70,35 @@
   },
   "parameters": [
     {
-      "evidence": "provisional synthetic mechanics value; pending Lima evidence",
+      "evidence": "altura efectiva constante adoptada como supuesto simplificador aceptado para el alcance de la tesis; no medida ni calibrada para Lima",
       "evidence_class": "synthetic",
       "name": "mixing_height_m",
       "unit": "m",
       "value": 200.0
     },
     {
-      "evidence": "provisional mechanics value; horizontal Lima calibration pending",
+      "evidence": "difusividad horizontal constante adoptada como supuesto del modelo para el alcance de la tesis; no calibrada específicamente para Lima",
       "evidence_class": "synthetic",
       "name": "horizontal_diffusivity_m2_s",
       "unit": "m2/s",
       "value": 25.0
     },
     {
-      "evidence": "generic PM2.5 order supported by Zhang et al. 2014; not Lima-specific",
+      "evidence": "orden de magnitud genérico de PM2.5 sustentado en Zhang et al. 2014; no específico de Lima",
       "evidence_class": "literature_constrained",
       "name": "dry_deposition_velocity_m_s",
       "unit": "m/s",
       "value": 0.001
     },
     {
-      "evidence": "generic below-cloud PM2.5 coefficient order; Lima rain is sparse",
+      "evidence": "orden de magnitud genérico del coeficiente de lavado de PM2.5 bajo nubes; precipitación escasa en Lima",
       "evidence_class": "literature_constrained",
       "name": "wet_scavenging_per_mm",
       "unit": "1/mm",
       "value": 0.03
     },
     {
-      "evidence": "representative demo scale; not an inferred Lima emission rate",
+      "evidence": "escala representativa de demostración; no es una tasa de emisión inferida para Lima",
       "evidence_class": "synthetic",
       "name": "routine_road_source_rates",
       "unit": "ug/(m s)",
@@ -110,6 +110,7 @@
   },
   "pm25_resource_id": "pm25_lima_2025_2026_imputed.csv",
   "pm25_resource_sha256": "54f845390ca35cbe5648cf0c5a3c173cc0317cbbf2717918fabea45c85cac766",
+  "publication_note": "Corrección editorial de las explicaciones; se conservan las distribuciones, valores y clasificaciones originales, sin nuevo cálculo.",
   "weather_resource_id": "var_meteorologicas_lima_2025_2026_imputed.csv",
   "weather_resource_sha256": "6d63ff43d3a9b324b9536c2d52de0f49f9a717fc7d00efe15decf89a2945a6c8",
   "weather_source_counts": {

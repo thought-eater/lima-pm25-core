@@ -34,8 +34,9 @@ permite entrada a barlovento y salida a sotavento.
 ## Fuentes
 
 `PM25SourceProvider` entrega un `PM25SourceContribution`: arreglo de masa por
-celda en µg y masa integrada declarada. El solver comprueba forma, unidades,
-valores finitos no negativos, celdas inactivas, identidad y reconciliación de masa.
+celda en µg y masa integrada declarada. El integrador numérico comprueba forma,
+unidades, valores finitos no negativos, celdas inactivas, identidad y
+reconciliación de masa.
 
 `GaussianKernelSource` distribuye masa emitida mediante pesos gaussianos
 normalizados en la grilla. Es una fuente sintética de verificación, no un modelo
@@ -59,7 +60,8 @@ unidades, el tratamiento de intersecciones y los escenarios de estrés.
 Cada subpaso aplica:
 
 1. Inyección de masa de las fuentes.
-2. Advección upwind de primer orden y flujos de frontera.
+2. Advección de primer orden con valores de la celda a barlovento (*upwind*) y
+   flujos de frontera.
 3. Difusión mediante diferencias centradas.
 4. Deposición seca y húmeda mediante actualizaciones exponenciales.
 
@@ -68,8 +70,9 @@ efectiva. La húmeda es coeficiente de lavado multiplicado por precipitación y
 dividido entre 3 600. Las caras internas comparten flujos para conservar masa;
 el flujo difusivo externo es nulo. Las celdas inactivas permanecen en cero.
 
-El solver divide los intervalos según una condición combinada de estabilidad
-advectiva y difusiva. El aporte de fuentes se inyecta al inicio del subpaso.
+El integrador numérico divide los intervalos según una condición combinada de
+estabilidad advectiva y difusiva. El aporte de fuentes se inyecta al inicio del
+subpaso.
 El [motor integrado](simulation-orchestration.md) separa los intervalos en las
 transiciones conocidas de fuentes, meteorología y fronteras.
 

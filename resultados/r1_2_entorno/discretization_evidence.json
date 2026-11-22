@@ -579,12 +579,12 @@
   },
   "protocol": {
     "claim_limits": [
-      "The 50 m candidate is a numerical reference, not observed ground truth.",
-      "Passing criteria justify only the declared quantities and conclusions.",
-      "Cell-level peaks remain diagnostic when convergence assumptions fail.",
-      "Event-effect percentages and centroids are evaluated only while excess mass is at least 1 percent of its episode peak.",
-      "Temporal information loss includes unresolved evolution between persisted outputs, not only shared instants and peaks.",
-      "Effective mixing height is a constant 200 m provisional approximation for the thesis scope."
+      "La alternativa de 50 m es una referencia numérica, no un campo real observado.",
+      "El cumplimiento de los criterios justifica solo las cantidades y conclusiones declaradas.",
+      "Los máximos por celda siguen siendo diagnósticos cuando no se cumplen los supuestos de convergencia.",
+      "Los porcentajes y centroides del efecto del evento se evalúan solo mientras la masa adicional alcanza al menos el 1 % de su máximo durante el episodio.",
+      "La pérdida de información temporal incluye la evolución no resuelta entre salidas conservadas, no solo los instantes compartidos y los máximos.",
+      "Se adopta una altura efectiva constante de 200 m como supuesto simplificador aceptado para el alcance de la tesis, no como altura atmosférica medida o calibrada para Lima."
     ],
     "horizontal": {
       "candidate_cell_sizes_m": [
@@ -628,9 +628,10 @@
       "trajectory_l1_relative_tolerance": 0.05
     }
   },
-  "protocol_fingerprint": "e7ae3d38624222238981af6506a7c7f628e96421f951f186942546af20997ad7",
+  "protocol_fingerprint": "45320531fe97ae9dd0e40a9d6729cf9183e5ab67aff41ae6d8532bdbba2d8da7",
+  "publication_note": "Reedición documental del informe de discretización: se traducen los límites de interpretación y se actualizan las referencias a la configuración adoptada. Todas las comparaciones, métricas y selecciones son las originales; no se repitió el experimento de sensibilidad.",
   "schema_version": 1,
-  "study_configuration_fingerprint": "0d07da275a7d9643e4fe78eeb2761c838f2c2b329c0816587ecc1c30d64cc897",
+  "study_configuration_fingerprint": "0e9cd12b84c5ee814f9a00f00b617aa980a0cd91c3670af36d245ed7d8d1102b",
   "technical_selection": {
     "cell_size_m": 200.0,
     "concentration_output_interval_s": 300.0,

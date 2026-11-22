@@ -385,7 +385,7 @@ class SensingService:
 def create_lima_fixed_sensor_configs(
     station_catalog: FixedStationCatalog,
     *,
-    provenance: str = "baseline synthetic sensing at SENAMHI PM2.5 sites",
+    provenance: str = "medición sintética de referencia en los sitios SENAMHI de PM2.5",
 ) -> tuple[SensorConfig, ...]:
     return tuple(
         SensorConfig(

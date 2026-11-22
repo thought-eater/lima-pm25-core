@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "result": "R2.3",
-  "description": "Required functional and R1.3 integration cases for sequential map-update acceptance.",
+  "description": "Casos funcionales y de integración con R1.3 requeridos para aceptar la actualización secuencial de mapas.",
   "cases": [
     {
       "id": "evaluated-policy",

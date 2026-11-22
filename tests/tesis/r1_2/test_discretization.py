@@ -37,7 +37,7 @@ def test_completed_discretization_evidence_has_human_summary() -> None:
 
     summary = render_discretization_markdown(evidence)
 
-    assert "Selected horizontal cell size: `200.0 m`" in summary
-    assert "Selected concentration-output interval: `300.0 s`" in summary
+    assert "Tamaño horizontal de celda seleccionado: `200.0 m`" in summary
+    assert "Intervalo seleccionado de salida de concentración: `300.0 s`" in summary
     assert "`100_vs_50`" in summary
     assert "`900_vs_300`" in summary

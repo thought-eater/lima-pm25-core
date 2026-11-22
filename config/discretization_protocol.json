@@ -25,11 +25,11 @@
     "selection_rule": "coarsest_passing_shared_field_and_information_loss"
   },
   "claim_limits": [
-    "The 50 m candidate is a numerical reference, not observed ground truth.",
-    "Passing criteria justify only the declared quantities and conclusions.",
-    "Cell-level peaks remain diagnostic when convergence assumptions fail.",
-    "Event-effect percentages and centroids are evaluated only while excess mass is at least 1 percent of its episode peak.",
-    "Temporal information loss includes unresolved evolution between persisted outputs, not only shared instants and peaks.",
-    "Effective mixing height is a constant 200 m provisional approximation for the thesis scope."
+    "La alternativa de 50 m es una referencia numérica, no un campo real observado.",
+    "El cumplimiento de los criterios justifica solo las cantidades y conclusiones declaradas.",
+    "Los máximos por celda siguen siendo diagnósticos cuando no se cumplen los supuestos de convergencia.",
+    "Los porcentajes y centroides del efecto del evento se evalúan solo mientras la masa adicional alcanza al menos el 1 % de su máximo durante el episodio.",
+    "La pérdida de información temporal incluye la evolución no resuelta entre salidas conservadas, no solo los instantes compartidos y los máximos.",
+    "Se adopta una altura efectiva constante de 200 m como supuesto simplificador aceptado para el alcance de la tesis, no como altura atmosférica medida o calibrada para Lima."
   ]
 }

@@ -96,7 +96,8 @@ def test_fixed_sensor_samples_every_crossed_due_time_exactly_once() -> None:
         record.quality_status is MeasurementQuality.ACCEPTED for record in records
     )
     assert all(
-        record.provenance == "baseline synthetic sensing at SENAMHI PM2.5 sites"
+        record.provenance
+        == "medición sintética de referencia en los sitios SENAMHI de PM2.5"
         for record in records
     )
     assert all(record.position_source_id == "STATION" for record in records)

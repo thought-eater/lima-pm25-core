@@ -19,8 +19,8 @@
   },
   "vertical": {
     "mixing_height_m": 200.0,
-    "evidence_status": "synthetic_demo",
-    "provenance": "constant effective height of 200 m accepted provisionally for thesis scope, as reported by the author; vertically averaged model assumption, not measured Lima mixing height",
+    "evidence_status": "modeling_assumption",
+    "provenance": "Altura efectiva constante de 200 m adoptada como supuesto simplificador aceptado para el alcance de la tesis; representación verticalmente promediada, no altura atmosférica medida o calibrada para Lima",
     "time_varying": false
   },
   "temporal": {
@@ -28,7 +28,7 @@
     "concentration_output_times_s": [],
     "concentration_output_status": "technical_selection_complete",
     "mobile_sampling_interval_s": 300.0,
-    "mobile_sampling_status": "provisional_implementation_value"
+    "mobile_sampling_status": "confirmed"
   },
   "horizontal_candidate_cell_sizes_m": [
     50.0,

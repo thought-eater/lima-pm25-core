@@ -1,0 +1,16 @@
+{
+  "calibration_artifact_sha256": "486104af785fdcfde40a43539187c7de78209e0cdd578ad943d23d4007514375",
+  "calibration_run_id": "e54ced78886984b19416230e25061bf82cc80030a62f216ad057ec4dedfbc4fa",
+  "fingerprint": "5b9504c3208dd3689921cf38517fe1036b22880967e094ccdd63c318627c131e",
+  "historical_r22_reasons": [],
+  "historical_r22_status": "pass",
+  "historical_scale_ug_m3": 41.45,
+  "historical_validation_method": "leave_one_station_out",
+  "profile_sha256": "5ca0de26ca34f74d3cedb7b43aa28c3771b2046aed667b180538ad4ea84a4444",
+  "profile_status": "frozen_for_thesis",
+  "publication_note": "Reedición documental en español de la evaluación 19010dd4072b1d5a484ca25c656265b8df72f32703b60bca99749558970726e2. Se reutilizan las matrices, mediciones, métricas y figuras originales, sin nueva simulación, ajuste ni evaluación numérica. Los manifiestos internos y sus textos de procedencia se conservan como registros de origen.",
+  "retained_run_id": "389276c1bc6779aebda2186094bd7297f2582649fcdf761c5261496dd9ae7af5",
+  "routine_source_scale": 20.09519380779664,
+  "selected_spatial_length_scale_m": 2000.0,
+  "synthetic_scale_ug_m3": 10.625182210031852
+}

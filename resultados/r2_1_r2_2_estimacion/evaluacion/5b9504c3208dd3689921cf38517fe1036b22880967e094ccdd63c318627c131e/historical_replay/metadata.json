@@ -8,9 +8,9 @@
   "hidden_field_available_to_gp": false,
   "historical_weather_resource": "var_meteorologicas_lima_2025_2026_imputed.csv",
   "limitations": [
-    "The complete replay field is model-generated, not observed Lima truth.",
-    "Routine source rates and unresolved physics remain provisional.",
-    "Ceres has no historical PM2.5 readings in the supplied product."
+    "El campo completo de la reproducción histórica procede del modelo; no es una superficie observada de Lima.",
+    "Las tasas de emisión y los parámetros físicos no calibrados son supuestos adoptados para el alcance de la tesis, no estimaciones locales medidas.",
+    "Ceres no tiene lecturas históricas de PM2.5 en el producto suministrado."
   ],
   "map_validation": {
     "active_cells": 4459,
@@ -20,8 +20,8 @@
     "valid_uncertainty_fraction": 1.0
   },
   "mobile_measurement_kind": "model_sampled",
-  "profile_status": "provisional_pending_adviser",
-  "purpose": "provisional_historical_deployment_proxy",
+  "profile_status": "frozen_for_thesis",
+  "purpose": "historical_deployment_proxy",
   "used_measurements": {
     "previous_context": {
       "fixed": 0,
